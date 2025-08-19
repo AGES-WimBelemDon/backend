@@ -158,6 +158,17 @@ conteúdo:
     Isso aplicará as migrações no banco.
 
 ------------------------------------------------------------------------
+## Acessando a aplicação após a instalação
+### Swagger (documentação da API)
+
+Após instalar e subir o projeto, a documentação interativa da API estará disponível em:
+
+    http://localhost:3000/docs
+
+
+Você pode usar essa interface para explorar os endpoints, enviar requisições e visualizar respostas.
+
+------------------------------------------------------------------------
 
 ## Comandos no Docker Compose
 
