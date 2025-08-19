@@ -92,7 +92,7 @@ git clone https://github.com/AGES-WimBelemDon/backend.git
 cd backend
 ```
 
-3.  Verifique e configure as credenciais do git para o projeto
+3.  Verifique e configure as credenciais do git para o projeto. Utilize o seu e-mail da PUC-RS.
 
 ``` sh
 git config user.name "Seu Nome"
