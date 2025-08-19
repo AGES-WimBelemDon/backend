@@ -6,7 +6,7 @@ interface ExampleEntityProps {
     id?: string;
 }
 export class ExampleEntity{
-    id: string
+    id : string
     name  : string
     email : string
     birthDate : Date
