@@ -1,4 +1,4 @@
-# Projeto WDB
+# Projeto WimBelemDon+ - backend
 
 Este documento descreve os passos necessários para configurar e executar
 o ambiente de desenvolvimento do projeto utilizando **Docker** e
@@ -73,12 +73,30 @@ No terminal Ubuntu 24.04, execute:
 
 ``` bash
 docker --version
-docker compose version
+docker-compose version
+```
+
+Como resultado algo semelhante ao que segue abaixo será apresentado no terminal:
+```
+Docker version 28.3.0, build xxxx
+```
+E
+```
+docker-compose version 1.29.2, build xxxx
 ```
 
 ------------------------------------------------------------------------
 
 ## Instalação do ambiente de desenvolvimento
+### Instruções específicas para usuários do Windows
+O repositório deve ser clonado dentro do Ubuntu (WSL2), e não no PowerShell ou CMD. Por isso, abra o Ubuntu (WSL2) a partir da linha de comando do Windows. No PowerShell ou Prompt de Comando (CMD), execute:
+
+    wsl -d Ubuntu-24.04
+
+Isso abrirá um terminal Linux (Ubuntu 24.04) dentro do WSL2.
+
+
+### Instruções comuns a usuários de quaisquer sistemas operacionais
 
 1. Clone o repositório:
 
@@ -102,45 +120,48 @@ git config user.email seu_email@exemplo.com
 
 ## Iniciando o projeto pela primeira vez
 
-Na raiz do projeto (`backend`), crie o arquivo `.env.development` com o seguinte
+1. Na raiz do projeto (`backend`), crie o arquivo `.env.development` com o seguinte
 conteúdo:
 
-``` yaml
-DATABASE_URL="postgresql://admin:admin@db-wbd:5432/wbd_database?schema=public"
-NODE_ENV="development"
-POSTGRES_USER=admin
-POSTGRES_PASSWORD=admin
-POSTGRES_DB=wbd_database
-```
-Com o Docker Desktop rodando (ou seja, com ele aberto), rode:
+    ``` yaml
+    DATABASE_URL="postgresql://admin:admin@db-wbd:5432/wbd_database?schema=public"
+    NODE_ENV="development"
+    POSTGRES_USER=admin
+    POSTGRES_PASSWORD=admin
+    POSTGRES_DB=wbd_database
+    ```
 
-``` bash
-docker-compose up --build -d
-```
+    Ou se você preferir, basta fazer uma cópia do arquivo `.env.example` e renomeá-lo como `.env.development`.
 
-Dois containers serão iniciados:
-- **api-wbd** (API da aplicação)
-- **db-wbd** (Banco de dados Postgres)
+2. Com o Docker Desktop rodando (ou seja, com ele aberto), rode:
 
-Verifique os containers que estão rodando com:
+    ``` bash
+    docker-compose up --build -d
+    ```
 
-``` bash
-docker ps
-```
+    Dois containers serão iniciados:
+    - **api-wbd** (API da aplicação)
+    - **db-wbd** (Banco de dados Postgres)
 
-Depois, execute:
+    Verifique os containers que estão rodando com:
 
-``` bash
-docker compose exec api-wbd yarn prisma migrate deploy
-```
+    ``` bash
+    docker ps
+    ```
 
-Isso aplicará as migrações no banco.
+3. Depois, execute:
+
+    ``` bash
+    docker-compose exec api-wbd yarn prisma migrate deploy
+    ```
+
+    Isso aplicará as migrações no banco.
 
 ------------------------------------------------------------------------
 
 ## Comandos no Docker Compose
 
-### **`docker-compose up -d --build`**
+#### - **`docker-compose up -d --build`**
 
 Usar quando: - iniciar o projeto pela primeira vez; - houver alterações
 no `docker-compose.yml`; - precisar reiniciar o projeto; - após executar
@@ -148,21 +169,21 @@ no `docker-compose.yml`; - precisar reiniciar o projeto; - após executar
 
 ------------------------------------------------------------------------
 
-### **`docker-compose down`**
+#### - **`docker-compose down`**
 
 Usar quando: - precisar parar e remover os containers;
 - para remover também os volumes, usar: `bash   docker-compose down -v`
 
 ------------------------------------------------------------------------
 
-### **`docker-compose start`**
+#### - **`docker-compose start`**
 
 -   Reinicia containers parados.
 -   Útil para liberar RAM e CPU temporariamente sem perder estado.
 
 ------------------------------------------------------------------------
 
-### **`docker-compose stop`**
+#### - **`docker-compose stop`**
 
 -   Para containers em execução sem removê-los.
 -   Também pode ser usado para liberar recursos temporariamente.
@@ -174,7 +195,7 @@ Usar quando: - precisar parar e remover os containers;
 É possível parar ou iniciar apenas um container específico:
 
 ``` bash
-docker-compose stop api-wdb
+docker-compose stop api-wbd
 ```
 
 ------------------------------------------------------------------------
@@ -184,5 +205,5 @@ docker-compose stop api-wdb
 Para acompanhar os logs em tempo real da aplicação:
 
 ``` bash
-docker compose logs -f api-wdb
+docker compose logs -f api-wbd
 ```
