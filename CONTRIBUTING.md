@@ -10,7 +10,6 @@ This document defines our guidelines for branch naming, commit messages, pull re
 - [Pull Requests](#pull-requests)
 - [Secrets and Configuration](#secrets-and-configuration)
 - [Language](#language)
-- [Thank You](#thank-you)
 
 ---
 
