@@ -23,7 +23,7 @@ export class PrismaExampleEntityRepository implements IExampleEntityRepository {
         return exampleEntities.map(exampleEntity => ExampleEntityMapper.toDomain(exampleEntity))
     }
     public async create(exampleEntity: ExampleEntity): Promise<ExampleEntity> {
-        const createdStudent = await this.prisma.exampleEntity.create({
+        const createdExampleEntity = await this.prisma.exampleEntity.create({
             data : ExampleEntityMapper.toPersistence(exampleEntity)
         }
         );
