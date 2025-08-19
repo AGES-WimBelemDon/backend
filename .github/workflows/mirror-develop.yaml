@@ -18,4 +18,4 @@ jobs:
         # GAT is in format https://oauth2:<GROUP_ACCESS_TOKEN>@tools.ages.pucrs.br/wimbelemdon-mais
         run: |
           git remote add gitlab "${{ secrets.GITLAB_GAT }}/backend.git"
-          git push gitlab develop:develop
+          git push --force gitlab develop:develop
