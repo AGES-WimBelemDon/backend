@@ -5,5 +5,4 @@ export interface IExampleEntityRepository {
     findByEmail(email: string): Promise<ExampleEntity | null>;
     findAll(): Promise<ExampleEntity[]>;
     create(data: ExampleEntity): Promise<ExampleEntity>;
-    //public abstract update(id: string, data: UpdateStudentDto): Promise<Student>;
     delete(id: string): Promise<void>;}
