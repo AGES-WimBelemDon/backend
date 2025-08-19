@@ -1,0 +1,13 @@
+# Git and system files
+.git
+.DS_Store
+
+# Local dependencies and build artifacts
+node_modules
+dist
+coverage
+
+# Environment files and logs
+.env*
+!.env.example
+npm-debug.log

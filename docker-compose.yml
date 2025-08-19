@@ -1,0 +1,29 @@
+services:
+  api-wbd:
+    build: .
+    ports:
+      - "3000:3000"
+      - "9229:9229"
+    env_file:
+      - .env.development
+    volumes:
+      - .:/usr/app
+      - /usr/app/node_modules
+    depends_on:
+      db-wbd:
+        condition: service_healthy
+    command: sh -c "yarn prisma generate && yarn start:debug"
+  db-wbd:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env.development
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d wbd_database"]
+      interval: 5s
+      retries: 5
+    volumes:
+      - wbd_database:/var/lib/postgresql/data
+volumes:
+  wbd_database:
