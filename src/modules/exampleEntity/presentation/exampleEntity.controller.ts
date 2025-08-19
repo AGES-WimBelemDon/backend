@@ -8,8 +8,8 @@ import { CreateExampleEntityDTO } from "../application/create-exampleEntity.dto"
 export class ExampleEntityontroller{
     constructor(private exampleEntityService: ExampleEntityService){}
     @Post()
-    @ApiOperation({ summary: "Create a new student" })
-    @ApiResponse({ status: 201, description: "The student has been successfully created." })
+    @ApiOperation({ summary: "Create a new example entity" })
+    @ApiResponse({ status: 201, description: "The example entity has been successfully created." })
     @ApiResponse({ status: 403, description: "Forbidden." })
     async createStudent(@Body() createExampleEntitytDto: CreateExampleEntityDTO):Promise<ExampleEntity>{
         return await this.exampleEntityService.createExampleentity(createExampleEntitytDto)
