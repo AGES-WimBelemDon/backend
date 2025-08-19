@@ -131,7 +131,7 @@ docker ps
 Depois, execute:
 
 ``` bash
-docker compose exec api-wdb yarn prisma migrate deploy
+docker compose exec api-wbd yarn prisma migrate deploy
 ```
 
 Isso aplicará as migrações no banco.
