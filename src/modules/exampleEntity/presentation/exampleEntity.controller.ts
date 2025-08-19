@@ -12,7 +12,7 @@ export class ExampleEntityontroller{
     @ApiResponse({ status: 201, description: "The example entity has been successfully created." })
     @ApiResponse({ status: 403, description: "Forbidden." })
     async createStudent(@Body() createExampleEntitytDto: CreateExampleEntityDTO):Promise<ExampleEntity>{
-        return await this.exampleEntityService.createExampleentity(createExampleEntitytDto)
+        return await this.exampleEntityService.createExampleEntity(createExampleEntitytDto)
     }
     @ApiOperation({ summary: "Hello world" })
     @Get()

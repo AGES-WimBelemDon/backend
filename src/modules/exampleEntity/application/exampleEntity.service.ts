@@ -7,9 +7,9 @@ import { ExampleEntity } from "../domain/exampleEntity.entity";
 export class ExampleEntityService{
     @Inject(EXAMPLE_ENTITY_REPOSITORY_TOKEN)
     private readonly exampleEntityRepository: IExampleEntityRepository;
-    async createExampleentity(exampleEntityDto: CreateExampleEntityDTO):Promise<ExampleEntity>{
+    async createExampleEntity(exampleEntityDto: CreateExampleEntityDTO):Promise<ExampleEntity>{
         if(await this.exampleEntityRepository.findByEmail(exampleEntityDto.email)){
-            throw new ConflictException("the provided email already was used");
+            throw new ConflictException("the provided email is already in use");
         }
         const exampleEntity: ExampleEntity = new ExampleEntity({
             "name" : exampleEntityDto.name,

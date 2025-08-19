@@ -27,7 +27,7 @@ export class PrismaExampleEntityRepository implements IExampleEntityRepository {
             data : ExampleEntityMapper.toPersistence(exampleEntity)
         }
         );
-        return ExampleEntityMapper.toDomain(createdStudent);
+        return ExampleEntityMapper.toDomain(createdExampleEntity);
     }
     public async delete(id: string): Promise<void> {
         await this.prisma.exampleEntity.delete({
