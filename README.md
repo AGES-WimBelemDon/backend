@@ -106,11 +106,11 @@ Na raiz do projeto (`backend`), crie o arquivo `.env.development` com o seguinte
 conteúdo:
 
 ``` yaml
-DATABASE_URL="postgresql://admin:admin@db-wdb:5432/wdb_database?schema=public"
+DATABASE_URL="postgresql://admin:admin@db-wbd:5432/wbd_database?schema=public"
 NODE_ENV="development"
 POSTGRES_USER=admin
 POSTGRES_PASSWORD=admin
-POSTGRES_DB=wdb_database
+POSTGRES_DB=wbd_database
 ```
 Com o Docker Desktop rodando (ou seja, com ele aberto), rode:
 
