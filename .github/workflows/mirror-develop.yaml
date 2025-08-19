@@ -1,0 +1,21 @@
+name: Push develop to GitLab
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  sync-develop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history
+
+      - name: Push develop to GitLab
+        # GAT must be in format https://oauth2:<GROUP_ACCESS_TOKEN>@tools.ages.pucrs.com/username/repo.git
+        run: |
+          git remote add gitlab "${{ secrets.GITLAB_GAT }}/backend.git"
+          git push gitlab develop:develop

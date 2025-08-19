@@ -20,7 +20,7 @@ We use **kebab-case** for branch names. Branches must be prefixed according to t
 
 | Type     | Prefix       | Example                         |
 |----------|--------------|---------------------------------|
-| Feature  | `feature/`   | `feature/add-student-controller`|
+| Feature  | `feat/`      | `feat/add-student-controller`   |
 | Bugfix   | `fix/`       | `fix/fix-login-error`           |
 | Chore    | `chore/`     | `chore/update-dependencies`     |
 | Test     | `test/`      | `test/add-login-tests`          |
