@@ -112,7 +112,7 @@ POSTGRES_USER=admin
 POSTGRES_PASSWORD=admin
 POSTGRES_DB=wdb_database
 ```
-Com o Docker Desktop rodando (ou seja, como ele aberto), rode:
+Com o Docker Desktop rodando (ou seja, com ele aberto), rode:
 
 ``` bash
 docker-compose up --build -d
