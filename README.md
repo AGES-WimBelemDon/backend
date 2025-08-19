@@ -119,8 +119,8 @@ docker-compose up --build -d
 ```
 
 Dois containers serão iniciados:
-- **api-wdb** (API da aplicação)
-- **db-wdb** (Banco de dados Postgres)
+- **api-wbd** (API da aplicação)
+- **db-wbd** (Banco de dados Postgres)
 
 Verifique os containers que estão rodando com:
 
