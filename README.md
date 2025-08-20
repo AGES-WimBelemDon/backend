@@ -218,7 +218,7 @@ Para acompanhar os logs em tempo real da aplicação:
 ``` bash
 docker-compose logs -f api-wbd
 ```
-## Bebug com VS Code
+## Debug com VS Code
 
 O projeto já está configurado para permitir a depuração diretamente pelo **Visual Studio Code**.
 
