@@ -12,7 +12,8 @@ o ambiente de desenvolvimento do projeto utilizando **Docker** e
 2.  [Clonando o repositório](#clonando-o-repositório)
 3.  [Configuração ambiente de desenvolvimento - OPÇÃO 1 - Windows (nativo)](#configuração-ambiente-de-desenvolvimento---opção-1---windows-nativo)
 
-4. [Configuração ambiente de desenvolvimento - OPÇÃO 2 - Windows(WSL2 + Ubuntu 24.04)](#configuração-ambiente-de-desenvolvimento---opção-2---windows-nativo)
+4. [Configuração ambiente de desenvolvimento - OPÇÃO 2 - Windows(WSL2 + Ubuntu 24.04)](#configuração-ambiente-de-desenvolvimento---opção-2---windowswsl2--ubuntu-2404)
+
 5.  [Comandos no Docker Compose](#comandos-no-docker-compose)
 6.  [Iniciando e parando containers
     individualmente](#iniciando-e-parando-containers-individualmente)
