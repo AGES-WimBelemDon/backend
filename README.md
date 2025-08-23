@@ -8,11 +8,12 @@ o ambiente de desenvolvimento do projeto utilizando **Docker** e
 
 ## Índice
 
-1.  [Requisitos](#requisitos)
-2.  [Configuração ambiente de desenvolvimento - OPÇÃO 1 - Windows (nativo)](#configuração-ambiente-de-desenvolvimento---opção-1---windows-nativo)
+1.  [Tecnologias utilizadas](#tecnologias-utilizadas)
+2.  [Clonando o repositório](#clonando-o-repositório)
+3.  [Configuração ambiente de desenvolvimento - OPÇÃO 1 - Windows (nativo)](#configuração-ambiente-de-desenvolvimento---opção-1---windows-nativo)
 
-3. [Configuração ambiente de desenvolvimento - OPÇÃO 2 - Windows(WSL2 + Ubuntu 24.04)](#configuração-ambiente-de-desenvolvimento---opção-2---windows-nativo)
-4.  [Comandos no Docker Compose](#comandos-no-docker-compose)
+4. [Configuração ambiente de desenvolvimento - OPÇÃO 2 - Windows(WSL2 + Ubuntu 24.04)](#configuração-ambiente-de-desenvolvimento---opção-2---windows-nativo)
+5.  [Comandos no Docker Compose](#comandos-no-docker-compose)
 6.  [Iniciando e parando containers
     individualmente](#iniciando-e-parando-containers-individualmente)
 7.  [Debug - Visualizando logs da
@@ -20,11 +21,35 @@ o ambiente de desenvolvimento do projeto utilizando **Docker** e
 
 ------------------------------------------------------------------------
 
-## Requisitos
+## Tecnologias utilizadas
 
 -   Docker
 -   Docker Compose
+-   Yarn
+-   Prisma
+-   Node.js (v. 22.18.0)
 
+## Clonando o repositório
+
+1. Clone o repositório:
+
+``` bash
+git clone https://github.com/AGES-WimBelemDon/backend.git
+```
+
+2.  Acesse o diretório do projeto
+
+``` sh
+cd backend
+```
+
+3.  Verifique e configure as credenciais do git para o projeto. Utilize o seu e-mail da PUC-RS.
+
+``` sh
+git config user.name "Seu Nome"
+git config user.email seu_email@exemplo.com
+```
+------------------------------------------------------------------------
 ------------------------------------------------------------------------
 ## Configuração ambiente de desenvolvimento - OPÇÃO 1 - Windows (nativo)
 
@@ -90,26 +115,7 @@ yarn --version
 ```
 npm install -g yarn
 ```
-### Clonando o repositório
 
-1. Clone o repositório:
-
-``` bash
-git clone https://github.com/AGES-WimBelemDon/backend.git
-```
-
-2.  Acesse o diretório do projeto
-
-``` sh
-cd backend
-```
-
-3.  Verifique e configure as credenciais do git para o projeto. Utilize o seu e-mail da PUC-RS.
-
-``` sh
-git config user.name "Seu Nome"
-git config user.email seu_email@exemplo.com
-```
 ### Iniciando o projeto pela primeira vez com Windows (nativo)
 
 1. Na raiz do projeto (`backend`), crie o arquivo `.env.development` com o seguinte
@@ -156,6 +162,10 @@ conteúdo:
     ```bash
     yarn start:dev
     ```
+6. Acesse a aplicação:
+   - A API estará disponível em `http://localhost:3000/`.
+   - A documentação Swagger estará disponível em `http://localhost:3000/docs`.
+
 ------------------------------------------------------------------------
 ## Configuração ambiente de desenvolvimento - OPÇÃO 2 - Windows(WSL2 + Ubuntu 24.04)
 
@@ -215,29 +225,6 @@ O repositório deve ser clonado dentro do Ubuntu (WSL2), e não no PowerShell ou
 
 Isso abrirá um terminal Linux (Ubuntu 24.04) dentro do WSL2.
 
-
-### Clonando o repositório
-
-1. Clone o repositório:
-
-``` bash
-git clone https://github.com/AGES-WimBelemDon/backend.git
-```
-
-2.  Acesse o diretório do projeto
-
-``` sh
-cd backend
-```
-
-3.  Verifique e configure as credenciais do git para o projeto. Utilize o seu e-mail da PUC-RS.
-
-``` sh
-git config user.name "Seu Nome"
-git config user.email seu_email@exemplo.com
-```
-------------------------------------------------------------------------
-
 ### Iniciando o projeto pela primeira vez
 
 1. Na raiz do projeto (`backend`), crie o arquivo `.env.development` com o seguinte
@@ -275,19 +262,11 @@ conteúdo:
 
     Isso aplicará as migrações no banco.
 
-------------------------------------------------------------------------
-# Acessando a aplicação após a instalação
-### Swagger (documentação da API)
-
-Após instalar e subir o projeto, a documentação interativa da API estará disponível em:
-
-    http://localhost:3000/docs
-
-
-Você pode usar essa interface para explorar os endpoints, enviar requisições e visualizar respostas.
+4. Acesse a aplicação:
+   - A API estará disponível em `http://localhost:3000/`.
+   - A documentação Swagger estará disponível em `http://localhost:3000/docs`.
 
 ------------------------------------------------------------------------
-
 ## Principais comandos no Docker Compose
 
 #### - **`docker-compose up -d --build <nome_do_serviço>`**
@@ -343,7 +322,7 @@ Para acompanhar os logs em tempo real da aplicação:
 ``` bash
 docker-compose logs -f api-wbd
 ```
-## Debug com VS Code no WSL2
+## Debug com VS Code no Windows com WSL2
 
 O projeto já está configurado para permitir a depuração diretamente pelo **Visual Studio Code**.
 
