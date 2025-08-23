@@ -9,14 +9,10 @@ o ambiente de desenvolvimento do projeto utilizando **Docker** e
 ## Índice
 
 1.  [Requisitos](#requisitos)
-2.  [Configurando o ambiente de
-    desenvolvimento](#configurando-o-ambiente-de-desenvolvimento)
-    -   [Windows (WSL2 + Ubuntu 24.04)](#windows)
-3.  [Instalação do ambiente de
-    desenvolvimento](#instalação-do-ambiente-de-desenvolvimento)
-4.  [Iniciando o projeto pela primeira
-    vez](#iniciando-o-projeto-pela-primeira-vez)
-5.  [Comandos no Docker Compose](#comandos-no-docker-compose)
+2.  [Configuração ambiente de desenvolvimento - OPÇÃO 1 - Windows (nativo)](#configuração-ambiente-de-desenvolvimento---opção-1---windows-nativo)
+
+3. [Configuração ambiente de desenvolvimento - OPÇÃO 2 - Windows(WSL2 + Ubuntu 24.04)](#configuração-ambiente-de-desenvolvimento---opção-2---windows-nativo)
+4.  [Comandos no Docker Compose](#comandos-no-docker-compose)
 6.  [Iniciando e parando containers
     individualmente](#iniciando-e-parando-containers-individualmente)
 7.  [Debug - Visualizando logs da
@@ -30,13 +26,138 @@ o ambiente de desenvolvimento do projeto utilizando **Docker** e
 -   Docker Compose
 
 ------------------------------------------------------------------------
+## Configuração ambiente de desenvolvimento - OPÇÃO 1 - Windows (nativo)
 
-## Configurando o ambiente de desenvolvimento
+### Passo 1: Download e Instalação do Docker Desktop
+1.  **Baixe o instalador:**\
+    [Docker Desktop para
+    Windows](https://www.docker.com/products/docker-desktop)
+2.  **Durante a instalação:**\
+    Certifique-se de que a opção **"Use WSL 2 instead of Hyper-V
+    (recommended)"** esteja marcada.
+3. **Verifique a instalação do Docker e Docker Compose:**
+``` bash
+docker --version
+docker-compose version
+```
 
-### Windows
+Como resultado algo semelhante ao que segue abaixo será apresentado no terminal:
+```
+Docker version 28.3.0, build xxxx
+```
+E
+```
+docker-compose version 1.29.2, build xxxx
+```
+### Passo 2: Download do nvm para Windows
+1. Verifique se o nvm já está instalado:
+    ```
+    nvm version
+    ```
+    Se não estiver, faça o download e a instalação do nvm para Windows, siga os passos abaixo:
 
-Se o seu sistema operacional for **Windows 10 ou 11**, siga os passos
-abaixo:
+2. Acesse o repositório oficial do nvm-windows no GitHub:
+https://github.com/coreybutler/nvm-windows/releases
+
+3. Baixe o arquivo instalador:
+- Procure pelo arquivo nvm-setup.exe (ex: nvm-setup.exe).
+4. Verifique se o NVM foi instalado corretamente
+- Abra o Prompt de Comando e digite:
+    ```
+    nvm version
+    ```
+    Você deverá ver algo como:
+    ```
+    1.1.12
+    ```
+
+### Passo 3: Instale versões específicas do Node.js
+Instale a versão 22.18.0 do Node.js
+```
+nvm install 22.18.0
+```
+Uma mensagem de sucesso deve aparecer, indicando que a versão foi instalada corretamente.
+A versão instalada pode ser ativada com o comando:
+```
+nvm use 22.18.0
+```
+### Passo 4: Instale o Yarn
+1. Verifique se o Yarn já está instalado:
+```
+yarn --version
+```
+2. Se não estiver, faça a instalação:
+```
+npm install -g yarn
+```
+### Clonando o repositório
+
+1. Clone o repositório:
+
+``` bash
+git clone https://github.com/AGES-WimBelemDon/backend.git
+```
+
+2.  Acesse o diretório do projeto
+
+``` sh
+cd backend
+```
+
+3.  Verifique e configure as credenciais do git para o projeto. Utilize o seu e-mail da PUC-RS.
+
+``` sh
+git config user.name "Seu Nome"
+git config user.email seu_email@exemplo.com
+```
+### Iniciando o projeto pela primeira vez com Windows (nativo)
+
+1. Na raiz do projeto (`backend`), crie o arquivo `.env.development` com o seguinte
+conteúdo:
+
+    ``` yaml
+    DATABASE_URL="postgresql://admin:admin@localhost:5432/wbd_database?schema=public"
+    NODE_ENV="development"
+    POSTGRES_USER=admin
+    POSTGRES_PASSWORD=admin
+    POSTGRES_DB=wbd_database
+    ```
+
+2. Com o Docker Desktop rodando (ou seja, com ele aberto), rode:
+
+    ``` bash
+    docker-compose up --build -d db-wbd
+    ```
+
+    Um container será iniciado:
+    - **db-wbd** (Banco de dados Postgres)
+
+    Verifique os containers que estão rodando com:
+
+    ``` bash
+    docker ps
+    ```
+3. Instale as dependências do projeto:
+
+    ``` bash
+    yarn install
+    ```
+4. Gere o cliente Prisma:
+
+    ```bash
+    yarn prisma generate
+    ```
+5. Realize as migrações do banco de dados:
+
+    ```bash
+    yarn prisma:migrate:deploy
+    ```
+5. Inicie a aplicação:
+    ```bash
+    yarn start:dev
+    ```
+------------------------------------------------------------------------
+## Configuração ambiente de desenvolvimento - OPÇÃO 2 - Windows(WSL2 + Ubuntu 24.04)
 
 #### **PASSO 1: Instalação do WSL2 e da Distribuição Ubuntu 24.04**
 
@@ -87,8 +208,7 @@ docker-compose version 1.29.2, build xxxx
 
 ------------------------------------------------------------------------
 
-## Instalação do ambiente de desenvolvimento
-### Instruções específicas para usuários do Windows
+### Instalação do ambiente de desenvolvimento
 O repositório deve ser clonado dentro do Ubuntu (WSL2), e não no PowerShell ou CMD. Por isso, abra o Ubuntu (WSL2) a partir da linha de comando do Windows. No PowerShell ou Prompt de Comando (CMD), execute:
 
     wsl -d Ubuntu-24.04
@@ -96,7 +216,7 @@ O repositório deve ser clonado dentro do Ubuntu (WSL2), e não no PowerShell ou
 Isso abrirá um terminal Linux (Ubuntu 24.04) dentro do WSL2.
 
 
-### Instruções comuns a usuários de quaisquer sistemas operacionais
+### Clonando o repositório
 
 1. Clone o repositório:
 
@@ -118,7 +238,7 @@ git config user.email seu_email@exemplo.com
 ```
 ------------------------------------------------------------------------
 
-## Iniciando o projeto pela primeira vez
+### Iniciando o projeto pela primeira vez
 
 1. Na raiz do projeto (`backend`), crie o arquivo `.env.development` com o seguinte
 conteúdo:
@@ -130,8 +250,6 @@ conteúdo:
     POSTGRES_PASSWORD=admin
     POSTGRES_DB=wbd_database
     ```
-
-    Ou se você preferir, basta fazer uma cópia do arquivo `.env.example` e renomeá-lo como `.env.development`.
 
 2. Com o Docker Desktop rodando (ou seja, com ele aberto), rode:
 
@@ -158,7 +276,7 @@ conteúdo:
     Isso aplicará as migrações no banco.
 
 ------------------------------------------------------------------------
-## Acessando a aplicação após a instalação
+# Acessando a aplicação após a instalação
 ### Swagger (documentação da API)
 
 Após instalar e subir o projeto, a documentação interativa da API estará disponível em:
@@ -170,14 +288,17 @@ Você pode usar essa interface para explorar os endpoints, enviar requisições 
 
 ------------------------------------------------------------------------
 
-## Comandos no Docker Compose
+## Principais comandos no Docker Compose
 
-#### - **`docker-compose up -d --build`**
+#### - **`docker-compose up -d --build <nome_do_serviço>`**
 
-Usar quando: - iniciar o projeto pela primeira vez; - houver alterações
-no `docker-compose.yml`; - precisar reiniciar o projeto; - após executar
+Usar quando: 
+- iniciar o projeto pela primeira vez; 
+- houver alterações
+no `docker-compose.yml`;
+- precisar reiniciar o projeto; - após executar
 `docker-compose down`.
-
+OBS.: na opção Windows com WSL2, utilize o comando `docker-compose up -d --build` para reconstruir o projeto.
 ------------------------------------------------------------------------
 
 #### - **`docker-compose down`**
@@ -187,11 +308,11 @@ Usar quando: - precisar parar e remover os containers;
 
 ------------------------------------------------------------------------
 
-#### - **`docker-compose start`**
+#### - **`docker-compose start <nome_do_serviço>`**
 
 -   Reinicia containers parados.
 -   Útil para liberar RAM e CPU temporariamente sem perder estado.
-
+OBS.: na opção Windows com WSL2, utilize o comando `docker-compose start` para reiniciar ambos os containers
 ------------------------------------------------------------------------
 
 #### - **`docker-compose stop`**
@@ -203,12 +324,16 @@ Usar quando: - precisar parar e remover os containers;
 
 ## Iniciando e parando containers individualmente
 
-É possível parar ou iniciar apenas um container específico:
+É possível iniciar apenas um container específico:
+
+``` bash
+docker-compose start api-wbd
+```
+Ou então pare o container:
 
 ``` bash
 docker-compose stop api-wbd
 ```
-
 ------------------------------------------------------------------------
 
 ## Debug - Visualizando os logs da aplicação
@@ -218,7 +343,7 @@ Para acompanhar os logs em tempo real da aplicação:
 ``` bash
 docker-compose logs -f api-wbd
 ```
-## Debug com VS Code
+## Debug com VS Code no WSL2
 
 O projeto já está configurado para permitir a depuração diretamente pelo **Visual Studio Code**.
 
@@ -230,3 +355,5 @@ docker-compose start
 2. No VS Code, abra o menu Run and Debug.
 3. Selecione a configuração Attach NestJS in Docker.
 4. Clique em Start Debugging e utilize breakpoints normalmente nos arquivos .ts.
+
+
