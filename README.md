@@ -323,17 +323,5 @@ Para acompanhar os logs em tempo real da aplicação:
 ``` bash
 docker-compose logs -f api-wbd
 ```
-## Debug com VS Code no Windows com WSL2
-
-O projeto já está configurado para permitir a depuração diretamente pelo **Visual Studio Code**.
-
-### Como utilizar
-1. Inicie a aplicação normalmente:
-```bash
-docker-compose start
-```
-2. No VS Code, abra o menu Run and Debug.
-3. Selecione a configuração Attach NestJS in Docker.
-4. Clique em Start Debugging e utilize breakpoints normalmente nos arquivos .ts.
 
 
