@@ -7,7 +7,7 @@ import {
 } from "@nestjs/common";
 import { Request } from "express";
 import * as admin from "firebase-admin";
-import { FIREBASE_ADMIN } from "../auth.module";
+import { FIREBASE_ADMIN } from "src/modules/firebase/firebase.config.module";
 
 @Injectable()
 export class FirebaseAuthGuard implements CanActivate {
