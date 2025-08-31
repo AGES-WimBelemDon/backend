@@ -9,7 +9,7 @@ export class FirebaseService{
     constructor(
     @Inject(FIREBASE_ADMIN) private readonly firebaseAdmin: admin.app.App
   ) {};
-
+    // Foi inserido aqui o DTO para a criação do ExampleEntity
     async createExampleEntityOnFirebase(userData: CreateExampleEntityDTO): Promise<{
       user: admin.auth.UserRecord;
     }> {
