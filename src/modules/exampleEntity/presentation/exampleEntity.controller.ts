@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post } from "@nestjs/common"
+import { Body, Controller, Get, Post, UseGuards } from "@nestjs/common"
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { ExampleEntityService } from "../application/exampleEntity.service";
 import { ExampleEntity } from "../domain/exampleEntity.entity";
 import { CreateExampleEntityDTO } from "../application/create-exampleEntity.dto";
+import { FirebaseAuthGuard } from "src/modules/auth/guards/firebase-auth.guard";
 @ApiTags("exampleEntity")
 @Controller("exampleEntity")
 export class ExampleEntityontroller{
@@ -18,5 +19,11 @@ export class ExampleEntityontroller{
     @Get()
     async get(){
         return "hello world";
+    }
+    @Get("protected")
+    @UseGuards(FirebaseAuthGuard)
+    @ApiOperation({summary:"Protected route"})
+    get_protect(){
+        return "protected route"
     }
 }
