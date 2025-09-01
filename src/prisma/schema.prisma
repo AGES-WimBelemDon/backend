@@ -210,19 +210,6 @@ model Doc {
   @@map("doc")
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 model ExampleEntity {
   id        String   @id
   name      String   
