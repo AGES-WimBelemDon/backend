@@ -6,6 +6,209 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+enum StudentStatus {
+  ACTIVE
+  INACTIVE
+}
+enum FrequencyStatus {
+  PRESENT
+  ABSENT
+}
+model User {
+  id            Int      @id @default(autoincrement())
+  uidFirebase   String   @unique @map("uid_firebase")
+  fullName      String   @map("full_name")
+  email         String   @unique
+  roleId        Int?     @map("role_id")
+  addressId     Int      @map("address_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+  status        UserStatus @default(ACTIVE)
+  role          Role?    @relation("Roles", fields: [roleId], references: [id])
+  address       Address  @relation(fields: [addressId], references: [id])
+  classes       Class[]  @relation("ClassTeacher")
+
+  @@map("user")
+}
+
+model Role {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+
+  users User[]  @relation("Roles")
+
+  @@map("role")
+}
+
+model Student {
+  id                 Int           @id @default(autoincrement())
+  addressId          Int?          @map("address_id")
+  fullName           String        @map("full_name")
+  dateOfBirth        DateTime?     @map("date_of_birth") @db.Date
+  registrationNumber String        @unique @map("registration_number")
+  enrollmentDate     DateTime      @default(now()) @map("enrollment_date") @db.Date
+  disenrollmentDate  DateTime?     @map("disenrollment_date") @db.Date
+  status             StudentStatus @default(ACTIVE)
+  levelId            Int?           @map("level_id")
+
+  address            Address?      @relation(fields: [addressId], references: [id])
+  level              Level?        @relation("LevelRelation",fields: [levelId], references: [id])
+  family             Family[]      @relation("StudentFamily")
+  frequencies        Frequency[]   @relation("StudentFrequency")
+  classes            Enrollment[]
+  forms              Form[]
+  docs               Doc[]         @relation("StudentDocs")
+
+  @@map("student")
+}
+
+model Address {
+  id            Int       @id @default(autoincrement())
+  cep           String    @db.VarChar(9)
+  street        String
+  number        String?   @db.VarChar(10)
+  complement    String?
+  neighborhood  String
+  city          String
+  state         String    @db.VarChar(2)
+
+  users         User[]
+  students      Student[]
+  familyMembers Family[]  @relation("FamilyAddress")
+
+  @@map("address")
+}
+
+model Question {
+  id         Int      @id @default(autoincrement())
+  statement  String
+  type       String
+  options    Json?
+  isRequired Boolean? @default(false) @map("is_required")
+
+  answers Answer[]
+
+  @@map("question")
+}
+
+model Answer {
+  id         Int    @id @default(autoincrement())
+  formId     Int    @map("id_form")
+  questionId Int    @map("id_question")
+  content    String
+
+  form     Form     @relation(fields: [formId], references: [id])
+  question Question @relation(fields: [questionId], references: [id])
+
+  @@map("answer")
+}
+
+model Class {
+  id          Int       @id @default(autoincrement())
+  name        String
+  activityId  Int       @map("activity_id")
+  levelId     Int       @map("level_id")
+  state       String
+  teacher     User[]    @relation("ClassTeacher")
+  activity    Activity  @relation(fields: [activityId], references: [id])
+  level       Level     @relation(fields: [levelId], references: [id])
+  frequencies Frequency[]
+  students    Enrollment[]
+
+  @@map("class")
+}
+
+model Frequency {
+  id        Int               @id @default(autoincrement())
+  studentId Int               @map("id_student")
+  classId   Int?              @map("id_class")
+  date      DateTime          @db.Date
+  status    FrequencyStatus   @default(PRESENT)
+  notes     String?
+
+  student Student @relation("StudentFrequency",fields: [studentId], references: [id])
+  class   Class?   @relation(fields: [classId], references: [id])
+
+  @@map("frequency")
+}
+
+model Family {
+  id           Int     @id @default(autoincrement())
+  studentId    Int     @map("id_student")
+  addressId    Int     @map("address_id")
+  fullName     String  @map("full_name")
+  relationship String
+  phoneNumber  String  @map("phone_number")
+  email        String?
+
+  student Student[] @relation("StudentFamily")
+  address Address   @relation("FamilyAddress", fields: [addressId], references: [id])
+
+  @@map("family")
+}
+
+model Level {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+
+  students Student[]    @relation("LevelRelation")
+  classes  Class[]
+
+  @@map("level")
+}
+
+model Activity {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  classes Class[]
+
+  @@map("activity")
+}
+
+// Tabela de junção para a relação Muitos-para-Muitos entre Student e Class
+model Enrollment {
+  id             Int       @id @default(autoincrement())
+  studentId      Int       @map("id_student")
+  classId        Int       @map("id_class")
+  enrollmentDate DateTime  @default(now()) @map("enrollment_date")
+  endDate        DateTime? @map("end_date") 
+
+  student Student @relation(fields: [studentId], references: [id])
+  class   Class   @relation(fields: [classId], references: [id])
+
+  @@unique([studentId, classId])
+  @@map("enrollment")
+}
+
+model Form {
+  id             Int      @id @default(autoincrement())
+  studentId      Int      @map("id_student")
+  submissionDate DateTime @default(now()) @map("submission_date")
+
+  student Student  @relation(fields: [studentId], references: [id])
+  answers Answer[]
+
+  @@map("form")
+}
+
+model Doc {
+  id             Int      @id @default(autoincrement())
+  studentId      Int      @map("id_student")
+  slug           String   @unique
+  type           String
+  name           String?
+  enrollmentDate DateTime @default(now()) @map("enrollment_date")
+
+  student Student @relation("StudentDocs", fields: [studentId], references: [id])
+
+  @@map("doc")
+}
 
 model ExampleEntity {
   id        String   @id
