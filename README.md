@@ -19,6 +19,7 @@ o ambiente de desenvolvimento do projeto utilizando **Docker** e
     individualmente](#iniciando-e-parando-containers-individualmente)
 7.  [Debug - Visualizando logs da
     aplicação](#debug---visualizando-os-logs-da-aplicação)
+8.  [Autenticação pelo Firebase](#autenticação-pelo-firebase)
 
 ------------------------------------------------------------------------
 
@@ -128,8 +129,11 @@ conteúdo:
     POSTGRES_USER=admin
     POSTGRES_PASSWORD=admin
     POSTGRES_DB=wbd_database
+    FIREBASE_PROJECT_ID="your-project-id"
+    FIREBASE_CLIENT_EMAIL="firebase-adminsdk-...@your-project-id.iam.gserviceaccount.com"
+    FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...your-private-key...\n-----END PRIVATE KEY-----\n"
     ```
-
+    > O valor das variáveis relacionadas ao Firebase serão disponibilizados através de um canal privado. A variável `FIREBASE_PRIVATE_KEY` não deve ser compartilhada.
 2. Com o Docker Desktop rodando (ou seja, com ele aberto), rode:
 
     ``` bash
@@ -237,8 +241,11 @@ conteúdo:
     POSTGRES_USER=admin
     POSTGRES_PASSWORD=admin
     POSTGRES_DB=wbd_database
+    FIREBASE_PROJECT_ID="your-project-id"
+    FIREBASE_CLIENT_EMAIL="firebase-adminsdk-...@your-project-id.iam.gserviceaccount.com"
+    FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...your-private-key...\n-----END PRIVATE KEY-----\n"
     ```
-
+    > O valor das variáveis relacionadas ao Firebase serão disponibilizados através de um canal privado. A variável `FIREBASE_PRIVATE_KEY` não deve ser compartilhada.
 2. Com o Docker Desktop rodando (ou seja, com ele aberto), rode:
 
     ``` bash
@@ -325,3 +332,25 @@ docker-compose logs -f api-wbd
 ```
 
 
+## Autenticação pelo Firebase
+Quando uma rota ou controller é protegido com a classe FirebaseAuthGuard, como no exemplo abaixo:
+```ts
+@Get("endpoint")
+@UseGuards(FirebaseAuthGuard)
+@ApiOperation({ summary: "Protected route" })
+get_protect(@Request() req: any) {
+    const user = req.user;
+    return user;
+}
+```
+isso significa que, para acessá-la, será necessário enviar um ID token gerado pelo Firebase.
+
+Para obter esse token, siga os passos:
+
+1. Abra o arquivo get_token.html em um servidor HTTP local (por exemplo, utilizando a extensão Live Server no VSCode).
+
+2. Faça login com sua conta do Google vinculada ao Firebase.
+
+3. O Firebase retornará um token JWT, que poderá ser usado para acessar as rotas protegidas.
+
+> Atenção: o token expira em aproximadamente 1 hora. Após esse período, será necessário gerar um novo.
