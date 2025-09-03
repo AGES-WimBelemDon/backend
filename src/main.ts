@@ -9,6 +9,17 @@ async function bootstrap() {
   .setTitle("WBD-API")
   .setDescription("The WBD project API is the API REST")
   .setVersion("1.0")
+  .addBearerAuth(
+      {
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      name: 'JWT-auth',
+      description: 'Enter JWT token',
+      in: 'header',
+      },
+      'JWT-auth',
+      )
   .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("docs", app, document);

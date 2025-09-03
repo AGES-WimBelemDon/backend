@@ -1,11 +1,12 @@
 import { Body, Controller, Get, Post, Request, UseGuards } from "@nestjs/common"
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { ExampleEntityService } from "../application/exampleEntity.service";
 import { ExampleEntity } from "../domain/exampleEntity.entity";
 import { CreateExampleEntityDTO } from "../application/create-exampleEntity.dto";
 import { FirebaseAuthGuard } from "src/modules/auth/guards/firebase-auth.guard";
 @ApiTags("exampleEntity")
 @Controller("exampleEntity")
+@ApiBearerAuth("JWT-auth")
 export class ExampleEntityontroller{
     constructor(private exampleEntityService: ExampleEntityService){}
     @Post()
