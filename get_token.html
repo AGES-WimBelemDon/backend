@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firebase Emulator Token Generator</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <h1>Firebase Token Generator</h1>
+    <button id="signInBtn">Sign in with Google</button>
+    <hr>
+    <h2>Your ID Token:</h2>
+    <textarea id="idToken" rows="10" cols="80" readonly></textarea>
+
+    <h2>Token Expiration Countdown:</h2>
+    <div id="countdown" style="font-size: 20px; font-weight: bold; color: green;">--:--:--</div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBy6-S2RXPxtcXToynPZAdSRSg5mspHsoA",
+            authDomain: "ages-wimbelemdon-development.firebaseapp.com",
+            projectId: "ages-wimbelemdon-development"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const signInBtn = document.getElementById('signInBtn');
+        const idTokenText = document.getElementById('idToken');
+        const countdownEl = document.getElementById('countdown');
+
+        let countdownTimer;
+        function startCountdown(durationInSeconds) {
+            let timeRemaining = durationInSeconds;
+
+            clearInterval(countdownTimer);
+
+            countdownTimer = setInterval(() => {
+                const hours = Math.floor(timeRemaining / 3600);
+                const minutes = Math.floor((timeRemaining % 3600) / 60);
+                const seconds = timeRemaining % 60;
+
+                countdownEl.textContent =
+                    `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+                if (timeRemaining <= 0) {
+                    clearInterval(countdownTimer);
+                    countdownEl.textContent = "Expired";
+                    countdownEl.style.color = "red";
+                    idTokenText.value = "⚠️ Your ID token has expired.";
+                }
+
+                timeRemaining--;
+            }, 1000);
+        }
+
+        signInBtn.onclick = async () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                const result = await auth.signInWithPopup(provider);
+                const user = result.user;
+                const idToken = await user.getIdToken();
+                idTokenText.value = idToken;
+                console.log("Token copied to text area.");
+                startCountdown(3600);
+
+            } catch (error) {
+                console.error("Error signing in: ", error);
+                idTokenText.value = "Error: " + error.message;
+            }
+        };
+    </script>
+</body>
+</html>
