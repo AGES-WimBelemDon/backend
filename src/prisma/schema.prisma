@@ -6,18 +6,7 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-enum UserStatus {
-  ACTIVE
-  INACTIVE
-}
-enum StudentStatus {
-  ACTIVE
-  INACTIVE
-}
-enum FrequencyStatus {
-  PRESENT
-  ABSENT
-}
+
 model User {
   id            Int      @id @default(autoincrement())
   uidFirebase   String   @unique @map("uid_firebase")
@@ -26,7 +15,7 @@ model User {
   roleId        Int?     @map("role_id")
   addressId     Int      @map("address_id")
   createdAt     DateTime @default(now()) @map("created_at")
-  status        UserStatus @default(ACTIVE)
+  status        UserStatus @default(ATIVO)
   role          Role?    @relation("Roles", fields: [roleId], references: [id])
   address       Address  @relation(fields: [addressId], references: [id])
   classes       Class[]  @relation("ClassTeacher")
@@ -45,66 +34,50 @@ model Role {
 }
 
 model Student {
-  id                 Int           @id @default(autoincrement())
-  addressId          Int?          @map("address_id")
-  fullName           String        @map("full_name")
-  dateOfBirth        DateTime?     @map("date_of_birth") @db.Date
-  registrationNumber String        @unique @map("registration_number")
-  enrollmentDate     DateTime      @default(now()) @map("enrollment_date") @db.Date
-  disenrollmentDate  DateTime?     @map("disenrollment_date") @db.Date
-  status             StudentStatus @default(ACTIVE)
-  levelId            Int?           @map("level_id")
+  id                  Int               @id @default(autoincrement())
+  addressId           Int?              @map("address_id")
+  fullName            String            @map("full_name")
+  dateOfBirth         DateTime?         @map("date_of_birth") @db.Date
+  registrationNumber  String            @unique @map("registration_number")
+  enrollmentDate      DateTime          @default(now()) @map("enrollment_date") @db.Date
+  disenrollmentDate   DateTime?         @map("disenrollment_date") @db.Date
+  status              StudentStatus     @default(ATIVO)
+  levelId             Int?              @map("level_id")
+  socialName          String?           @map("social_name")
+  race                Race?
+  schoolName          String?           @map("school_name")
+  schoolShift         String?           @map("school_shift")
+  schoolYear          SchoolYear?
+  socialPrograms      SocialProgram?
+  gender              Gender?
+  employmentStatus    EmploymentStatus? @map("employment_status")
+  gradeGap            Boolean?          @map("grade_gap") // defasagem escolar
 
-  address            Address?      @relation(fields: [addressId], references: [id])
-  level              Level?        @relation("LevelRelation",fields: [levelId], references: [id])
-  family             Family[]      @relation("StudentFamily")
-  frequencies        Frequency[]   @relation("StudentFrequency")
+  address            Address?           @relation(fields: [addressId], references: [id])
+  level              Level?             @relation("LevelRelation",fields: [levelId], references: [id])
+  family             FamilyMember[]     @relation("StudentFamily")
+  frequencies        Frequency[]        @relation("StudentFrequency")
   classes            Enrollment[]
-  forms              Form[]
-  docs               Doc[]         @relation("StudentDocs")
-
+  answers            Answer[]           @relation("StudentAnswers")
+  docs               Doc[]              @relation("StudentDocs")
   @@map("student")
 }
 
 model Address {
-  id            Int       @id @default(autoincrement())
-  cep           String    @db.VarChar(9)
+  id            Int             @id @default(autoincrement())
+  cep           String          @db.VarChar(9)
   street        String
-  number        String?   @db.VarChar(10)
+  number        String?         @db.VarChar(10)
   complement    String?
   neighborhood  String
   city          String
-  state         String    @db.VarChar(2)
+  state         String          @db.VarChar(2)
 
   users         User[]
   students      Student[]
-  familyMembers Family[]  @relation("FamilyAddress")
+  familyMembers FamilyMember[]  @relation("FamilyAddress")
 
   @@map("address")
-}
-
-model Question {
-  id         Int      @id @default(autoincrement())
-  statement  String
-  type       String
-  options    Json?
-  isRequired Boolean? @default(false) @map("is_required")
-
-  answers Answer[]
-
-  @@map("question")
-}
-
-model Answer {
-  id         Int    @id @default(autoincrement())
-  formId     Int    @map("id_form")
-  questionId Int    @map("id_question")
-  content    String
-
-  form     Form     @relation(fields: [formId], references: [id])
-  question Question @relation(fields: [questionId], references: [id])
-
-  @@map("answer")
 }
 
 model Class {
@@ -127,7 +100,7 @@ model Frequency {
   studentId Int               @map("id_student")
   classId   Int?              @map("id_class")
   date      DateTime          @db.Date
-  status    FrequencyStatus   @default(PRESENT)
+  status    FrequencyStatus   @default(PRESENTE)
   notes     String?
 
   student Student @relation("StudentFrequency",fields: [studentId], references: [id])
@@ -136,19 +109,25 @@ model Frequency {
   @@map("frequency")
 }
 
-model Family {
-  id           Int     @id @default(autoincrement())
-  studentId    Int     @map("id_student")
-  addressId    Int     @map("address_id")
-  fullName     String  @map("full_name")
-  relationship String
-  phoneNumber  String  @map("phone_number")
-  email        String?
+model FamilyMember {
+  id                Int               @id @default(autoincrement())
+  studentId         Int               @map("id_student")
+  addressId         Int               @map("address_id")
+  fullName          String            @map("full_name")
+  relationship      String
+  phoneNumber       String            @map("phone_number")
+  email             String?
 
+  socialName        String?           @map("social_name")
+  race              Race?
+  gender            Gender?
+  educationLevel    EducationLevel?   @map("education_level")
+  dateOfBirth       DateTime?         @map("date_of_birth") @db.Date
+  socialPrograms    SocialProgram?
+  employmentStatus  EmploymentStatus? @map("employment_status")
   student Student[] @relation("StudentFamily")
   address Address   @relation("FamilyAddress", fields: [addressId], references: [id])
-
-  @@map("family")
+  @@map("family_member")
 }
 
 model Level {
@@ -185,15 +164,33 @@ model Enrollment {
   @@unique([studentId, classId])
   @@map("enrollment")
 }
+model Question {
+  id         Int      @id @default(autoincrement())
+  formId     Int
+  statement  String
+  isRequired Boolean? @default(false) @map("is_required")
+  form       Form     @relation(fields: [formId], references: [id])
+  answers    Answer[] @relation("AnswersQuestions")
+  @@map("question")
+}
 
+model Answer {
+  id         Int    @id @default(autoincrement())
+  questionId Int    @map("id_question")
+  studentId  Int
+  content    String
+  
+  question Question @relation("AnswersQuestions", fields: [questionId], references: [id])
+  student  Student  @relation("StudentAnswers",fields: [studentId], references: [id])
+
+  @@map("answer")
+}
 model Form {
   id             Int      @id @default(autoincrement())
-  studentId      Int      @map("id_student")
   submissionDate DateTime @default(now()) @map("submission_date")
-
-  student Student  @relation(fields: [studentId], references: [id])
-  answers Answer[]
-
+  type           FormType
+  title          String
+  questions      Question[]
   @@map("form")
 }
 
@@ -208,6 +205,77 @@ model Doc {
   student Student @relation("StudentDocs", fields: [studentId], references: [id])
 
   @@map("doc")
+}
+enum FormType {
+  PSICOLOGIA
+  SOCIAL
+}
+enum UserStatus {
+  ATIVO
+  INATIVO
+}
+enum StudentStatus {
+  ATIVO
+  INATIVO
+}
+enum FrequencyStatus {
+  PRESENTE
+  AUSENTE
+}
+
+enum Race {
+  BRANCA
+  PRETA
+  PARDA
+  AMARELA
+  INDIGENA
+  NA
+}
+
+enum Gender {
+  MASCULINO
+  FEMININO
+  HOMEM_TRANS
+  MULHER_TRANS
+  TRAVESTI
+  NAO_BINARIO
+  OUTRO
+}
+
+enum SocialProgram {
+  BOLSA_FAMILIA
+  BPC_LOAS
+  TARIFA_SOCIAL_ENERGIA
+  AUXILIO_GAS
+  PROGRAMA_ESTADUAL
+  PROGRAMA_MUNICIPAL_VIA_CRAS
+}
+
+enum EmploymentStatus {
+  EMPREGADO
+  DESEMPREGADO
+}
+
+enum SchoolYear {
+  EDUCACAO_INFANTIL
+  FUNDAMENTAL_1
+  FUNDAMENTAL_2
+  ENSINO_MEDIO_1
+  ENSINO_MEDIO_2
+  ENSINO_MEDIO_3
+  EJA
+}
+
+enum EducationLevel {
+  NENHUM
+  ALFABETIZADO
+  FUNDAMENTAL_INCOMPLETO
+  FUNDAMENTAL_COMPLETO
+  ENSINO_MEDIO_INCOMPLETO
+  ENSINO_MEDIO_COMPLETO
+  SUPERIOR_INCOMPLETO
+  SUPERIOR_COMPLETO
+  POS_GRADUACAO
 }
 
 model ExampleEntity {
