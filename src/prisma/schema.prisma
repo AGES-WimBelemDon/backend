@@ -123,7 +123,7 @@ model FamilyMember {
   gender            Gender?
   educationLevel    EducationLevel?   @map("education_level")
   dateOfBirth       DateTime?         @map("date_of_birth") @db.Date
-  socialPrograms    SocialProgram?
+  socialPrograms    SocialProgram?    @map("social_programs")
   employmentStatus  EmploymentStatus? @map("employment_status")
   student Student[] @relation("StudentFamily")
   address Address   @relation("FamilyAddress", fields: [addressId], references: [id])
