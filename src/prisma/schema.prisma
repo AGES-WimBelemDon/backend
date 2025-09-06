@@ -47,8 +47,8 @@ model Student {
   race                Race?
   schoolName          String?           @map("school_name")
   schoolShift         String?           @map("school_shift")
-  schoolYear          SchoolYear?
-  socialPrograms      SocialProgram?
+  schoolYear          SchoolYear?       @map("school_year")
+  socialPrograms      SocialProgram?    @map("social_programs")
   gender              Gender?
   employmentStatus    EmploymentStatus? @map("employment_status")
   gradeGap            Boolean?          @map("grade_gap") // defasagem escolar
