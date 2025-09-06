@@ -21,6 +21,13 @@ async function bootstrap() {
       'JWT-auth',
       )
   .build();
+  app.enableCors({
+    origin: [
+      "http://localhost:5173",
+      "https://ages-wimbelemdon.github.io"
+    ],
+    credentials: true,
+  });
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("docs", app, document);
   app.useGlobalPipes(new ValidationPipe({
