@@ -4,11 +4,13 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { ExampleEntityModule } from './modules/exampleEntity/exampleEntity.module';
 import { FirebaseModule } from './modules/firebase/firebase.module';
+import { StudentModule } from './modules/student/student.module';
 
 @Module({
   imports: [
     AuthModule,
     ExampleEntityModule,
+    StudentModule,
     PrismaModule,
     FirebaseModule,
     ConfigModule.forRoot({
