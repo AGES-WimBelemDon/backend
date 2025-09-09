@@ -4,6 +4,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { ExampleEntityModule } from './modules/exampleEntity/exampleEntity.module';
 import { FirebaseModule } from './modules/firebase/firebase.module';
+import { FrequencyModule } from './modules/frequency/frequency.module';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { FirebaseModule } from './modules/firebase/firebase.module';
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
       ignoreEnvFile: process.env.NODE_ENV === 'production',
       isGlobal: true
-    })
+    }),
+    FrequencyModule
   ],
 })
 export class AppModule {}
