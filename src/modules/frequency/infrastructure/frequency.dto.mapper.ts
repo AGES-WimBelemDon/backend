@@ -1,4 +1,4 @@
-import { UserClassesDTO } from "../application/frequency.dtos";
+import { StudentGeneralFrequencyDTO, UserClassesDTO } from "../application/frequency.dtos";
 
 
 type PrismaTeacherClass = {
@@ -8,6 +8,14 @@ type PrismaTeacherClass = {
   level: { name: string } | null;
   activity: { id: number; name: string } | null;
 };
+export type PrismaStudentGeneralFrequency = {
+  idstudent: number;
+  fullname: string;
+  date: Date;
+  registerbyanotherclass: "false" | "true";
+  status: "PRESENTE" | "AUSENTE";
+}
+
 export class FrequencyDTOMapper {
     static toUserClassesDTO(prismaClass: PrismaTeacherClass): UserClassesDTO {
         return {
@@ -21,5 +29,15 @@ export class FrequencyDTOMapper {
             activityName: prismaClass.activity?.name ?? "N/A",
         },
         };
+    }
+    static toStudentGeneralFrequencyDTO(prismaClass: PrismaStudentGeneralFrequency): StudentGeneralFrequencyDTO {
+        const studentRef =  {
+            idStudent: prismaClass.idstudent,
+            fullName: prismaClass.fullname,
+            date: prismaClass.date,
+            registerByAnotherClass: prismaClass.registerbyanotherclass==="true"?true:false,
+            status: prismaClass.status,
+    };
+        return studentRef;
     }
 }
