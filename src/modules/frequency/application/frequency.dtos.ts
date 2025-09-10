@@ -61,3 +61,12 @@ export class ResponseGetMyClassesDTO{
     })
     classes : UserClassesDTO[]
 }
+
+export class StudentGeneralFrequencyDTO{
+  idStudent: number;
+  fullName: string;
+  date: Date;
+  registerByAnotherClass: boolean;
+  status: 'PRESENTE' | 'AUSENTE';
+}
+
