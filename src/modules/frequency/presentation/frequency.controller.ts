@@ -1,7 +1,8 @@
-import { Controller, Get, Param, ParseIntPipe } from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe, ParseDatePipe } from "@nestjs/common";
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FrequencyService } from "../application/frequency.service";
-import { ResponseGetMyClassesDTO} from "../application/frequency.dtos";
+import { ResponseGetMyClassesDTO, StudentGeneralFrequencyDTO} from "../application/frequency.dtos";
+import { CustomParseDatePipe } from "src/common/pipes/CustomParseDatePipe";
 
 @Controller("frequency")
 @ApiTags("frequencyResource")
@@ -28,5 +29,10 @@ export class FrequencyConstroller{
     @ApiResponse({ status: 500, description: "An unexpected internal server error occurred." })
     async getUserClasses(@Param("userId", ParseIntPipe) userId: number):Promise<ResponseGetMyClassesDTO>{
         return await this.frequencyService.getUserClasses(userId);
+    }
+    @Get("general-frequency/:date")
+    async getGeneralFrequency(@Param("date", CustomParseDatePipe) date: Date): Promise<StudentGeneralFrequencyDTO[]>{
+        const studentList =  await this.frequencyService.getGeneralFrequency(date)
+        return studentList;
     }
 }
