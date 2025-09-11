@@ -1,7 +1,7 @@
 import { Controller, Get, Param, ParseIntPipe, ParseDatePipe } from "@nestjs/common";
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FrequencyService } from "../application/frequency.service";
-import { ResponseGetMyClassesDTO, StudentGeneralFrequencyDTO} from "../application/frequency.dtos";
+import { ResponseGetMyClassesDTO, StudentGeneralAttendanceDTO} from "../application/frequency.dtos";
 import { CustomParseDatePipe } from "src/common/pipes/CustomParseDatePipe";
 
 @Controller("frequency")
@@ -13,7 +13,7 @@ export class FrequencyConstroller{
     @ApiOperation({
     summary: "Get available classes for a user",
     description: "Retrieves a list of all classes a specific user is assigned to.",
-  })
+    })
     @ApiParam({
         name: "userId",
         type: "number",
@@ -30,8 +30,23 @@ export class FrequencyConstroller{
     async getUserClasses(@Param("userId", ParseIntPipe) userId: number):Promise<ResponseGetMyClassesDTO>{
         return await this.frequencyService.getUserClasses(userId);
     }
-    @Get("general-frequency/:date")
-    async getGeneralFrequency(@Param("date", CustomParseDatePipe) date: Date): Promise<StudentGeneralFrequencyDTO[]>{
+    @Get("general-attendance/:date")
+    @ApiOperation({
+        summary: "Get general attendance list for all active students",
+        description: "Retrieves the general attendance list of all active students"
+    })
+    @ApiParam({
+        name: "date",
+        type: Date,
+        description: "The date of the general attendance",
+        example: "2025-09-11",
+    })
+    @ApiResponse({
+        status: 200,
+        description: "Successfully retrieved the general attendance list",
+        type: [StudentGeneralAttendanceDTO],
+    })
+    async getGeneralFrequency(@Param("date", CustomParseDatePipe) date: Date): Promise<StudentGeneralAttendanceDTO[]>{
         const studentList =  await this.frequencyService.getGeneralFrequency(date)
         return studentList;
     }

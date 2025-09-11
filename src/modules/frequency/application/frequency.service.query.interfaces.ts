@@ -1,7 +1,7 @@
-import { StudentGeneralFrequencyDTO, UserClassesDTO } from "./frequency.dtos";
+import { StudentGeneralAttendanceDTO, UserClassesDTO } from "./frequency.dtos";
 
 export const FREQUENCY_QUERIES_TOKEN = "IFrequencyQueries";
 export interface IFrequencyQueries{
     getMyClasses(userId: number): Promise<UserClassesDTO[]>;
-    getGeneralFrequency(date: Date): Promise<StudentGeneralFrequencyDTO[]>;
+    getGeneralAttendance(date: Date): Promise<StudentGeneralAttendanceDTO[]>;
 }

@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { IFrequencyQueries } from "../application/frequency.service.query.interfaces";
-import { UserClassesDTO, StudentGeneralFrequencyDTO } from "../application/frequency.dtos";
+import { UserClassesDTO, StudentGeneralAttendanceDTO } from "../application/frequency.dtos";
 import { FrequencyDTOMapper,PrismaStudentGeneralFrequency } from "./frequency.dto.mapper";
 
 @Injectable()
@@ -39,14 +39,14 @@ export class PrismaFrequencyQueryService implements IFrequencyQueries {
     }
     return user.classes.map(cls => FrequencyDTOMapper.toUserClassesDTO(cls));
   }
-  async getGeneralFrequency(date: Date): Promise<StudentGeneralFrequencyDTO[]>{
+  async getGeneralAttendance(date: Date): Promise<StudentGeneralAttendanceDTO[]>{
     const result = await this.prisma.$queryRaw<PrismaStudentGeneralFrequency[]>`
       WITH 
       freq_query AS (
           SELECT
-              id_student AS id,
-              date,
-              'true' AS register_by_another_class,
+              id_student AS studentId,
+              NULL       AS frequencyId,
+              'false' AS generalAttendanceAllowed,
               'PRESENTE' AS status
           FROM frequency
           WHERE
@@ -58,48 +58,56 @@ export class PrismaFrequencyQueryService implements IFrequencyQueries {
           UNION
           
           SELECT
-              id_student AS id,
-              date,
-              'false' AS register_by_another_class,
+              id_student AS studentId,
+              id         AS frequencyId,
+              'true'    AS generalAttendanceAllowed,
               'PRESENTE' AS status
           FROM frequency
           WHERE
               date = ${date}
               AND status = 'PRESENTE'
               AND id_class IS NULL
-          GROUP BY id_student, date
+          GROUP BY id_student, date, id
       ),
       active_students AS (
           SELECT
-              id,
-              full_name
+              id        AS studentId,
+              full_name AS fullName
           FROM
               student
           WHERE
               status = 'ATIVO'
+      ),
+      left_j AS (
+        SELECT
+            acs.studentId,
+            acs.fullName,
+            fq.frequencyId,
+            fq.generalAttendanceAllowed,
+            fq.status
+        FROM active_students AS acs
+        LEFT JOIN freq_query AS fq
+        ON acs.studentId = fq.studentId
       )
       SELECT
-          acs.id AS idStudent,
-          acs.full_name AS fullName,
-          CASE
-              WHEN fq.date IS NULL THEN ${date}
-              ELSE fq.date
-          END AS date,
-          CASE
-              WHEN fq.register_by_another_class IS NULL THEN 'false'
-              ELSE fq.register_by_another_class
-          END AS registerByAnotherClass,
-          CASE
-              WHEN fq.status IS NULL THEN 'AUSENTE'
-              ELSE fq.status
-          END AS status
-      FROM active_students AS acs
-      LEFT JOIN freq_query AS fq
-      ON acs.id = fq.id
+        left_j.studentId,
+        left_j.frequencyId,
+        left_j.fullName,
+        ${date} AS date,
+        CASE
+            WHEN left_j.generalAttendanceAllowed IS NULL THEN 'true'
+            ELSE left_j.generalAttendanceAllowed
+        END AS generalAttendanceAllowed,
+        CASE
+              WHEN left_j.status IS NULL THEN 'AUSENTE'
+              ELSE left_j.status
+        END AS status
+      FROM left_j       
     `;
     if(!result){
       return []
-    }
-    return result.map(arg=>FrequencyDTOMapper.toStudentGeneralFrequencyDTO(arg));
+    };
+    const attendanceArray = result.map(arg=>FrequencyDTOMapper.toStudentGeneralAttendanceDTO(arg));
+    return attendanceArray;
   }
 }

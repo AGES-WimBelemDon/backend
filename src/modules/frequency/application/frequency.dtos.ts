@@ -62,11 +62,40 @@ export class ResponseGetMyClassesDTO{
     classes : UserClassesDTO[]
 }
 
-export class StudentGeneralFrequencyDTO{
-  idStudent: number;
+export class StudentGeneralAttendanceDTO{
+  @ApiProperty({ 
+    example: 1, 
+    description: "The ID of the student",
+    nullable: false 
+  })
+  studentId: number;
+  @ApiProperty({ 
+    example: null, 
+    description: "The ID of the frequency, if it exists. Otherwise, null",
+    nullable: true
+  })
+  frequencyId: null| number;
+  @ApiProperty({
+    example: "John Doe",
+    description: "The full name of the student",
+    nullable: false
+  })
   fullName: string;
+  @ApiProperty({
+    example: "2025-09-11",
+    description: "The requested frequency list date"
+  })
   date: Date;
-  registerByAnotherClass: boolean;
+  @ApiProperty({
+  description: "Indicates whether the student's attendance can be registered in the general attendance list. \
+  - true: the student can be marked directly in the general attendance list. \
+  - false: the student’s attendance is controlled by another class and cannot be modified here."
+})
+  generalAttendanceAllowed: boolean;
+  @ApiProperty({
+    description: "Describes if a student was present or not",
+    example: "PRESENTE"
+})
   status: 'PRESENTE' | 'AUSENTE';
 }
 
