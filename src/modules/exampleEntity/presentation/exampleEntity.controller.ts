@@ -4,8 +4,8 @@ import { ExampleEntityService } from "../application/exampleEntity.service";
 import { ExampleEntity } from "../domain/exampleEntity.entity";
 import { CreateExampleEntityDTO } from "../application/create-exampleEntity.dto";
 import { FirebaseAuthGuard } from "src/modules/auth/guards/firebase-auth.guard";
-@ApiTags("exampleEntity")
-@Controller("exampleEntity")
+@ApiTags("example-entity")
+@Controller("example-entity")
 @ApiBearerAuth("JWT-auth")
 export class ExampleEntityontroller{
     constructor(private exampleEntityService: ExampleEntityService){}
