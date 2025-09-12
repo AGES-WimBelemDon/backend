@@ -1,7 +1,7 @@
-import { Controller, Get, Param, ParseIntPipe, ParseDatePipe } from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe, Body, Patch, HttpCode } from "@nestjs/common";
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FrequencyService } from "../application/frequency.service";
-import { UserClassesResponseDTO, StudentGeneralAttendanceResponseDTO} from "../application/frequency.dtos";
+import { UserClassesResponseDTO, StudentGeneralAttendanceResponseDTO, UpdateGeneralAttendanceRequestDTO} from "../application/frequency.dtos";
 import { CustomParseDatePipe } from "src/common/pipes/CustomParseDatePipe";
 
 @Controller("frequency")
@@ -49,5 +49,15 @@ export class FrequencyConstroller{
     async getGeneralAttendance(@Param("date", CustomParseDatePipe) date: Date): Promise<StudentGeneralAttendanceResponseDTO[]>{
         const studentList =  await this.frequencyService.getGeneralAttendance(date)
         return studentList;
+    }
+    @Patch("general-attendance/")
+    @HttpCode(204)
+    @ApiResponse({
+        status: 204,
+        description: "Successfully updated the general attendance list"
+    })
+    async updateGeneralAttendance(@Body() updateDto: UpdateGeneralAttendanceRequestDTO): Promise<null>{
+        await this.frequencyService.updateGeneralAttendance(updateDto);
+        return null;
     }
 }
