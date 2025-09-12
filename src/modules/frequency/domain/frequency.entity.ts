@@ -1,6 +1,6 @@
 export enum FrequencyStatus {
   PRESENTE = "PRESENTE",
-  FALTA = "FALTA"
+  AUSENTE = "AUSENTE"
 }
 
 export interface FrequencyProps {
@@ -60,7 +60,7 @@ export class Frequency {
     }
 
     public markAbsent(notes?: string): void {
-        this.status = FrequencyStatus.FALTA;
+        this.status = FrequencyStatus.AUSENTE;
         this.notes = notes?.trim() ?? null;
     }
 }

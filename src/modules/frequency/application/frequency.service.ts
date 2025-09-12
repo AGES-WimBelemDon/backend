@@ -1,12 +1,12 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { FREQUENCY_QUERIES_TOKEN, IFrequencyQueries } from "./frequency.service.query.interfaces";
-import { ResponseGetMyClassesDTO, StudentGeneralAttendanceDTO } from "./frequency.dtos";
+import { UserClassesResponseDTO, StudentGeneralAttendanceResponseDTO } from "./frequency.dtos";
 
 @Injectable()
 export class FrequencyService{
     @Inject(FREQUENCY_QUERIES_TOKEN)
     private readonly frequencyQueryService: IFrequencyQueries;
-    public async getUserClasses(userId: number): Promise<ResponseGetMyClassesDTO>{
+    public async getUserClasses(userId: number): Promise<UserClassesResponseDTO>{
         var userClasses = await this.frequencyQueryService.getMyClasses(userId);
         userClasses.push({
             classId: null,
@@ -23,7 +23,7 @@ export class FrequencyService{
             classes : userClasses
         };
     }
-    public async getGeneralFrequency(date: Date): Promise<StudentGeneralAttendanceDTO[]>{
+    public async getGeneralAttendance(date: Date): Promise<StudentGeneralAttendanceResponseDTO[]>{
         const studentList = await this.frequencyQueryService.getGeneralAttendance(date);
         return studentList;
     }

@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { IFrequencyQueries } from "../application/frequency.service.query.interfaces";
-import { UserClassesDTO, StudentGeneralAttendanceDTO } from "../application/frequency.dtos";
+import { UserClassesDTO, StudentGeneralAttendanceResponseDTO } from "../application/frequency.dtos";
 import { FrequencyDTOMapper,PrismaStudentGeneralFrequency } from "./frequency.dto.mapper";
 
 @Injectable()
@@ -39,7 +39,7 @@ export class PrismaFrequencyQueryService implements IFrequencyQueries {
     }
     return user.classes.map(cls => FrequencyDTOMapper.toUserClassesDTO(cls));
   }
-  async getGeneralAttendance(date: Date): Promise<StudentGeneralAttendanceDTO[]>{
+  async getGeneralAttendance(date: Date): Promise<StudentGeneralAttendanceResponseDTO[]>{
     const result = await this.prisma.$queryRaw<PrismaStudentGeneralFrequency[]>`
       WITH 
       freq_query AS (

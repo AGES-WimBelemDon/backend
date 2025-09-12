@@ -1,5 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Transform } from "class-transformer";
+import { IsEnum, IsInt, IsNotEmpty } from "class-validator";
+import { FrequencyStatus } from "../domain/frequency.entity";
 
 export class ActivityResponseDTO {
   @ApiProperty({ 
@@ -55,7 +57,7 @@ export class UserClassesDTO {
   activity: ActivityResponseDTO;
 }
 
-export class ResponseGetMyClassesDTO{
+export class UserClassesResponseDTO{
     @ApiProperty({
       type: [UserClassesDTO],
       description: "A list of available classes for the user"
@@ -63,12 +65,14 @@ export class ResponseGetMyClassesDTO{
     classes : UserClassesDTO[]
 }
 
-export class StudentGeneralAttendanceDTO{
+export class StudentGeneralAttendanceResponseDTO{
   @ApiProperty({ 
     example: 1, 
     description: "The ID of the student",
     nullable: false 
   })
+  @IsInt()
+  @IsNotEmpty()
   studentId: number;
   @ApiProperty({
     example: "John Doe",
@@ -87,11 +91,13 @@ export class StudentGeneralAttendanceDTO{
   description: "Indicates whether the student's attendance can be registered in the general attendance list. \
   - true: the student can be marked directly in the general attendance list. \
   - false: the student's attendance is controlled by another class and cannot be modified here."
-})
+  })
   generalAttendanceAllowed: boolean;
   @ApiProperty({
     description: "Describes if a student was present or not",
-    example: "PRESENTE"
-})
-  status: 'PRESENTE' | 'AUSENTE';
+    example: FrequencyStatus.PRESENTE
+  })
+  @IsEnum(FrequencyStatus)
+  @IsNotEmpty()
+  status: FrequencyStatus;
 }

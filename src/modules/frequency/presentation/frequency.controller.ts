@@ -1,7 +1,7 @@
 import { Controller, Get, Param, ParseIntPipe, ParseDatePipe } from "@nestjs/common";
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FrequencyService } from "../application/frequency.service";
-import { ResponseGetMyClassesDTO, StudentGeneralAttendanceDTO} from "../application/frequency.dtos";
+import { UserClassesResponseDTO, StudentGeneralAttendanceResponseDTO} from "../application/frequency.dtos";
 import { CustomParseDatePipe } from "src/common/pipes/CustomParseDatePipe";
 
 @Controller("frequency")
@@ -23,11 +23,11 @@ export class FrequencyConstroller{
     @ApiResponse({
         status: 200,
         description: "Successfully retrieved the list of classes.",
-        type: ResponseGetMyClassesDTO,
+        type: UserClassesResponseDTO,
     })
     @ApiResponse({ status: 404, description: "User with the specified ID was not found." })
     @ApiResponse({ status: 500, description: "An unexpected internal server error occurred." })
-    async getUserClasses(@Param("userId", ParseIntPipe) userId: number):Promise<ResponseGetMyClassesDTO>{
+    async getUserClasses(@Param("userId", ParseIntPipe) userId: number):Promise<UserClassesResponseDTO>{
         return await this.frequencyService.getUserClasses(userId);
     }
     @Get("general-attendance/:date")
@@ -44,10 +44,10 @@ export class FrequencyConstroller{
     @ApiResponse({
         status: 200,
         description: "Successfully retrieved the general attendance list",
-        type: [StudentGeneralAttendanceDTO],
+        type: [StudentGeneralAttendanceResponseDTO],
     })
-    async getGeneralFrequency(@Param("date", CustomParseDatePipe) date: Date): Promise<StudentGeneralAttendanceDTO[]>{
-        const studentList =  await this.frequencyService.getGeneralFrequency(date)
+    async getGeneralAttendance(@Param("date", CustomParseDatePipe) date: Date): Promise<StudentGeneralAttendanceResponseDTO[]>{
+        const studentList =  await this.frequencyService.getGeneralAttendance(date)
         return studentList;
     }
 }

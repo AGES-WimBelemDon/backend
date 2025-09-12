@@ -1,4 +1,5 @@
-import { StudentGeneralAttendanceDTO, UserClassesDTO } from "../application/frequency.dtos";
+import { StudentGeneralAttendanceResponseDTO, UserClassesDTO } from "../application/frequency.dtos";
+import { FrequencyStatus } from "../domain/frequency.entity";
 
 
 type PrismaTeacherClass = {
@@ -13,7 +14,7 @@ export type PrismaStudentGeneralFrequency = {
   fullname:    string;
   date:        Date;
   generalattendanceallowed: "false" | "true";
-  status: "PRESENTE" | "AUSENTE";
+  status: FrequencyStatus;
 }
 
 export class FrequencyDTOMapper {
@@ -30,7 +31,7 @@ export class FrequencyDTOMapper {
         },
         };
     }
-    static toStudentGeneralAttendanceDTO(prismaClass: PrismaStudentGeneralFrequency): StudentGeneralAttendanceDTO {
+    static toStudentGeneralAttendanceDTO(prismaClass: PrismaStudentGeneralFrequency): StudentGeneralAttendanceResponseDTO {
         const formatDate = (date: Date): string|null => {
             if (!date) return null;
             return date.toISOString().split("T")[0]; 
