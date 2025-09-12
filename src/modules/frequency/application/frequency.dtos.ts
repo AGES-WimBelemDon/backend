@@ -1,75 +1,84 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Transform } from "class-transformer";
-import { IsEnum, IsInt, IsNotEmpty } from "class-validator";
+import { Type } from "class-transformer";
+import {
+  IsArray,
+  IsBoolean,
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsString,
+  ValidateNested,
+} from "class-validator";
 import { FrequencyStatus } from "../domain/frequency.entity";
 
 export class ActivityResponseDTO {
-  @ApiProperty({ 
-    example: 1, 
+  @ApiProperty({
+    example: 1,
     description: "The ID of the activity",
-    nullable: true 
+    nullable: true,
   })
   activityId: number | null;
 
-  @ApiProperty({ 
-    example: "Esportes", 
-    description: "The name of the activity" 
+  @ApiProperty({
+    example: "Esportes",
+    description: "The name of the activity",
   })
   activityName: string;
 }
 
 export class UserClassesDTO {
-  @ApiProperty({ 
-    example: 1, 
-    description: "The ID of the class", 
-    nullable: true 
+  @ApiProperty({
+    example: 1,
+    description: "The ID of the class",
+    nullable: true,
   })
   classId: number | null;
 
-  @ApiProperty({ 
-    example: "Tênis I", 
+  @ApiProperty({
+    example: "Tênis I",
     description: "The name of the class",
-    nullable: true 
+    nullable: true,
   })
   className: string | null;
-  @ApiProperty({ 
-    example: "ATIVA", 
-    description: "The current state of the class" 
+  @ApiProperty({
+    example: "ATIVA",
+    description: "The current state of the class",
   })
   classState: string;
 
-  @ApiProperty({ 
-    example: "Iniciante", 
+  @ApiProperty({
+    example: "Iniciante",
     description: "The level of the class",
-    nullable: true 
+    nullable: true,
   })
   levelName: string | null;
 
-  @ApiProperty({ 
-    example: false, 
-    description: "Indicates if this is a general roll call class (always false for specific classes)" 
+  @ApiProperty({
+    example: false,
+    description:
+      "Indicates if this is a general roll call class (always false for specific classes)",
   })
   isGeral: boolean;
-  @ApiProperty({ 
-    type: ActivityResponseDTO, 
-    description: "Details of the activity associated with the class" 
+  @ApiProperty({
+    type: ActivityResponseDTO,
+    description: "Details of the activity associated with the class",
   })
   activity: ActivityResponseDTO;
 }
 
-export class UserClassesResponseDTO{
-    @ApiProperty({
-      type: [UserClassesDTO],
-      description: "A list of available classes for the user"
-    })
-    classes : UserClassesDTO[]
+export class UserClassesResponseDTO {
+  @ApiProperty({
+    type: [UserClassesDTO],
+    description: "A list of available classes for the user",
+  })
+  classes: UserClassesDTO[];
 }
 
-export class StudentGeneralAttendanceResponseDTO{
-  @ApiProperty({ 
-    example: 1, 
+export class StudentGeneralAttendanceResponseDTO {
+  @ApiProperty({
+    example: 1,
     description: "The ID of the student",
-    nullable: false 
+    nullable: false,
   })
   @IsInt()
   @IsNotEmpty()
@@ -77,27 +86,75 @@ export class StudentGeneralAttendanceResponseDTO{
   @ApiProperty({
     example: "John Doe",
     description: "The full name of the student",
-    nullable: false
+    nullable: false,
   })
   fullName: string;
-  
-  @ApiProperty({
-    example: "2025-09-11",
-    description: "The requested frequency list date"
-  })
-  date: String|null;
 
   @ApiProperty({
-  description: "Indicates whether the student's attendance can be registered in the general attendance list. \
+    example: "2025-09-11",
+    description: "The requested frequency list date",
+  })
+  date: string | null;
+
+  @ApiProperty({
+    description:
+      "Indicates whether the student's attendance can be registered in the general attendance list. \
   - true: the student can be marked directly in the general attendance list. \
-  - false: the student's attendance is controlled by another class and cannot be modified here."
+  - false: the student's attendance is controlled by another class and cannot be modified here.",
   })
   generalAttendanceAllowed: boolean;
   @ApiProperty({
     description: "Describes if a student was present or not",
-    example: FrequencyStatus.PRESENTE
+    example: FrequencyStatus.PRESENTE,
   })
   @IsEnum(FrequencyStatus)
   @IsNotEmpty()
   status: FrequencyStatus;
+}
+
+export class UpdateGeneralAttendanceItemDTO {
+  @ApiProperty({
+    example: 1,
+    description: "The ID of the student",
+    nullable: false,
+  })
+  @IsInt()
+  @IsNotEmpty()
+  studentId: number;
+
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty({
+    example: "2025-09-11",
+    description: "The requested frequency list date",
+  })
+  date: string;
+  @IsBoolean()
+  @IsNotEmpty()
+  @ApiProperty({
+    description:
+      "Indicates whether the student's attendance can be registered in the general attendance list. \
+  - true: the student can be marked directly in the general attendance list. \
+  - false: the student's attendance is controlled by another class and cannot be modified here.",
+  })
+  generalAttendanceAllowed: boolean;
+
+  @ApiProperty({
+    description: "Describes if a student was present or not",
+    example: FrequencyStatus.PRESENTE,
+  })
+  @IsEnum(FrequencyStatus)
+  @IsNotEmpty()
+  status: FrequencyStatus;
+}
+
+export class UpdateGeneralAttendanceRequestDTO {
+  @ApiProperty({
+    description: "An array of student attendance updates.",
+    type: [UpdateGeneralAttendanceItemDTO],
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => UpdateGeneralAttendanceItemDTO)
+  updates: UpdateGeneralAttendanceItemDTO[];
 }
