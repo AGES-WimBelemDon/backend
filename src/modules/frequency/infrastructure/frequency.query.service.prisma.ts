@@ -45,7 +45,6 @@ export class PrismaFrequencyQueryService implements IFrequencyQueries {
       freq_query AS (
           SELECT
               id_student AS studentId,
-              NULL       AS frequencyId,
               'false' AS generalAttendanceAllowed,
               'PRESENTE' AS status
           FROM frequency
@@ -59,7 +58,6 @@ export class PrismaFrequencyQueryService implements IFrequencyQueries {
           
           SELECT
               id_student AS studentId,
-              id         AS frequencyId,
               'true'    AS generalAttendanceAllowed,
               'PRESENTE' AS status
           FROM frequency
@@ -82,7 +80,6 @@ export class PrismaFrequencyQueryService implements IFrequencyQueries {
         SELECT
             acs.studentId,
             acs.fullName,
-            fq.frequencyId,
             fq.generalAttendanceAllowed,
             fq.status
         FROM active_students AS acs
@@ -91,7 +88,6 @@ export class PrismaFrequencyQueryService implements IFrequencyQueries {
       )
       SELECT
         left_j.studentId,
-        left_j.frequencyId,
         left_j.fullName,
         ${date} AS date,
         CASE

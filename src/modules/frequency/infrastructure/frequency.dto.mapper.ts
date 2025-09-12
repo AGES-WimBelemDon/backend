@@ -10,7 +10,6 @@ type PrismaTeacherClass = {
 };
 export type PrismaStudentGeneralFrequency = {
   studentid:   number;
-  frequencyid: null | number,
   fullname:    string;
   date:        Date;
   generalattendanceallowed: "false" | "true";
@@ -32,11 +31,14 @@ export class FrequencyDTOMapper {
         };
     }
     static toStudentGeneralAttendanceDTO(prismaClass: PrismaStudentGeneralFrequency): StudentGeneralAttendanceDTO {
+        const formatDate = (date: Date): string|null => {
+            if (!date) return null;
+            return date.toISOString().split("T")[0]; 
+            };
         const studentRef =  {
             studentId: prismaClass.studentid,
-            frequencyId: prismaClass.frequencyid,
             fullName: prismaClass.fullname,
-            date: prismaClass.date,
+            date: formatDate(prismaClass.date),
             generalAttendanceAllowed: prismaClass.generalattendanceallowed==="true"?true:false,
             status: prismaClass.status,
     };

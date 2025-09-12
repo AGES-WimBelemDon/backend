@@ -24,7 +24,7 @@ export class FrequencyService{
         };
     }
     public async getGeneralFrequency(date: Date): Promise<StudentGeneralAttendanceDTO[]>{
-        const studentList = await this.frequencyQueryService.getGeneralFrequency(date);
+        const studentList = await this.frequencyQueryService.getGeneralAttendance(date);
         return studentList;
     }
 }
