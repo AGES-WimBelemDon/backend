@@ -66,12 +66,8 @@ describe('StudentService', () => {
       dateOfBirth: '2010-05-15',
       socialName: 'Teste',
     };
-    // O class-validator não roda no service puro, mas você pode testar a validação manualmente se quiser
-    // Aqui simulamos o comportamento esperado
     repository.findByRegistrationNumber.mockResolvedValue(null);
     repository.create.mockImplementation(async (student) => student);
-    // Espera que o nome seja obrigatório na camada de validação do controller
-    // Aqui apenas mostra como seria
     expect(dto.fullName).toBe('');
   });
 });

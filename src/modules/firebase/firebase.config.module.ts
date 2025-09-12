@@ -14,7 +14,6 @@ export const FIREBASE_ADMIN = "FIREBASE_ADMIN";
         const clientEmail = configService.getOrThrow<string>("FIREBASE_CLIENT_EMAIL");
         const privateKey = configService
           .getOrThrow<string>("FIREBASE_PRIVATE_KEY")
-          // 🔥 converte os `\n` do .env em quebras reais
           .replace(/\\n/g, "\n");
 
         const adminConfig: ServiceAccount = {

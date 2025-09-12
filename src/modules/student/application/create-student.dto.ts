@@ -3,16 +3,12 @@ import { Type } from "class-transformer";
 import { IsString, IsNotEmpty, IsOptional, IsDateString, Matches, MinLength, MaxLength } from "class-validator";
 
 function isValidCPF(cpf: string): boolean {
-    // Remove caracteres não numéricos
     cpf = cpf.replace(/[^\d]+/g, '');
     
-    // Verifica se tem 11 dígitos
     if (cpf.length !== 11) return false;
     
-    // Verifica se todos os dígitos são iguais
     if (/^(\d)\1+$/.test(cpf)) return false;
     
-    // Valida primeiro dígito verificador
     let sum = 0;
     for (let i = 0; i < 9; i++) {
         sum += parseInt(cpf.charAt(i)) * (10 - i);
@@ -21,7 +17,6 @@ function isValidCPF(cpf: string): boolean {
     if (remainder === 10 || remainder === 11) remainder = 0;
     if (remainder !== parseInt(cpf.charAt(9))) return false;
     
-    // Valida segundo dígito verificador
     sum = 0;
     for (let i = 0; i < 10; i++) {
         sum += parseInt(cpf.charAt(i)) * (11 - i);
@@ -76,7 +71,6 @@ export class CreateStudentDTO {
     @MaxLength(50, { message: "Nome social deve ter no máximo 50 caracteres" })
     socialName?: string;
 
-    // Validação customizada para CPF
     static validateCPF(registrationNumber: string): boolean {
         return isValidCPF(registrationNumber);
     }

@@ -11,12 +11,10 @@ export class StudentService {
     ) {}
 
     async createStudent(createStudentDto: CreateStudentDTO): Promise<Student> {
-        // Validação de CPF
         if (!CreateStudentDTO.validateCPF(createStudentDto.registrationNumber)) {
             throw new BadRequestException("CPF inválido");
         }
 
-        // Verificar se CPF já está cadastrado
         const existingStudent = await this.studentRepository.findByRegistrationNumber(
             createStudentDto.registrationNumber
         );
@@ -25,17 +23,14 @@ export class StudentService {
             throw new ConflictException("CPF já está em uso");
         }
 
-        // Converter string de data para Date se fornecida
         let dateOfBirth: Date | undefined;
         if (createStudentDto.dateOfBirth) {
             dateOfBirth = new Date(createStudentDto.dateOfBirth);
             
-            // Validar se a data é válida
             if (isNaN(dateOfBirth.getTime())) {
                 throw new BadRequestException("Data de nascimento inválida");
             }
 
-            // Validar se a data não é futura
             if (dateOfBirth > new Date()) {
                 throw new BadRequestException("Data de nascimento não pode ser futura");
             }

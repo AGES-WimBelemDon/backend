@@ -17,17 +17,14 @@ import {
 import { StudentService } from "../application/student.service";
 import { CreateStudentDTO } from "../application/create-student.dto";
 import { StudentMapper } from "../infrastructure/student.mapper";
-// import { FirebaseAuthGuard } from "src/modules/auth/guards/firebase-auth.guard";
 
 @ApiTags("alunos")
 @Controller("alunos")
-// @ApiBearerAuth("JWT-auth")
 export class StudentController {
     constructor(private readonly studentService: StudentService) {}
 
     @Post()
     @HttpCode(HttpStatus.CREATED)
-    // @UseGuards(FirebaseAuthGuard)
     @ApiOperation({ 
         summary: "Cadastrar novo educando",
         description: "Cadastra um novo aluno no sistema com validação de CPF único"
@@ -90,7 +87,6 @@ export class StudentController {
     }
 
     @Get()
-    // @UseGuards(FirebaseAuthGuard)
     @ApiOperation({ 
         summary: "Listar todos os alunos",
         description: "Retorna lista de todos os alunos ativos do sistema"
@@ -105,7 +101,6 @@ export class StudentController {
     }
 
     @Get(':id')
-    // @UseGuards(FirebaseAuthGuard)
     @ApiOperation({ 
         summary: "Buscar aluno por ID",
         description: "Retorna os dados de um aluno específico"
@@ -128,7 +123,6 @@ export class StudentController {
     }
 
     @Get('cpf/:registrationNumber')
-    // @UseGuards(FirebaseAuthGuard)
     @ApiOperation({ 
         summary: "Buscar aluno por CPF",
         description: "Retorna os dados de um aluno através do CPF"
