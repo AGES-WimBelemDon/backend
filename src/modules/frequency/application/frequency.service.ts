@@ -68,7 +68,12 @@ export class FrequencyService {
         notPresent.push(element);
       };
     };
-    
-    return await this.frequencyRepository.deleteManyByStudentAndClassAndDate(notPresent); ;
+    if(notPresent.length){
+      await this.frequencyRepository.deleteManyByStudentAndClassAndDate(notPresent);
+    }
+    for (let index = 0; index < present.length; index++) {
+        await this.frequencyRepository.upsert(present[index]); 
+      }
+    return true;
   }
 }
