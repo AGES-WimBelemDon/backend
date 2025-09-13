@@ -1,8 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Type } from "class-transformer";
+import { Transform, Type } from "class-transformer";
 import {
   IsArray,
   IsBoolean,
+  IsDate,
+  IsDateString,
   IsEnum,
   IsInt,
   IsNotEmpty,
@@ -123,12 +125,13 @@ export class UpdateGeneralAttendanceItemDTO {
   studentId: number;
 
   @IsNotEmpty()
-  @IsString()
+  @IsDate()
+  @Transform(({ value }) => new Date(value))
   @ApiProperty({
     example: "2025-09-11",
     description: "The requested frequency list date",
   })
-  date: string;
+  date: Date;
   @IsBoolean()
   @IsNotEmpty()
   @ApiProperty({
