@@ -107,6 +107,7 @@ model Frequency {
   class   Class?   @relation(fields: [classId], references: [id])
 
   @@map("frequency")
+  @@unique([studentId, classId, date])
 }
 
 model FamilyMember {
