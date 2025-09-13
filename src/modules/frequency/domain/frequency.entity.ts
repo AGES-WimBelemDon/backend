@@ -4,7 +4,7 @@ export enum FrequencyStatus {
 }
 
 export interface FrequencyProps {
-  id: number;
+  id: number | null;
   studentId: number;
   classId: number | null;
   date: Date;
@@ -14,14 +14,14 @@ export interface FrequencyProps {
 
 
 export class Frequency {
-    private readonly id: number;
+    private readonly id: number | null;
     private readonly studentId: number;
     private readonly classId: number | null;
     private date:   Date;
     private status: FrequencyStatus;
     private notes: string | null;
 
-    private constructor(props: FrequencyProps) {
+    public constructor(props: FrequencyProps) {
         if (!props.studentId || !props.date) {
         throw new Error("Frequency requires a studentId and a date.");
         }
@@ -34,7 +34,7 @@ export class Frequency {
         this.notes = props.notes;
     }
 
-    public getId(): number { return this.id; }
+    public getId(): number | null { return this.id; }
     
     public getStudentId(): number { return this.studentId; }
     
