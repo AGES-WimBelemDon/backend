@@ -9,11 +9,16 @@ import {
   UpdateGeneralAttendanceRequestDTO,
   UpdateGeneralAttendanceItemDTO,
 } from "./frequency.dtos";
+import { Frequency, FrequencyStatus } from "../domain/frequency.entity";
+import { FREQUENCY_REPOSITORY_TOKEN, IFrequencyRepository } from "../domain/frequency.repository";
 
 @Injectable()
 export class FrequencyService {
   @Inject(FREQUENCY_QUERIES_TOKEN)
   private readonly frequencyQueryService: IFrequencyQueries;
+  @Inject(FREQUENCY_REPOSITORY_TOKEN)
+  private readonly frequencyRepository: IFrequencyRepository;
+
   public async getUserClasses(userId: number): Promise<UserClassesResponseDTO> {
     const userClasses = await this.frequencyQueryService.getMyClasses(userId);
     userClasses.push({
@@ -40,12 +45,30 @@ export class FrequencyService {
   }
   public async updateGeneralAttendance(
     array: UpdateGeneralAttendanceRequestDTO,
-  ): Promise<null> {
-    var validItems: UpdateGeneralAttendanceItemDTO[] = [];
-    if(array["updates"]){
-        validItems = array["updates"].filter(item=>item.generalAttendanceAllowed===true)
+  ): Promise<boolean> {
+    if(!array["updates"]){
+      return false;
     };
-    console.log(validItems);
-    return null;
+    var validItems   : UpdateGeneralAttendanceItemDTO[] = array["updates"].filter(item=>item.generalAttendanceAllowed===true);
+    var present      : Frequency[] = [];
+    var notPresent   : Frequency[] = [];
+    const domainItems: Frequency[] = validItems.map(item=>new Frequency({
+        id : null,
+        studentId: item.studentId,
+        classId: null,
+        date: item.date,
+        status: item.status,
+        notes: null
+    }));
+    for (let index = 0; index < domainItems.length; index++) {
+      const element = domainItems[index]
+      if(element.getStatus()===FrequencyStatus.PRESENTE){
+        present.push(element);
+      }else if(element.getStatus()===FrequencyStatus.AUSENTE){
+        notPresent.push(element);
+      };
+    };
+    
+    return await this.frequencyRepository.deleteManyByStudentAndClassAndDate(notPresent); ;
   }
 }
