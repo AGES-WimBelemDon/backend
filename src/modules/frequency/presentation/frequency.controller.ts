@@ -56,8 +56,7 @@ export class FrequencyConstroller{
         status: 204,
         description: "Successfully updated the general attendance list"
     })
-    async updateGeneralAttendance(@Body() updateDto: UpdateGeneralAttendanceRequestDTO): Promise<null>{
-        await this.frequencyService.updateGeneralAttendance(updateDto);
-        return null;
+    async updateGeneralAttendance(@Body() updateDto: UpdateGeneralAttendanceRequestDTO): Promise<boolean>{
+        return await this.frequencyService.updateGeneralAttendance(updateDto);
     }
 }
