@@ -1,4 +1,5 @@
 import {
+  EnrolledStudentDTO,
   StudentClassAttendanceItemDTO,
   StudentGeneralAttendanceResponseDTO,
   UserClassesDTO,
@@ -11,4 +12,5 @@ export interface IFrequencyQueries {
     date: Date,
   ): Promise<StudentGeneralAttendanceResponseDTO[]>;
   getStudentByClassAndDateAttendanceList(classId: number, date: Date): Promise<StudentClassAttendanceItemDTO[]>;
+  getStudentsByClassId(classId: number): Promise<EnrolledStudentDTO[]>;
 }

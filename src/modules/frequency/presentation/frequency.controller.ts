@@ -1,7 +1,7 @@
-import { Controller, Get, Param, ParseIntPipe, Body, Patch, HttpCode, Query } from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe, Body, Patch, HttpCode, Query, Post } from "@nestjs/common";
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FrequencyService } from "../application/frequency.service";
-import { UserClassesResponseDTO, StudentGeneralAttendanceResponseDTO, UpdateGeneralAttendanceRequestDTO, StudentListByClassAndDateResponseDTO} from "../application/frequency.dtos";
+import { UserClassesResponseDTO, StudentGeneralAttendanceResponseDTO, UpdateGeneralAttendanceRequestDTO, StudentListByClassAndDateResponseDTO, PostClassAttendanceDTO} from "../application/frequency.dtos";
 import { CustomParseDatePipe } from "src/common/pipes/CustomParseDatePipe";
 
 @Controller("frequency")
@@ -50,7 +50,7 @@ export class FrequencyConstroller{
         const studentList =  await this.frequencyService.getGeneralAttendance(date)
         return studentList;
     }
-    @Patch("general-attendance/")
+    @Patch("general-attendance")
     @HttpCode(204)
     @ApiResponse({
         status: 204,
@@ -91,10 +91,14 @@ export class FrequencyConstroller{
     status: 500, 
     description: "An unexpected internal server error occurred" 
     })
-    async getAttendanceList(
+    async getClassAttendanceList(
         @Query('classId', ParseIntPipe) classId: number,
         @Query('date', CustomParseDatePipe) date: Date
     ): Promise<StudentListByClassAndDateResponseDTO> {
     return await this.frequencyService.getAttendanceListByClassAndDate(date, classId);
+    }
+    @Post("class-attendance")
+    async postClassAttendance(@Body()body: PostClassAttendanceDTO) : Promise<boolean>{
+        return await this.frequencyService.createAttendanceList(body.date, body.classId);
     }
 }

@@ -11,4 +11,13 @@ export class FrequencyMapper{
             notes: object.notes,
         })
     };
+    static createFrequencyToPersistence(object: Frequency): Omit<PrismaFrequency, 'id'>{
+        return {
+            studentId: object.getStudentId(),
+            classId: object.getClassId(),
+            date: object.getDate(),
+            status: object.getStatus(),
+            notes: object.getNotes()
+        }
+    }
 }

@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { ConflictException, Inject, Injectable, InternalServerErrorException } from "@nestjs/common";
 import {
   FREQUENCY_QUERIES_TOKEN,
   IFrequencyQueries,
@@ -9,6 +9,7 @@ import {
   UpdateGeneralAttendanceRequestDTO,
   UpdateGeneralAttendanceItemDTO,
   StudentListByClassAndDateResponseDTO,
+  StudentClassAttendanceItemDTO,
 } from "./frequency.dtos";
 import { Frequency, FrequencyStatus } from "../domain/frequency.entity";
 import { FREQUENCY_REPOSITORY_TOKEN, IFrequencyRepository } from "../domain/frequency.repository";
@@ -84,5 +85,41 @@ export class FrequencyService {
       date    : date,
       studentList : attendanceList
     };
+  }
+  public async createAttendanceList(date: Date, classId: number): Promise<boolean>{
+    const attendanceList = await this.frequencyRepository.getByClassIdAnDate(classId, date);
+    if(attendanceList.length>0){
+      throw new ConflictException(`Class with ID ${classId} and date ${date} already was created.`);
+    }
+    const enrolledStudents = await this.frequencyQueryService.getStudentsByClassId(classId);
+    const frequencies: Frequency[] = [];
+    for (let index = 0; index < enrolledStudents.length; index++) {
+      const frequency = new Frequency({
+        id: null,
+        studentId: enrolledStudents[index].id,
+        classId: classId,
+        date: date,
+        status: FrequencyStatus.PRESENTE,
+        notes: null
+      });
+      frequencies.push(frequency);
+    };
+    const newFrequenciesArray = frequencies.map(frequency=>new Frequency({
+        id: null,
+        studentId: frequency.getStudentId(),
+        classId: null,
+        date: frequency.getDate(),
+        status: FrequencyStatus.PRESENTE,
+        notes: null
+    }))
+    const wasItDeleted = await this.frequencyRepository.deleteManyByStudentAndClassAndDate(newFrequenciesArray);
+    if(!wasItDeleted){
+      throw new InternalServerErrorException();
+    }
+    const wasItCreated = await this.frequencyRepository.createMany(frequencies);
+    if(!wasItCreated){
+      throw new InternalServerErrorException("The system wasn't able to create a new class attendance");
+    }
+    return true;
   }
 }

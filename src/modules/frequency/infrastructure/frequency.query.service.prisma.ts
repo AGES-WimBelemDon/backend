@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { IFrequencyQueries } from "../application/frequency.service.query.interfaces";
-import { UserClassesDTO, StudentGeneralAttendanceResponseDTO } from "../application/frequency.dtos";
+import { UserClassesDTO, StudentGeneralAttendanceResponseDTO, EnrolledStudentDTO } from "../application/frequency.dtos";
 import { FrequencyDTOMapper,PrismaStudentGeneralFrequency, PrismaStudentClassAttendance } from "./frequency.dto.mapper";
 
 @Injectable()
@@ -146,4 +146,19 @@ export class PrismaFrequencyQueryService implements IFrequencyQueries {
       `;
     return results.map(arg=>FrequencyDTOMapper.toStudentClassAttendanceItemDTO(arg));
   };
+  async getStudentsByClassId(classId: number): Promise<EnrolledStudentDTO[]> {
+    const enrolledStudents = await this.prisma.enrollment.findMany({
+      where: {
+        classId: classId
+      },
+      select: {
+        student: {
+          select: {
+            id: true
+          }
+        }
+      }
+    });
+    return enrolledStudents.map(enrollment => ({id: enrollment.student.id}));
+  }
 }

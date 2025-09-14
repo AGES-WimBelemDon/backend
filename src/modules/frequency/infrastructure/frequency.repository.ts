@@ -50,5 +50,26 @@ export class PrismaFrequencyRepository implements IFrequencyRepository {
             },
           });
       return FrequencyMapper.toDomain(result);
+    }
+  
+  async getByClassIdAnDate(id: number, date: Date): Promise<Frequency[]> {
+    const results = await this.prisma.frequency.findMany({
+      where: {
+        classId: id,
+        date: date
+      }
+    });
+    return results.map(result => FrequencyMapper.toDomain(result));
+  }
+  async createMany(frequencies: Frequency[]): Promise<boolean> {
+    if (frequencies.length === 0) {
+      return false;
+    }
+    const data = frequencies.map(frequency => FrequencyMapper.createFrequencyToPersistence(frequency));
+    const result = await this.prisma.frequency.createMany({
+      data,
+      skipDuplicates: true,
+    });
+    return result.count > 0;
 }
 }

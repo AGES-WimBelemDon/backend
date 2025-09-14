@@ -4,9 +4,11 @@ import {
   IsArray,
   IsBoolean,
   IsDate,
+  IsDateString,
   IsEnum,
   IsInt,
   IsNotEmpty,
+  IsNumber,
   ValidateNested,
 } from "class-validator";
 import { FrequencyStatus } from "../domain/frequency.entity";
@@ -217,4 +219,20 @@ export class StudentListByClassAndDateResponseDTO {
     description: "List of students with their attendance details"
   })
   studentList: StudentClassAttendanceItemDTO[];
+}
+
+export class PostClassAttendanceDTO {
+  @IsNumber()
+  @Type(() => Number)
+  classId: number;
+  @IsDate()
+  @Transform(({ value }) => new Date(value))
+  @ApiProperty({
+    example: "2025-09-11",
+    description: "The attendance class date",
+  })
+  date: Date;
+}
+export interface EnrolledStudentDTO {
+  id: number;
 }
