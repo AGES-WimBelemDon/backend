@@ -8,6 +8,7 @@ import {
   StudentGeneralAttendanceResponseDTO,
   UpdateGeneralAttendanceRequestDTO,
   UpdateGeneralAttendanceItemDTO,
+  StudentListByClassAndDateResponseDTO,
 } from "./frequency.dtos";
 import { Frequency, FrequencyStatus } from "../domain/frequency.entity";
 import { FREQUENCY_REPOSITORY_TOKEN, IFrequencyRepository } from "../domain/frequency.repository";
@@ -75,5 +76,13 @@ export class FrequencyService {
         await this.frequencyRepository.upsert(present[index]); 
       }
     return true;
+  }
+  public async getAttendanceListByClassAndDate(date: Date, classId: number): Promise<StudentListByClassAndDateResponseDTO>{
+    const attendanceList = await this.frequencyQueryService.getStudentByClassAndDateAttendanceList(classId, date);
+    return {
+      classId : classId,
+      date    : date,
+      studentList : attendanceList
+    };
   }
 }

@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { IFrequencyQueries } from "../application/frequency.service.query.interfaces";
 import { UserClassesDTO, StudentGeneralAttendanceResponseDTO } from "../application/frequency.dtos";
-import { FrequencyDTOMapper,PrismaStudentGeneralFrequency } from "./frequency.dto.mapper";
+import { FrequencyDTOMapper,PrismaStudentGeneralFrequency, PrismaStudentClassAttendance } from "./frequency.dto.mapper";
 
 @Injectable()
 export class PrismaFrequencyQueryService implements IFrequencyQueries {
@@ -106,17 +106,8 @@ export class PrismaFrequencyQueryService implements IFrequencyQueries {
     const attendanceArray = result.map(arg=>FrequencyDTOMapper.toStudentGeneralAttendanceDTO(arg));
     return attendanceArray;
   }
-  async getStudentAttendanceDetails(classId: number, date: Date) {
-    type AttendanceResult = {
-      frequencyId: number;
-      stutendId: number;
-      fullName: string;
-      attendance: number;
-      status: string;
-      notes: string | null;
-    }
-
-    const results = await this.prisma.$queryRaw<AttendanceResult[]>`
+  async getStudentByClassAndDateAttendanceList(classId: number, date: Date) {
+    const results = await this.prisma.$queryRaw<PrismaStudentClassAttendance[]>`
         WITH
         total_classes AS (
           SELECT COUNT(DISTINCT date) AS count
@@ -153,6 +144,6 @@ export class PrismaFrequencyQueryService implements IFrequencyQueries {
         JOIN student s ON s.id = d.id_student
         LEFT JOIN student_attendance a ON a.id_student = d.id_student
       `;
-    return results;
-  }
+    return results.map(arg=>FrequencyDTOMapper.toStudentClassAttendanceItemDTO(arg));
+  };
 }

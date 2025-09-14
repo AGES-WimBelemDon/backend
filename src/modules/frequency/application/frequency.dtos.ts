@@ -4,11 +4,9 @@ import {
   IsArray,
   IsBoolean,
   IsDate,
-  IsDateString,
   IsEnum,
   IsInt,
   IsNotEmpty,
-  IsString,
   ValidateNested,
 } from "class-validator";
 import { FrequencyStatus } from "../domain/frequency.entity";
@@ -160,4 +158,63 @@ export class UpdateGeneralAttendanceRequestDTO {
   @ValidateNested({ each: true })
   @Type(() => UpdateGeneralAttendanceItemDTO)
   updates: UpdateGeneralAttendanceItemDTO[];
+}
+export class StudentClassAttendanceItemDTO {
+  @ApiProperty({
+    example: 11,
+    description: "The unique ID of the frequency record"
+  })
+  frequencyId: number;
+
+  @ApiProperty({
+    example: 1,
+    description: "The ID of the student"
+  })
+  studentId: number;
+
+  @ApiProperty({
+    example: "João Silva",
+    description: "The student's full name"
+  })
+  studentFullName: string;
+
+  @ApiProperty({
+    example: "90.00%",
+    description: "The student's attendance percentage for this class"
+  })
+  attendancePercentage: string;
+
+  @ApiProperty({
+    example: "AUSENTE",
+    description: "The attendance status for this specific date",
+    enum: ["PRESENTE", "AUSENTE"]
+  })
+  status: string;
+
+  @ApiProperty({
+    example: "ATESTADO-MEDICO",
+    description: "Additional notes about the student's attendance",
+    nullable: true
+  })
+  notes: string | null;
+}
+
+export class StudentListByClassAndDateResponseDTO {
+  @ApiProperty({
+    example: 2,
+    description: "The ID of the class"
+  })
+  classId: number;
+  
+  @ApiProperty({
+    example: "2025-09-02T00:00:00.000Z",
+    description: "The date of the attendance record"
+  })
+  date: Date;
+  
+  @ApiProperty({
+    type: [StudentClassAttendanceItemDTO],
+    description: "List of students with their attendance details"
+  })
+  studentList: StudentClassAttendanceItemDTO[];
 }
