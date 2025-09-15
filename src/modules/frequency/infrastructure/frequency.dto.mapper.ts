@@ -39,14 +39,9 @@ export class FrequencyDTOMapper {
         };
     };
     static toStudentGeneralAttendanceDTO(prismaClass: PrismaStudentGeneralFrequency): StudentGeneralAttendanceResponseDTO {
-        const formatDate = (date: Date): string|null => {
-            if (!date) return null;
-            return date.toISOString().split("T")[0]; 
-            };
         const studentRef =  {
             studentId: prismaClass.studentid,
             fullName: prismaClass.fullname,
-            date: formatDate(prismaClass.date),
             generalAttendanceAllowed: prismaClass.generalattendanceallowed==="true"?true:false,
             status: prismaClass.status,
     };

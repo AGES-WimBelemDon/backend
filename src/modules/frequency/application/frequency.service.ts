@@ -5,12 +5,11 @@ import {
 } from "./frequency.service.query.interfaces";
 import {
   UserClassesResponseDTO,
-  StudentGeneralAttendanceResponseDTO,
   UpdateGeneralAttendanceRequestDTO,
   UpdateGeneralAttendanceItemDTO,
   StudentListByClassAndDateResponseDTO,
-  StudentClassAttendanceItemDTO,
   UpdateClassAttendanceRequestDTO,
+  GeneralAttendanceResponseDTO,
 } from "./frequency.dtos";
 import { Frequency, FrequencyStatus } from "../domain/frequency.entity";
 import { FREQUENCY_REPOSITORY_TOKEN, IFrequencyRepository } from "../domain/frequency.repository";
@@ -41,25 +40,26 @@ export class FrequencyService {
   }
   public async getGeneralAttendance(
     date: Date,
-  ): Promise<StudentGeneralAttendanceResponseDTO[]> {
+  ): Promise<GeneralAttendanceResponseDTO> {
     const studentList =
       await this.frequencyQueryService.getGeneralAttendance(date);
-    return studentList;
+    return {
+      date : date.toISOString().split("T")[0],
+      studentList: studentList
+    };
   }
   public async updateGeneralAttendance(
-    array: UpdateGeneralAttendanceRequestDTO,
+    object: UpdateGeneralAttendanceRequestDTO,
   ): Promise<boolean> {
-    if(!array["updates"]){
-      return false;
-    };
-    var validItems   : UpdateGeneralAttendanceItemDTO[] = array["updates"].filter(item=>item.generalAttendanceAllowed===true);
+    const date = object.date;
+    var validItems   : UpdateGeneralAttendanceItemDTO[] = object["studentList"].filter(item=>item.generalAttendanceAllowed===true);
     var present      : Frequency[] = [];
     var notPresent   : Frequency[] = [];
     const domainItems: Frequency[] = validItems.map(item=>new Frequency({
         id : null,
         studentId: item.studentId,
         classId: null,
-        date: item.date,
+        date: date,
         status: item.status,
         notes: null
     }));
@@ -167,10 +167,7 @@ export class FrequencyService {
         notes: null
       })
     );
-    const wasDeleted =  await this.frequencyRepository.deleteManyByStudentAndClassAndDate(deleteList);
-    if(!wasDeleted){
-      throw new InternalServerErrorException("Failed to update attendance records");
-    }
+    await this.frequencyRepository.deleteManyByStudentAndClassAndDate(deleteList);
     await Promise.all(updatePromises);
   }
 }

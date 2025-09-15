@@ -8,6 +8,7 @@ import {
   IsInt,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   ValidateNested,
 } from "class-validator";
 import { FrequencyStatus } from "../domain/frequency.entity";
@@ -75,44 +76,6 @@ export class UserClassesResponseDTO {
   classes: UserClassesDTO[];
 }
 
-export class StudentGeneralAttendanceResponseDTO {
-  @ApiProperty({
-    example: 1,
-    description: "The ID of the student",
-    nullable: false,
-  })
-  @IsInt()
-  @IsNotEmpty()
-  studentId: number;
-  @ApiProperty({
-    example: "John Doe",
-    description: "The full name of the student",
-    nullable: false,
-  })
-  fullName: string;
-
-  @ApiProperty({
-    example: "2025-09-11",
-    description: "The requested frequency list date",
-  })
-  date: string | null;
-
-  @ApiProperty({
-    description:
-      "Indicates whether the student's attendance can be registered in the general attendance list. \
-  - true: the student can be marked directly in the general attendance list. \
-  - false: the student's attendance is controlled by another class and cannot be modified here.",
-  })
-  generalAttendanceAllowed: boolean;
-  @ApiProperty({
-    description: "Describes if a student was present or not",
-    example: FrequencyStatus.PRESENTE,
-  })
-  @IsEnum(FrequencyStatus)
-  @IsNotEmpty()
-  status: FrequencyStatus;
-}
-
 export class UpdateGeneralAttendanceItemDTO {
   @ApiProperty({
     example: 1,
@@ -123,14 +86,6 @@ export class UpdateGeneralAttendanceItemDTO {
   @IsNotEmpty()
   studentId: number;
 
-  @IsNotEmpty()
-  @IsDate()
-  @Transform(({ value }) => new Date(value))
-  @ApiProperty({
-    example: "2025-09-11",
-    description: "The requested frequency list date",
-  })
-  date: Date;
   @IsBoolean()
   @IsNotEmpty()
   @ApiProperty({
@@ -151,14 +106,19 @@ export class UpdateGeneralAttendanceItemDTO {
 }
 
 export class UpdateGeneralAttendanceRequestDTO {
+  @IsDate()
+  @Transform(({ value }) => new Date(value))
+  @IsNotEmpty()
+  date: Date;
   @ApiProperty({
     description: "An array of student attendance updates.",
     type: [UpdateGeneralAttendanceItemDTO],
   })
   @IsArray()
   @ValidateNested({ each: true })
+  @IsNotEmpty()
   @Type(() => UpdateGeneralAttendanceItemDTO)
-  updates: UpdateGeneralAttendanceItemDTO[];
+  studentList: UpdateGeneralAttendanceItemDTO[];
 }
 export class StudentClassAttendanceItemDTO {
   @ApiProperty({
@@ -267,6 +227,7 @@ export class UpdateAttendanceItemDTO {
     description: "Additional notes about the attendance",
     nullable: true
   })
+  @IsOptional()
   notes: string | null;
 }
 
@@ -296,4 +257,55 @@ export class UpdateClassAttendanceRequestDTO {
   @ValidateNested({ each: true })
   @Type(() => UpdateAttendanceItemDTO)
   studentList: UpdateAttendanceItemDTO[];
+}
+
+export class StudentGeneralAttendanceResponseDTO {
+  @ApiProperty({
+    example: 1,
+    description: "The ID of the student",
+    nullable: false,
+  })
+  @IsInt()
+  @IsNotEmpty()
+  studentId: number;
+  @ApiProperty({
+    example: "John Doe",
+    description: "The full name of the student",
+    nullable: false,
+  })
+  fullName: string;
+
+  @ApiProperty({
+    description:
+      "Indicates whether the student's attendance can be registered in the general attendance list. \
+  - true: the student can be marked directly in the general attendance list. \
+  - false: the student's attendance is controlled by another class and cannot be modified here.",
+  })
+  generalAttendanceAllowed: boolean;
+  @ApiProperty({
+    description: "Describes if a student was present or not",
+    example: FrequencyStatus.PRESENTE,
+  })
+  @IsEnum(FrequencyStatus)
+  @IsNotEmpty()
+  status: FrequencyStatus;
+}
+
+export class GeneralAttendanceResponseDTO {
+  @ApiProperty({
+    example: "2025-09-20",
+    description: "The date of the attendance records",
+    type: String
+  })
+  @IsNotEmpty()
+  date: string;
+  
+  @ApiProperty({
+    type: [StudentGeneralAttendanceResponseDTO],
+    description: "List of students with their attendance details"
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => StudentGeneralAttendanceResponseDTO)
+  studentList: StudentGeneralAttendanceResponseDTO[];
 }

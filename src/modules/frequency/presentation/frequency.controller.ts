@@ -1,7 +1,7 @@
 import { Controller, Get, Param, ParseIntPipe, Body, Patch, HttpCode, Query, Post } from "@nestjs/common";
 import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FrequencyService } from "../application/frequency.service";
-import { UserClassesResponseDTO, StudentGeneralAttendanceResponseDTO, UpdateGeneralAttendanceRequestDTO, StudentListByClassAndDateResponseDTO, PostClassAttendanceDTO, UpdateClassAttendanceRequestDTO} from "../application/frequency.dtos";
+import { UserClassesResponseDTO, StudentGeneralAttendanceResponseDTO, UpdateGeneralAttendanceRequestDTO, StudentListByClassAndDateResponseDTO, PostClassAttendanceDTO, UpdateClassAttendanceRequestDTO, GeneralAttendanceResponseDTO} from "../application/frequency.dtos";
 import { CustomParseDatePipe } from "src/common/pipes/CustomParseDatePipe";
 
 @Controller("frequency")
@@ -32,24 +32,32 @@ export class FrequencyConstroller{
     }
     @Get("general-attendance")
     @ApiOperation({
-        summary: "Get general attendance list for all active students",
-        description: "Retrieves the general attendance list of all active students"
+        summary: "Get general attendance list for a specific date",
+        description: "Retrieves the consolidated attendance information for all active students on a given date, showing their attendance status and eligibility for general attendance tracking"
     })
-    @ApiQuery({ 
-        name: 'date', 
-        type: String, 
-        example: '2025-09-11',
-        description: "The date of the attendance record in YYYY-MM-DD format",
-        required: true 
+    @ApiQuery({
+        name: 'date',
+        required: true,
+        type: String,
+        example: '2025-09-20',
+        description: 'The date for which to retrieve attendance records (YYYY-MM-DD format)'
     })
     @ApiResponse({
         status: 200,
         description: "Successfully retrieved the general attendance list",
-        type: [StudentGeneralAttendanceResponseDTO],
+        type: GeneralAttendanceResponseDTO,
     })
-    async getGeneralAttendance(@Query('date', CustomParseDatePipe) date: Date): Promise<StudentGeneralAttendanceResponseDTO[]>{
-        const studentList =  await this.frequencyService.getGeneralAttendance(date)
-        return studentList;
+    @ApiResponse({
+        status: 400,
+        description: "Invalid date format"
+    })
+    @ApiResponse({
+        status: 500,
+        description: "An unexpected server error occurred"
+    })
+    async getGeneralAttendance(@Query('date', CustomParseDatePipe) date: Date): Promise<GeneralAttendanceResponseDTO> {
+    const studentList = await this.frequencyService.getGeneralAttendance(date);
+    return studentList;
     }
     @Patch("general-attendance")
     @HttpCode(204)
@@ -63,22 +71,20 @@ export class FrequencyConstroller{
     examples: {
         standard: {
         value: {
-            updates: [
+            date: "2025-09-11",
+            studentList: [
             {
                 studentId: 1,
-                date: "2025-09-11",
                 status: "PRESENTE",
                 generalAttendanceAllowed: true
             },
             {
                 studentId: 2,
-                date: "2025-09-11",
                 status: "AUSENTE",
                 generalAttendanceAllowed: true
             },
             {
                 studentId: 3,
-                date: "2025-09-11",
                 status: "PRESENTE",
                 generalAttendanceAllowed: false
             }
@@ -100,8 +106,8 @@ export class FrequencyConstroller{
     status: 500,
     description: "Failed to update attendance records"
     })
-    async updateGeneralAttendance(@Body() updateDto: UpdateGeneralAttendanceRequestDTO): Promise<boolean> {
-    return await this.frequencyService.updateGeneralAttendance(updateDto);
+    async updateGeneralAttendance(@Body() updateDto: UpdateGeneralAttendanceRequestDTO): Promise<void> {
+    await this.frequencyService.updateGeneralAttendance(updateDto);
     }
     @Get("class-attendance")
     @ApiOperation({
