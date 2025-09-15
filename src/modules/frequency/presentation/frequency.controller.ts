@@ -5,7 +5,7 @@ import { UserClassesResponseDTO, StudentGeneralAttendanceResponseDTO, UpdateGene
 import { CustomParseDatePipe } from "src/common/pipes/CustomParseDatePipe";
 
 @Controller("frequency")
-@ApiTags("frequencyResource")
+@ApiTags("frequency-resource")
 export class FrequencyConstroller{
     constructor(private frequencyService: FrequencyService ){}
     
