@@ -1,4 +1,4 @@
-import { ConflictException, Inject, Injectable, InternalServerErrorException } from "@nestjs/common";
+import { ConflictException, Inject, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import {
   FREQUENCY_QUERIES_TOKEN,
   IFrequencyQueries,
@@ -86,12 +86,15 @@ export class FrequencyService {
       studentList : attendanceList
     };
   }
-  public async createAttendanceList(date: Date, classId: number): Promise<boolean>{
+  public async createAttendanceList(date: Date, classId: number): Promise<StudentListByClassAndDateResponseDTO>{
     const attendanceList = await this.frequencyRepository.getByClassIdAnDate(classId, date);
     if(attendanceList.length>0){
-      throw new ConflictException(`Class with ID ${classId} and date ${date} already was created.`);
+      throw new ConflictException(`Class with ID ${classId} and date ${date.toISOString().split("T")[0]} already was created.`);
     }
     const enrolledStudents = await this.frequencyQueryService.getStudentsByClassId(classId);
+    if(enrolledStudents.length===0){
+      throw new NotFoundException(`The class with ID ${classId} has no enrolled students or wasn't found.`);
+    }
     const frequencies: Frequency[] = [];
     for (let index = 0; index < enrolledStudents.length; index++) {
       const frequency = new Frequency({
@@ -120,6 +123,6 @@ export class FrequencyService {
     if(!wasItCreated){
       throw new InternalServerErrorException("The system wasn't able to create a new class attendance");
     }
-    return true;
+    return await this.getAttendanceListByClassAndDate(date, classId);
   }
 }

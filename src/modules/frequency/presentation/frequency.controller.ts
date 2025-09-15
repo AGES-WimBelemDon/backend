@@ -1,5 +1,5 @@
 import { Controller, Get, Param, ParseIntPipe, Body, Patch, HttpCode, Query, Post } from "@nestjs/common";
-import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FrequencyService } from "../application/frequency.service";
 import { UserClassesResponseDTO, StudentGeneralAttendanceResponseDTO, UpdateGeneralAttendanceRequestDTO, StudentListByClassAndDateResponseDTO, PostClassAttendanceDTO} from "../application/frequency.dtos";
 import { CustomParseDatePipe } from "src/common/pipes/CustomParseDatePipe";
@@ -30,34 +30,78 @@ export class FrequencyConstroller{
     async getUserClasses(@Param("userId", ParseIntPipe) userId: number):Promise<UserClassesResponseDTO>{
         return await this.frequencyService.getUserClasses(userId);
     }
-    @Get("general-attendance/:date")
+    @Get("general-attendance")
     @ApiOperation({
         summary: "Get general attendance list for all active students",
         description: "Retrieves the general attendance list of all active students"
     })
-    @ApiParam({
-        name: "date",
-        type: Date,
-        description: "The date of the general attendance",
-        example: "2025-09-11",
+    @ApiQuery({ 
+        name: 'date', 
+        type: String, 
+        example: '2025-09-11',
+        description: "The date of the attendance record in YYYY-MM-DD format",
+        required: true 
     })
     @ApiResponse({
         status: 200,
         description: "Successfully retrieved the general attendance list",
         type: [StudentGeneralAttendanceResponseDTO],
     })
-    async getGeneralAttendance(@Param("date", CustomParseDatePipe) date: Date): Promise<StudentGeneralAttendanceResponseDTO[]>{
+    async getGeneralAttendance(@Query('date', CustomParseDatePipe) date: Date): Promise<StudentGeneralAttendanceResponseDTO[]>{
         const studentList =  await this.frequencyService.getGeneralAttendance(date)
         return studentList;
     }
     @Patch("general-attendance")
     @HttpCode(204)
-    @ApiResponse({
-        status: 204,
-        description: "Successfully updated the general attendance list"
+    @ApiOperation({
+    summary: "Update general attendance records",
+    description: "Updates the general attendance status for multiple students. Present students will have records created or updated, while absent students will have records removed from the frequency table."
     })
-    async updateGeneralAttendance(@Body() updateDto: UpdateGeneralAttendanceRequestDTO): Promise<boolean>{
-        return await this.frequencyService.updateGeneralAttendance(updateDto);
+    @ApiBody({
+    type: UpdateGeneralAttendanceRequestDTO,
+    description: "The list of attendance updates to process",
+    examples: {
+        standard: {
+        value: {
+            updates: [
+            {
+                studentId: 1,
+                date: "2025-09-11",
+                status: "PRESENTE",
+                generalAttendanceAllowed: true
+            },
+            {
+                studentId: 2,
+                date: "2025-09-11",
+                status: "AUSENTE",
+                generalAttendanceAllowed: true
+            },
+            {
+                studentId: 3,
+                date: "2025-09-11",
+                status: "PRESENTE",
+                generalAttendanceAllowed: false
+            }
+            ]
+        },
+        summary: "Mixed attendance update"
+        }
+    }
+    })
+    @ApiResponse({
+    status: 204,
+    description: "Successfully updated the general attendance records"
+    })
+    @ApiResponse({
+    status: 400,
+    description: "Invalid request format or missing required data"
+    })
+    @ApiResponse({
+    status: 500,
+    description: "Failed to update attendance records"
+    })
+    async updateGeneralAttendance(@Body() updateDto: UpdateGeneralAttendanceRequestDTO): Promise<boolean> {
+    return await this.frequencyService.updateGeneralAttendance(updateDto);
     }
     @Get("class-attendance")
     @ApiOperation({
@@ -98,7 +142,42 @@ export class FrequencyConstroller{
     return await this.frequencyService.getAttendanceListByClassAndDate(date, classId);
     }
     @Post("class-attendance")
-    async postClassAttendance(@Body()body: PostClassAttendanceDTO) : Promise<boolean>{
-        return await this.frequencyService.createAttendanceList(body.date, body.classId);
+    @ApiOperation({
+    summary: "Create a new attendance list for a class on a specific date",
+    description: "Creates attendance records for all enrolled students in the specified class, setting their default status to PRESENTE."
+    })
+    @ApiBody({
+    type: PostClassAttendanceDTO,
+    description: "Class ID and date for creating the attendance list",
+    examples: {
+        example1: {
+        value: {
+            classId: 2,
+            date: "2025-09-15"
+        },
+        summary: "Standard attendance creation request"
+        }
+    }
+    })
+    @ApiResponse({
+    status: 201,
+    description: "Successfully created the attendance list",
+    type: StudentListByClassAndDateResponseDTO
+    })
+    @ApiResponse({
+    status: 409,
+    description: "Attendance list already exists for this class and date"
+    })
+    @ApiResponse({
+    status: 404,
+    description: "The class has no enrolled students or the class was not found"
+    })
+    @ApiResponse({
+    status: 500,
+    description: "Failed to create the attendance list"
+    })
+    @HttpCode(201)
+    async postClassAttendance(@Body() body: PostClassAttendanceDTO): Promise<StudentListByClassAndDateResponseDTO> {
+    return await this.frequencyService.createAttendanceList(body.date, body.classId);
     }
 }
