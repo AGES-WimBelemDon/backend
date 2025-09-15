@@ -1,7 +1,7 @@
 import { Controller, Get, Param, ParseIntPipe, Body, Patch, HttpCode, Query, Post } from "@nestjs/common";
 import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FrequencyService } from "../application/frequency.service";
-import { UserClassesResponseDTO, StudentGeneralAttendanceResponseDTO, UpdateGeneralAttendanceRequestDTO, StudentListByClassAndDateResponseDTO, PostClassAttendanceDTO} from "../application/frequency.dtos";
+import { UserClassesResponseDTO, StudentGeneralAttendanceResponseDTO, UpdateGeneralAttendanceRequestDTO, StudentListByClassAndDateResponseDTO, PostClassAttendanceDTO, UpdateClassAttendanceRequestDTO} from "../application/frequency.dtos";
 import { CustomParseDatePipe } from "src/common/pipes/CustomParseDatePipe";
 
 @Controller("frequency")
@@ -179,5 +179,59 @@ export class FrequencyConstroller{
     @HttpCode(201)
     async postClassAttendance(@Body() body: PostClassAttendanceDTO): Promise<StudentListByClassAndDateResponseDTO> {
     return await this.frequencyService.createAttendanceList(body.date, body.classId);
+    };
+    @Patch("class-attendance")
+    @HttpCode(204)
+    @ApiOperation({
+    summary: "Update attendance records for a class",
+    description: "Updates the attendance status and notes for multiple students in a specific class on a given date."
+    })
+    @ApiBody({
+    type: UpdateClassAttendanceRequestDTO,
+    description: "The class attendance records to update",
+    examples: {
+        standard: {
+        value: {
+            classId: 2,
+            date: "2025-09-11",
+            studentList: [
+            {
+                frequencyId: 19,
+                studentId: 2,
+                status: "PRESENTE",
+                notes: null
+            },
+            {
+                frequencyId: 20,
+                studentId: 5,
+                status: "AUSENTE",
+                notes: "ATESTADO-MEDICO"
+            }
+            ]
+        },
+        summary: "Update attendance for multiple students"
+        }
+    }
+    })
+    @ApiResponse({
+    status: 204,
+    description: "Successfully updated the attendance records"
+    })
+    @ApiResponse({
+    status: 400,
+    description: "Invalid request format or missing required data"
+    })
+    @ApiResponse({
+    status: 404,
+    description: "Class attendance records not found for the specified date"
+    })
+    @ApiResponse({
+    status: 500,
+    description: "Failed to update attendance records"
+    })
+    async updateClassAttendance(
+    @Body() updateDto: UpdateClassAttendanceRequestDTO
+    ): Promise<void> {
+    await this.frequencyService.updateAttendanceList(updateDto);
     }
 }

@@ -1,4 +1,4 @@
-import { ConflictException, Inject, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Inject, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import {
   FREQUENCY_QUERIES_TOKEN,
   IFrequencyQueries,
@@ -10,6 +10,7 @@ import {
   UpdateGeneralAttendanceItemDTO,
   StudentListByClassAndDateResponseDTO,
   StudentClassAttendanceItemDTO,
+  UpdateClassAttendanceRequestDTO,
 } from "./frequency.dtos";
 import { Frequency, FrequencyStatus } from "../domain/frequency.entity";
 import { FREQUENCY_REPOSITORY_TOKEN, IFrequencyRepository } from "../domain/frequency.repository";
@@ -82,7 +83,7 @@ export class FrequencyService {
     const attendanceList = await this.frequencyQueryService.getStudentByClassAndDateAttendanceList(classId, date);
     return {
       classId : classId,
-      date    : date,
+      date    : date.toISOString().split("T")[0],
       studentList : attendanceList
     };
   }
@@ -124,5 +125,52 @@ export class FrequencyService {
       throw new InternalServerErrorException("The system wasn't able to create a new class attendance");
     }
     return await this.getAttendanceListByClassAndDate(date, classId);
+  };
+  
+  public async updateAttendanceList(
+    updateDto: UpdateClassAttendanceRequestDTO,
+  ): Promise<void> {
+    const { classId, date, studentList } = updateDto;
+    if (studentList.length === 0) {
+      throw new BadRequestException('The studentList array cannot be empty.');
+    }
+    const existingFrequencies = await this.frequencyRepository.getByClassIdAnDate(classId,date);
+    if (existingFrequencies.length === 0) {
+      throw new BadRequestException(`Attendance list for class ID ${classId} on this date has not been created yet.`);
+    }
+    const frequencyMap = new Map<number, Frequency>();
+    for (const freq of existingFrequencies) {
+      frequencyMap.set(freq.getId()??-1, freq);
+    }
+    const updatePromises: Promise<Frequency>[] = [];
+    var presentList: Frequency[] = []
+    for (const studentUpdate of studentList) {
+      const frequencyToUpdate = frequencyMap.get(studentUpdate.frequencyId);
+      if (!frequencyToUpdate) {
+        throw new BadRequestException(`Frequency record with ID ${studentUpdate.frequencyId} is not part of this attendance list.`);
+      }
+      if (studentUpdate.status === FrequencyStatus.PRESENTE) {
+        frequencyToUpdate.markPresent();
+        presentList.push(frequencyToUpdate);
+      } else {
+        frequencyToUpdate.markAbsent(studentUpdate.notes ?? undefined);
+      }
+      updatePromises.push(this.frequencyRepository.upsert(frequencyToUpdate));
+    }
+    const deleteList = presentList.map(frequency=>
+      new Frequency({
+        id: null,
+        studentId: frequency.getStudentId(),
+        classId: null,
+        date: frequency.getDate(),
+        status: FrequencyStatus.PRESENTE,
+        notes: null
+      })
+    );
+    const wasDeleted =  await this.frequencyRepository.deleteManyByStudentAndClassAndDate(deleteList);
+    if(!wasDeleted){
+      throw new InternalServerErrorException("Failed to update attendance records");
+    }
+    await Promise.all(updatePromises);
   }
 }

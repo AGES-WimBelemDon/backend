@@ -208,10 +208,10 @@ export class StudentListByClassAndDateResponseDTO {
   classId: number;
   
   @ApiProperty({
-    example: "2025-09-02T00:00:00.000Z",
+    example: "2025-09-02",
     description: "The date of the attendance record"
   })
-  date: Date;
+  date: String;
   
   @ApiProperty({
     type: [StudentClassAttendanceItemDTO],
@@ -234,4 +234,66 @@ export class PostClassAttendanceDTO {
 }
 export interface EnrolledStudentDTO {
   id: number;
+}
+
+export class UpdateAttendanceItemDTO {
+  @ApiProperty({
+    example: 19,
+    description: "The ID of the frequency record to update"
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  frequencyId: number;
+
+  @ApiProperty({
+    example: 2,
+    description: "The ID of the student"
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  studentId: number;
+
+  @ApiProperty({
+    example: "PRESENTE",
+    description: "The updated attendance status",
+    enum: ["PRESENTE", "AUSENTE"]
+  })
+  @IsEnum(FrequencyStatus)
+  @IsNotEmpty()
+  status: FrequencyStatus;
+
+  @ApiProperty({
+    example: "ATESTADO-MEDICO",
+    description: "Additional notes about the attendance",
+    nullable: true
+  })
+  notes: string | null;
+}
+
+export class UpdateClassAttendanceRequestDTO {
+  @ApiProperty({
+    example: 2,
+    description: "The ID of the class"
+  })
+  @IsNumber()
+  @Type(() => Number)
+  @IsNotEmpty()
+  classId: number;
+  
+  @ApiProperty({
+    example: "2025-09-11",
+    description: "The date of the attendance records"
+  })
+  @IsDate()
+  @Transform(({ value }) => new Date(value))
+  date: Date;
+  
+  @ApiProperty({
+    type: [UpdateAttendanceItemDTO],
+    description: "List of student attendance records to update"
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => UpdateAttendanceItemDTO)
+  studentList: UpdateAttendanceItemDTO[];
 }
