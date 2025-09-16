@@ -18,8 +18,8 @@ import { StudentModule } from './modules/student/student.module';
       ignoreEnvFile: process.env.NODE_ENV === 'production',
       isGlobal: true
     }),
-    FrequencyModule
-    StudentModule,
+    FrequencyModule,
+    StudentModule
   ],
 })
 export class AppModule {}

@@ -18,42 +18,42 @@ import { StudentService } from "../application/student.service";
 import { CreateStudentDTO } from "../application/create-student.dto";
 import { StudentMapper } from "../infrastructure/student.mapper";
 
-@ApiTags("alunos")
-@Controller("alunos")
+@ApiTags("students")
+@Controller("students")
 export class StudentController {
     constructor(private readonly studentService: StudentService) {}
 
     @Post()
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({ 
-        summary: "Cadastrar novo educando",
-        description: "Cadastra um novo aluno no sistema com validação de CPF único"
+        summary: "Register new student",
+        description: "Registers a new student in the system with unique CPF validation"
     })
     @ApiResponse({ 
         status: 201, 
-        description: "Aluno criado com sucesso",
+        description: "Student successfully created",
         schema: {
             example: {
                 id: 1,
-                fullName: "João Silva Santos",
+                fullName: "John Silva Santos",
                 registrationNumber: "12345678901",
                 dateOfBirth: "2010-05-15T00:00:00.000Z",
-                socialName: "João",
+                socialName: "John",
                 enrollmentDate: "2025-09-07T15:30:00.000Z",
-                status: "ATIVO"
+                status: "ACTIVE"
             }
         }
     })
     @ApiResponse({ 
         status: 400, 
-        description: "Dados inválidos",
+        description: "Invalid data",
         schema: {
             example: {
                 statusCode: 400,
                 message: [
-                    "Nome completo é obrigatório",
-                    "CPF deve conter exatamente 11 dígitos numéricos",
-                    "Data de nascimento deve estar no formato YYYY-MM-DD"
+                    "Full name is required",
+                    "CPF must contain exactly 11 numeric digits",
+                    "Date of birth must be in YYYY-MM-DD format"
                 ],
                 error: "Bad Request"
             }
@@ -61,18 +61,18 @@ export class StudentController {
     })
     @ApiResponse({ 
         status: 409, 
-        description: "CPF já cadastrado",
+        description: "CPF already registered",
         schema: {
             example: {
                 statusCode: 409,
-                message: "CPF já está em uso",
+                message: "CPF is already in use",
                 error: "Conflict"
             }
         }
     })
     @ApiResponse({ 
         status: 500, 
-        description: "Erro interno do servidor",
+        description: "Internal server error",
         schema: {
             example: {
                 statusCode: 500,
@@ -88,12 +88,12 @@ export class StudentController {
 
     @Get()
     @ApiOperation({ 
-        summary: "Listar todos os alunos",
-        description: "Retorna lista de todos os alunos ativos do sistema"
+        summary: "List all students",
+        description: "Returns a list of all active students in the system"
     })
     @ApiResponse({ 
         status: 200, 
-        description: "Lista de alunos recuperada com sucesso"
+        description: "Student list successfully retrieved"
     })
     async findAllStudents() {
         const students = await this.studentService.findAll();
@@ -102,44 +102,44 @@ export class StudentController {
 
     @Get(':id')
     @ApiOperation({ 
-        summary: "Buscar aluno por ID",
-        description: "Retorna os dados de um aluno específico"
+        summary: "Find student by ID",
+        description: "Returns the data of a specific student"
     })
-    @ApiParam({ name: 'id', description: 'ID do aluno', type: 'number' })
+    @ApiParam({ name: 'id', description: 'Student ID', type: 'number' })
     @ApiResponse({ 
         status: 200, 
-        description: "Aluno encontrado com sucesso"
+        description: "Student successfully found"
     })
     @ApiResponse({ 
         status: 404, 
-        description: "Aluno não encontrado"
+        description: "Student not found"
     })
     async findStudentById(@Param('id', ParseIntPipe) id: number) {
         const student = await this.studentService.findById(id);
         if (!student) {
-            return { message: "Aluno não encontrado" };
+            return { message: "Student not found" };
         }
         return StudentMapper.toResponse(student);
     }
 
     @Get('cpf/:registrationNumber')
     @ApiOperation({ 
-        summary: "Buscar aluno por CPF",
-        description: "Retorna os dados de um aluno através do CPF"
+        summary: "Find student by CPF",
+        description: "Returns the data of a student by CPF"
     })
-    @ApiParam({ name: 'registrationNumber', description: 'CPF do aluno (11 dígitos)', type: 'string' })
+    @ApiParam({ name: 'registrationNumber', description: 'Student CPF (11 digits)', type: 'string' })
     @ApiResponse({ 
         status: 200, 
-        description: "Aluno encontrado com sucesso"
+        description: "Student successfully found"
     })
     @ApiResponse({ 
         status: 404, 
-        description: "Aluno não encontrado"
+        description: "Student not found"
     })
     async findStudentByRegistrationNumber(@Param('registrationNumber') registrationNumber: string) {
         const student = await this.studentService.findByRegistrationNumber(registrationNumber);
         if (!student) {
-            return { message: "Aluno não encontrado" };
+            return { message: "Student not found" };
         }
         return StudentMapper.toResponse(student);
     }
