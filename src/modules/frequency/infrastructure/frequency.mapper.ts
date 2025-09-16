@@ -1,5 +1,5 @@
-import { Frequency, FrequencyStatus } from "../domain/frequency.entity";
-import { FrequencyStatus as PrismaFrequencyStatus, Frequency as PrismaFrequency } from "@prisma/client";
+import { Frequency } from "../domain/frequency.entity";
+import { FrequencyStatus as PrismaFrequencyStatus, Frequency as PrismaFrequency, FrequencyStatus } from "@prisma/client";
 export class FrequencyMapper{
     static toDomain(object: PrismaFrequency): Frequency{
         return new Frequency({

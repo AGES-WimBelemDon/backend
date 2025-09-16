@@ -1,7 +1,4 @@
-export enum FrequencyStatus {
-  PRESENTE = "PRESENTE",
-  AUSENTE = "AUSENTE"
-}
+import { FrequencyStatus } from "src/common/enums/domain.enums";
 
 export interface FrequencyProps {
   id: number | null;

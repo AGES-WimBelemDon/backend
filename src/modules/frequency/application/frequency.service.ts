@@ -11,8 +11,9 @@ import {
   UpdateClassAttendanceRequestDTO,
   GeneralAttendanceResponseDTO,
 } from "./frequency.dtos";
-import { Frequency, FrequencyStatus } from "../domain/frequency.entity";
+import { Frequency } from "../domain/frequency.entity";
 import { FREQUENCY_REPOSITORY_TOKEN, IFrequencyRepository } from "../domain/frequency.repository";
+import { FrequencyStatus } from "src/common/enums/domain.enums";
 
 @Injectable()
 export class FrequencyService {

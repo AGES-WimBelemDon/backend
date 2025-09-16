@@ -1,5 +1,5 @@
+import { FrequencyStatus } from "src/common/enums/domain.enums";
 import { StudentClassAttendanceItemDTO, StudentGeneralAttendanceResponseDTO, UserClassesDTO } from "../application/frequency.dtos";
-import { FrequencyStatus } from "../domain/frequency.entity";
 
 
 type PrismaTeacherClass = {

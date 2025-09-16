@@ -11,7 +11,8 @@ import {
   IsOptional,
   ValidateNested,
 } from "class-validator";
-import { FrequencyStatus } from "../domain/frequency.entity";
+import { FrequencyStatus } from "src/common/enums/domain.enums";
+
 
 export class ActivityResponseDTO {
   @ApiProperty({
