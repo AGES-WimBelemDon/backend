@@ -10,7 +10,7 @@ import {
   StudentListByClassAndDateResponseDTO,
   UpdateClassAttendanceRequestDTO,
   GeneralAttendanceResponseDTO,
-} from "./frequency.dtos";
+} from "./dtos";
 import { Frequency } from "../domain/frequency.entity";
 import { FREQUENCY_REPOSITORY_TOKEN, IFrequencyRepository } from "../domain/frequency.repository";
 import { FrequencyStatus } from "src/common/enums/domain.enums";

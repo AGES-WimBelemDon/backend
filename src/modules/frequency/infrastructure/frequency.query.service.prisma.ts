@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { IFrequencyQueries } from "../application/frequency.service.query.interfaces";
-import { UserClassesDTO, StudentGeneralAttendanceResponseDTO, EnrolledStudentDTO } from "../application/frequency.dtos";
+import { UserClassesDTO, StudentGeneralAttendanceResponseDTO, EnrolledStudentDTO } from "../application/dtos";
 import { FrequencyDTOMapper,PrismaStudentGeneralFrequency, PrismaStudentClassAttendance } from "./frequency.dto.mapper";
 
 @Injectable()

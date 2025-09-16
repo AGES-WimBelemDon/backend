@@ -1,7 +1,14 @@
 import { Controller, Get, Param, ParseIntPipe, Body, Patch, HttpCode, Query, Post } from "@nestjs/common";
 import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FrequencyService } from "../application/frequency.service";
-import { UserClassesResponseDTO, StudentGeneralAttendanceResponseDTO, UpdateGeneralAttendanceRequestDTO, StudentListByClassAndDateResponseDTO, PostClassAttendanceDTO, UpdateClassAttendanceRequestDTO, GeneralAttendanceResponseDTO} from "../application/frequency.dtos";
+import {
+    UserClassesResponseDTO,
+    UpdateGeneralAttendanceRequestDTO,
+    StudentListByClassAndDateResponseDTO,
+    PostClassAttendanceDTO,
+    UpdateClassAttendanceRequestDTO,
+    GeneralAttendanceResponseDTO
+} from "../application/dtos";
 import { CustomParseDatePipe } from "src/common/pipes/CustomParseDatePipe";
 
 @Controller("frequency")

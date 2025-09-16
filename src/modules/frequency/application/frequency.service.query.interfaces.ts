@@ -2,8 +2,7 @@ import {
   EnrolledStudentDTO,
   StudentClassAttendanceItemDTO,
   StudentGeneralAttendanceResponseDTO,
-  UserClassesDTO,
-} from "./frequency.dtos";
+  UserClassesDTO } from "./dtos";
 
 export const FREQUENCY_QUERIES_TOKEN = "IFrequencyQueries";
 export interface IFrequencyQueries {
