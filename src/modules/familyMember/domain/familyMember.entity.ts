@@ -1,50 +1,5 @@
 import { Optional } from "@nestjs/common";
-
-export enum Race {
-    WHITE = "Branca",
-    BLACK = "Preta",
-    BROWN = "Parda",
-    YELLOW = "Amarela",
-    INDIGENOUS = "Indígena",
-    NA = "NA"
-}
-
-export enum Gender {
-    MALE = "Masculino",
-    FEMALE = "Feminino",
-    TRANSGENDER_MALE = "Transgênero Masculino",
-    TRANSGENDER_FEMALE = "Transgênero Feminino",
-    TRANSVESTITE = "Travesti",
-    NON_BINARY = "Não Binário",
-    OTHER = "Outro",
-
-}
-
-export enum EducationLevel {
-    NO_FORMAL_EDUCATION = "Sem escolaridade",
-    ALPHABETIZATED = "Alfabetizado",
-    ELEMENTARY_INCOMPLETE = "Ensino Fundamental Incompleto",
-    ELEMENTARY_COMPLETE = "Ensino Fundamental Completo",
-    HIGH_SCHOOL_INCOMPLETE = "Ensino Médio Incompleto",
-    HIGH_SCHOOL_COMPLETE = "Ensino Médio Completo",
-    HIGHER_EDUCATION_INCOMPLETE = "Ensino Superior Incompleto",
-    HIGHER_EDUCATION_COMPLETE = "Ensino Superior Completo",
-    POSTGRADUATE = "Pós-Graduação"
-}
-
-export enum SocialProgram {
-    BOLSA_FAMILIA = "Bolsa Família",
-    BCP = "Benefício de Prestação Continuada (BPC)",
-    TARIFA_SOCIAL_ENERGIA = "Tarifa Social de Energia Elétrica",
-    AUXILIO_GAS = "Auxílio Gás",
-    PROGRAMA_ESTADUAL = "Programa Estadual",
-    PROGRAMA_MUNICIPAL_VIA_CRAS = "Programa Municipal via CRAS"
-}
-
-export enum EmploymentStatus {
-    EMPLOYED = "Empregado",
-    UNEMPLOYED = "Desempregado",
-}
+import { Race, Gender, EducationLevel, SocialProgram, EmploymentStatus, Address, Student } from "@prisma/client";
 
 interface familyMemberProps {
 
@@ -60,14 +15,12 @@ interface familyMemberProps {
     dateOfBirth?: Date,
     socialPrograms?: SocialProgram,
     employmentStatus?: EmploymentStatus,
-    studentId: number,
-    addressId: number
+    students: [Student],
+    address: Address
 }
 
 export class FamilyMemberEntity {
     private readonly id: number;
-    private readonly studentId: number;
-    private readonly addressId: number
     private fullName: String;
     private phoneNumber: String;
     private relationship: String;
@@ -79,13 +32,14 @@ export class FamilyMemberEntity {
     private dateOfBirth?: Date;
     private socialPrograms?: SocialProgram;
     private employmentStatus?: EmploymentStatus;
+    private students: Student[];
+    private address: Address;
 
 
     constructor(props: familyMemberProps) {
-        if (!props.studentId) throw new Error("Student ID is required");
         this.id = props.id;
-        this.studentId = props.studentId;
-        this.addressId = props.addressId;
+        this.students = props.students;
+        this.address = props.address;
         this.fullName = props.fullName;
         this.phoneNumber = props.phoneNumber;
         this.relationship = props.relationship;
@@ -101,9 +55,9 @@ export class FamilyMemberEntity {
 
     public getId(): number { return this.id; }
 
-    public getStudentId(): number { return this.studentId; }
+    public getStudents(): Student[] { return this.students; }
 
-    public getAddressId(): number { return this.addressId; }
+    public getAddress(): Address { return this.address; }
 
     public getFullName(): String { return this.fullName; }
 
@@ -126,8 +80,6 @@ export class FamilyMemberEntity {
     public getSocialPrograms(): SocialProgram | undefined { return this.socialPrograms; }
 
     public getEmploymentStatus(): EmploymentStatus | undefined { return this.employmentStatus; }
-
-
 
     public setFullName(fullName: String): void { this.fullName = fullName; }
 

@@ -10,4 +10,6 @@ export class FamilyMemberService {
     private readonly firebaseAdminService: FirebaseService;
     async create(familyMemberDto: any): Promise<any> {
     }
+    async boundStudent(familyMemberId: string, studentId: string): Promise<void> { }
+
 }

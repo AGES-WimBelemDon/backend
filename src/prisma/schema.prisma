@@ -117,7 +117,6 @@ model FamilyMember {
   relationship      String
   phoneNumber       String            @map("phone_number")
   email             String?
-
   socialName        String?           @map("social_name")
   race              Race?
   gender            Gender?
