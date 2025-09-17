@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ExampleEntityModule } from './modules/exampleEntity/exampleEntity.module';
 import { FirebaseModule } from './modules/firebase/firebase.module';
 import { FrequencyModule } from './modules/frequency/frequency.module';
+import { StudentModule } from './modules/student/student.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { FrequencyModule } from './modules/frequency/frequency.module';
       ignoreEnvFile: process.env.NODE_ENV === 'production',
       isGlobal: true
     }),
-    FrequencyModule
+    FrequencyModule,
+    StudentModule
   ],
 })
 export class AppModule {}
