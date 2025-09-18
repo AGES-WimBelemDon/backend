@@ -53,13 +53,13 @@ export class FrequencyDTOMapper {
     };
     static toStudentClassAttendanceItemDTO(result: PrismaStudentClassAttendance): StudentClassAttendanceItemDTO {
         const formattedAttendance = result.attendance !== null 
-        ? `${(result.attendance * 100).toFixed(2)}%` 
-        : '0.00%';
+        ? (result.attendance * 100).toFixed(2)
+        : '0.00';
         return {
             frequencyId: result.frequencyId,
             studentId: result.stutendId,
             studentFullName: result.fullName,
-            attendancePercentage: formattedAttendance,
+            attendancePercentage: +formattedAttendance,
             status: result.status,
             notes: result.notes,
         };

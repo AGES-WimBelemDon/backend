@@ -190,13 +190,13 @@ export class FrequencyService {
       await this.frequencyRepository.deleteManyByStudentAndClassAndDate(
         newFrequenciesArray,
       );
-    if (!wasItDeleted) {
+    if (!wasFrequencyDeleted) {
       throw new InternalServerErrorException(
         "The system wasn't able to create a new class attendance",
       );
     }
-    const wasItCreated = await this.frequencyRepository.createMany(frequencies);
-    if (!wasItCreated) {
+    const wasCreated = await this.frequencyRepository.createMany(frequencies);
+    if (!wasCreated) {
       throw new InternalServerErrorException(
         "The system wasn't able to create a new class attendance",
       );

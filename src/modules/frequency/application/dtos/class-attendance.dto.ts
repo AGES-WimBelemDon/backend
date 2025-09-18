@@ -30,10 +30,10 @@ export class StudentClassAttendanceItemDTO {
   studentFullName: string;
 
   @ApiProperty({
-    example: "90.00%",
+    example: 90.55,
     description: "The student's attendance percentage for this class"
   })
-  attendancePercentage: string;
+  attendancePercentage: number;
 
   @ApiProperty({
     example: "AUSENTE",
