@@ -17,7 +17,7 @@ export class FamilyMemberService {
         if (dto.email) {
             const existingMember = await this.familyMemberRepository.findByEmail(dto.email);
             if (existingMember) {
-                throw new ConflictException(`O e-mail '${dto.email}' já está em uso.`);
+                throw new ConflictException(`Email '${dto.email}' already in use!`);
             }
         }
         
@@ -27,10 +27,10 @@ export class FamilyMemberService {
         if (dto.dateOfBirth) {
             dateOfBirth = new Date(dto.dateOfBirth);
             if (isNaN(dateOfBirth.getTime())) {
-                throw new BadRequestException("Data de nascimento inválida");
+                throw new BadRequestException("Invalid dateOfBirth");
             }
             if (dateOfBirth > new Date()) {
-                throw new BadRequestException("Data de nascimento não pode ser futura");
+                throw new BadRequestException("dateOfBirth cannot be in the future");
             }
         }
         
@@ -42,7 +42,7 @@ export class FamilyMemberService {
     async update(id: number, dto: UpdateFamilyMemberDTO): Promise<FamilyMemberEntity> {
         const existingFamilyMember = await this.familyMemberRepository.findById(id);
         if (!existingFamilyMember) {
-            throw new NotFoundException(`Membro da família com ID ${id} não encontrado.`);
+            throw new NotFoundException(`Family member with ID ${id} not found.`);
         }
 
         if (dto.email) {
@@ -50,7 +50,7 @@ export class FamilyMemberService {
                 where: { email: dto.email, NOT: { id: id } },
             });
             if (memberWithSameEmail) {
-                throw new ConflictException(`O e-mail '${dto.email}' já está em uso.`);
+                throw new ConflictException(`Email '${dto.email}' already in use!`);
             }
         }
         
@@ -62,7 +62,7 @@ export class FamilyMemberService {
     async delete(id: number): Promise<void> {
         const existingFamilyMember = await this.familyMemberRepository.findById(id);
         if (!existingFamilyMember) {
-            throw new NotFoundException(`Membro da família com ID ${id} não encontrado.`);
+            throw new NotFoundException(`Family member with ID ${id} not found.`);
         }
         return this.familyMemberRepository.delete(id);
     }
@@ -70,7 +70,7 @@ export class FamilyMemberService {
     async findById(id: number): Promise<FamilyMemberEntity> {
         const familyMember = await this.familyMemberRepository.findById(id);
         if (!familyMember) {
-            throw new NotFoundException(`Membro da família com ID ${id} não encontrado.`);
+            throw new NotFoundException(`Family member with ID ${id} not found.`);
         }
         return familyMember;
     }
@@ -83,13 +83,13 @@ export class FamilyMemberService {
         if (addressId) {
             const address = await this.prisma.address.findUnique({ where: { id: addressId } });
             if (!address) {
-                throw new NotFoundException(`Endereço com ID ${addressId} não encontrado.`);
+                throw new NotFoundException(`Address with ID ${addressId} not found.`);
             }
         }
         const foundStudents = await this.prisma.student.findMany({ where: { id: { in: studentIds } } });
         if (foundStudents.length !== studentIds.length) {
             const notFoundIds = studentIds.filter(id => !foundStudents.some(s => s.id === id));
-            throw new NotFoundException(`Estudante(s) com ID(s) ${notFoundIds.join(', ')} não encontrado(s).`);
+            throw new NotFoundException(`Students with IDs [${notFoundIds.join(", ")}] not found.`);
         }
     }
 }
