@@ -74,7 +74,7 @@ export class FrequencyService {
     }
     const validItems: UpdateGeneralAttendanceItemDTO[] = object[
       "studentList"
-    ].filter((item) => item.generalAttendanceAllowed === true);
+    ].filter((item) => item.generalAttendanceAllowed);
     const present: Frequency[] = [];
     const notPresent: Frequency[] = [];
     const domainItems: Frequency[] = validItems.map(
@@ -153,7 +153,7 @@ export class FrequencyService {
     );
     if (attendanceList.length > 0) {
       throw new ConflictException(
-        `Class with ID ${classId} and date ${date.toISOString().split("T")[0]} already was created.`,
+        `Class with ID ${classId} and date ${date.toISOString().split("T")[0]} was already created.`,
       );
     }
     const enrolledStudents =
@@ -186,7 +186,7 @@ export class FrequencyService {
           notes: null,
         }),
     );
-    const wasItDeleted =
+    const wasFrequencyDeleted =
       await this.frequencyRepository.deleteManyByStudentAndClassAndDate(
         newFrequenciesArray,
       );

@@ -61,7 +61,7 @@ export class StudentListByClassAndDateResponseDTO {
     example: "2025-09-02",
     description: "The date of the attendance record"
   })
-  date: String;
+  date: string;
   
   @ApiProperty({
     type: [StudentClassAttendanceItemDTO],
