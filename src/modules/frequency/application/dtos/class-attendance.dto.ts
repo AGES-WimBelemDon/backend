@@ -105,7 +105,7 @@ export class UpdateAttendanceItemDTO {
   studentId: number;
 
   @ApiProperty({
-    example: "PRESENTE",
+    example: FrequencyStatus.PRESENTE,
     description: "The updated attendance status",
     enum: [FrequencyStatus.PRESENTE, FrequencyStatus.AUSENTE],
     nullable: false

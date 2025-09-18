@@ -8,7 +8,7 @@ import { FrequencyMapper } from "./frequency.mapper";
 export class PrismaFrequencyRepository implements IFrequencyRepository {
   constructor(private readonly prisma: PrismaService) {}
   async deleteManyByStudentAndClassAndDate(frequencies: Frequency[]): Promise<boolean> {
-      if(frequencies.length==0){
+      if(frequencies.length===0){
         return false;
       }
       const whereConditions = frequencies.map(frequency => ({

@@ -60,11 +60,11 @@ export class FrequencyService {
     };
   }
   public async updateGeneralAttendance(
-    object: UpdateGeneralAttendanceRequestDTO,
+    data: UpdateGeneralAttendanceRequestDTO,
   ): Promise<boolean> {
-    const date = object.date;
+    const date = data.date;
     const isConsistent = await this.isGeneralAttendanceConsistent(
-      object["studentList"],
+      data["studentList"],
       date,
     );
     if (!isConsistent.isValid) {
@@ -72,7 +72,7 @@ export class FrequencyService {
         `Attendance permission conflict: The generalAttendanceAllowed values in your request don't match our system records. Problem with studentId: ${isConsistent.problematicId}`,
       );
     }
-    const validItems: UpdateGeneralAttendanceItemDTO[] = object[
+    const validItems: UpdateGeneralAttendanceItemDTO[] = data[
       "studentList"
     ].filter((item) => item.generalAttendanceAllowed);
     const present: Frequency[] = [];
@@ -110,11 +110,11 @@ export class FrequencyService {
     frequencyList: UpdateGeneralAttendanceItemDTO[],
     date: Date,
   ): Promise<{isValid:boolean, problematicId: number | null;}> {
-    const atndcListFromDb =
+    const attendanceListFromDb =
       await this.frequencyQueryService.getGeneralAttendance(date);
     const stdntIdVsStatusMap: Map<number, boolean> = new Map();
-    for (let i = 0; i < atndcListFromDb.length; i++) {
-      const item = atndcListFromDb[i];
+    for (let i = 0; i < attendanceListFromDb.length; i++) {
+      const item = attendanceListFromDb[i];
       const studentId = item.studentId;
       const isAllowed = item.generalAttendanceAllowed;
       stdntIdVsStatusMap.set(studentId, isAllowed);
@@ -122,7 +122,7 @@ export class FrequencyService {
     for (let i = 0; i < frequencyList.length; i++) {
       const fqItem = frequencyList[i];
       const statusDb = stdntIdVsStatusMap.get(fqItem.studentId);
-      if (statusDb===undefined || !statusDb == fqItem.generalAttendanceAllowed) {
+      if (statusDb===undefined || !statusDb === fqItem.generalAttendanceAllowed) {
         return {isValid:false, problematicId: fqItem.studentId};
       }
     }
