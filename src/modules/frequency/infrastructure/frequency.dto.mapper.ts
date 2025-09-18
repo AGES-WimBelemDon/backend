@@ -1,4 +1,4 @@
-import { FrequencyStatus } from "src/common/enums/domain.enums";
+import { FrequencyStatus, NoteTypes } from "src/common/enums/domain.enums";
 import {
     StudentClassAttendanceItemDTO,
     StudentGeneralAttendanceResponseDTO,
@@ -26,7 +26,7 @@ export type PrismaStudentClassAttendance = {
       fullName: string;
       attendance: number;
       status: string;
-      notes: string | null;
+      notes: NoteTypes | null;
     }
 export class FrequencyDTOMapper {
     static toUserClassesDTO(prismaClass: PrismaTeacherClass): UserClassesDTO {

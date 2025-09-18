@@ -1,4 +1,4 @@
-import { FrequencyStatus } from "src/common/enums/domain.enums";
+import { FrequencyStatus, NoteTypes } from "src/common/enums/domain.enums";
 
 export interface FrequencyProps {
   id: number | null;
@@ -6,7 +6,7 @@ export interface FrequencyProps {
   classId: number | null;
   date: Date;
   status: FrequencyStatus;
-  notes: string | null;
+  notes: NoteTypes | null;
 }
 
 
@@ -16,7 +16,7 @@ export class Frequency {
     private readonly classId: number | null;
     private date:   Date;
     private status: FrequencyStatus;
-    private notes: string | null;
+    private notes: NoteTypes | null;
 
     public constructor(props: FrequencyProps) {
         if (!props.studentId || !props.date) {
@@ -41,14 +41,14 @@ export class Frequency {
     
     public getStatus(): FrequencyStatus { return this.status; }
     
-    public getNotes(): string | null { return this.notes; }
+    public getNotes(): NoteTypes | null { return this.notes; }
     
     public setDate(newDate: Date): void {
         this.date = newDate;
     }
     
-    public setNotes(newNotes: string | null): void {
-        this.notes = newNotes ? newNotes.trim() : null;
+    public setNotes(newNotes: NoteTypes | null): void {
+        this.notes = newNotes;
     }
 
     public markPresent(): void {
@@ -56,8 +56,8 @@ export class Frequency {
         this.notes = null;
     }
 
-    public markAbsent(notes?: string): void {
+    public markAbsent(notes?: NoteTypes): void {
         this.status = FrequencyStatus.AUSENTE;
-        this.notes = notes?.trim() ?? null;
+        this.notes = notes ?? null;
     }
 }

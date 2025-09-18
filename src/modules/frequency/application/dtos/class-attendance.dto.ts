@@ -9,7 +9,7 @@ import {
   IsOptional,
   ValidateNested,
 } from "class-validator";
-import { FrequencyStatus } from "src/common/enums/domain.enums";
+import { FrequencyStatus, NoteTypes } from "src/common/enums/domain.enums";
 export class StudentClassAttendanceItemDTO {
   @ApiProperty({
     example: 11,
@@ -43,11 +43,12 @@ export class StudentClassAttendanceItemDTO {
   status: string;
 
   @ApiProperty({
-    example: "ATESTADO-MEDICO",
+    example: NoteTypes.ATESTADO_MEDICO,
     description: "Additional notes about the student's attendance",
-    nullable: true
+    nullable: true,
+    enum: NoteTypes
   })
-  notes: string | null;
+  notes: NoteTypes | null;
 }
 
 export class StudentListByClassAndDateResponseDTO {
@@ -106,19 +107,22 @@ export class UpdateAttendanceItemDTO {
   @ApiProperty({
     example: "PRESENTE",
     description: "The updated attendance status",
-    enum: ["PRESENTE", "AUSENTE"]
+    enum: [FrequencyStatus.PRESENTE, FrequencyStatus.AUSENTE],
+    nullable: false
   })
   @IsEnum(FrequencyStatus)
   @IsNotEmpty()
   status: FrequencyStatus;
 
   @ApiProperty({
-    example: "ATESTADO-MEDICO",
+    example: NoteTypes.ATESTADO_MEDICO,
     description: "Additional notes about the attendance",
+    enum: [NoteTypes.SEM_JUSTIFICATIVA,NoteTypes.ATESTADO_MEDICO],
     nullable: true
   })
+  @IsEnum(NoteTypes)
   @IsOptional()
-  notes: string | null;
+  notes: NoteTypes | null;
 }
 
 export class UpdateClassAttendanceRequestDTO {

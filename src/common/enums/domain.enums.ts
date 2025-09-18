@@ -8,7 +8,8 @@ import {
   SocialProgram,
   EmploymentStatus,
   SchoolYear,
-  EducationLevel
+  EducationLevel,
+  NoteTypes
 } from '@prisma/client';
 
 export {
@@ -21,5 +22,6 @@ export {
   SocialProgram,
   EmploymentStatus,
   SchoolYear,
-  EducationLevel
+  EducationLevel,
+  NoteTypes
 };
