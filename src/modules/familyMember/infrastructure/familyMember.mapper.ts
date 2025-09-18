@@ -1,12 +1,19 @@
 import { FamilyMemberEntity } from "../domain/familyMember.entity";
-import { FamilyMember as PrismaFamilyMember } from "@prisma/client";
-export class familyMemberMapper {
-    static toDomain(prismaFamilyMember: PrismaFamilyMember): FamilyMemberEntity {
+import { FamilyMember as PrismaFamilyMember, Student } from "@prisma/client";
+
+type PrismaFamilyMemberWithRelations = PrismaFamilyMember & {
+    student?: Student[];
+};
+
+export class FamilyMemberMapper {
+    static toDomain(prismaFamilyMember: PrismaFamilyMemberWithRelations): FamilyMemberEntity {
         return new FamilyMemberEntity({
             id: prismaFamilyMember.id,
             fullName: prismaFamilyMember.fullName,
             relationship: prismaFamilyMember.relationship,
             phoneNumber: prismaFamilyMember.phoneNumber,
+            studentIds: prismaFamilyMember.student?.map(s => s.id) || [],
+            addressId: prismaFamilyMember.addressId || undefined,
             email: prismaFamilyMember.email || undefined,
             socialName: prismaFamilyMember.socialName || undefined,
             race: prismaFamilyMember.race || undefined,
@@ -15,47 +22,25 @@ export class familyMemberMapper {
             dateOfBirth: prismaFamilyMember.dateOfBirth || undefined,
             socialPrograms: prismaFamilyMember.socialPrograms || undefined,
             employmentStatus: prismaFamilyMember.employmentStatus || undefined,
-            studentId: prismaFamilyMember.studentId,
-            addressId: prismaFamilyMember.addressId
         });
     }
 
-    static toPrisma(familyMember: FamilyMemberEntity): Omit<PrismaFamilyMember, 'id' | 'addressId' | 'studentId' | 'fullName' | 'relationship' | 'phoneNumber' | 'email' | 'socialName' | 'race' | 'gender' | 'educationLevel' | 'dateOfBirth' | 'socialPrograms' | 'employmentStatus'> {
+    static toResponse(familyMember: FamilyMemberEntity) {
         return {
             id: familyMember.getId(),
             fullName: familyMember.getFullName(),
             relationship: familyMember.getRelationship(),
             phoneNumber: familyMember.getPhoneNumber(),
-            email: familyMember.getEmail() || null,
-            socialName: familyMember.getSocialName() || null,
-            race: familyMember.getRace() || null,
-            gender: familyMember.getGender() || null,
-            educationLevel: familyMember.getEducationLevel() || null,
-            dateOfBirth: familyMember.getDateOfBirth() || null,
-            socialPrograms: familyMember.getSocialPrograms() || null,
-            employmentStatus: familyMember.getEmploymentStatus() || null,
-            studentId: familyMember.getStudentId(),
-            addressId: familyMember.getAddressId()
-        }
-    }
-
-
-    static toPersistence(familyMember: FamilyMemberEntity) {
-        return {
-            id: familyMember.getId(),
-            fullname: familyMember.getFullName(),
-            relationship: familyMember.getRelationship(),
-            phone_number: familyMember.getPhoneNumber(),
+            studentIds: familyMember.getStudentIds(),
+            addressId: familyMember.getAddressId(),
             email: familyMember.getEmail(),
-            social_name: familyMember.getSocialName(),
+            socialName: familyMember.getSocialName(),
             race: familyMember.getRace(),
             gender: familyMember.getGender(),
-            EducationLevel: familyMember.getEducationLevel(),
-            date_of_birth: familyMember.getDateOfBirth(),
-            social_programs: familyMember.getSocialPrograms(),
-            employment_status: familyMember.getEmploymentStatus(),
-            student_id: familyMember.getStudentId(),
-            address_id: familyMember.getAddressId()
+            educationLevel: familyMember.getEducationLevel(),
+            dateOfBirth: familyMember.getDateOfBirth(),
+            socialPrograms: familyMember.getSocialPrograms(),
+            employmentStatus: familyMember.getEmploymentStatus(),
         };
     }
 }

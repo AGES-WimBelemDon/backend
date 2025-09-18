@@ -1,45 +1,43 @@
-import { Optional } from "@nestjs/common";
-import { Race, Gender, EducationLevel, SocialProgram, EmploymentStatus, Address, Student } from "@prisma/client";
+import { Race, Gender, EducationLevel, SocialProgram, EmploymentStatus } from "@prisma/client";
 
 interface familyMemberProps {
 
-    id: number;
-    fullName: String,
-    phoneNumber: String,
-    relationship: String,
-    email?: String,
-    socialName?: String,
+    id?: number;
+    fullName: string,
+    phoneNumber: string,
+    relationship: string,
+    email?: string,
+    socialName?: string,
     race?: Race,
     gender?: Gender,
     educationLevel?: EducationLevel,
     dateOfBirth?: Date,
     socialPrograms?: SocialProgram,
     employmentStatus?: EmploymentStatus,
-    students: [Student],
-    address: Address
+    studentIds: number[],
+    addressId?: number,
 }
 
 export class FamilyMemberEntity {
-    private readonly id: number;
-    private fullName: String;
-    private phoneNumber: String;
-    private relationship: String;
-    private email?: String;
-    private socialName?: String;
+    private readonly id?: number;
+    private fullName: string;
+    private phoneNumber: string;
+    private relationship: string;
+    private email?: string;
+    private socialName?: string;
     private race?: Race;
     private gender?: Gender;
     private educationLevel?: EducationLevel;
     private dateOfBirth?: Date;
     private socialPrograms?: SocialProgram;
     private employmentStatus?: EmploymentStatus;
-    private students: Student[];
-    private address: Address;
-
+    private studentIds: number[];
+    private addressId?: number;
 
     constructor(props: familyMemberProps) {
         this.id = props.id;
-        this.students = props.students;
-        this.address = props.address;
+        this.studentIds = props.studentIds;
+        this.addressId = props.addressId;
         this.fullName = props.fullName;
         this.phoneNumber = props.phoneNumber;
         this.relationship = props.relationship;
@@ -53,21 +51,21 @@ export class FamilyMemberEntity {
         this.employmentStatus = props.employmentStatus;
     }
 
-    public getId(): number { return this.id; }
+    public getId(): number | undefined { return this.id; }
 
-    public getStudents(): Student[] { return this.students; }
+    public getStudentIds(): number[] { return this.studentIds; }
 
-    public getAddress(): Address { return this.address; }
+    public getAddressId(): number | undefined { return this.addressId; } 
 
-    public getFullName(): String { return this.fullName; }
+    public getFullName(): string { return this.fullName; }
 
-    public getPhoneNumber(): String { return this.phoneNumber; }
+    public getPhoneNumber(): string { return this.phoneNumber; }
 
-    public getRelationship(): String { return this.relationship; }
+    public getRelationship(): string { return this.relationship; }
 
-    public getEmail(): String | undefined { return this.email; }
+    public getEmail(): string | undefined { return this.email; }
 
-    public getSocialName(): String | undefined { return this.socialName; }
+    public getSocialName(): string | undefined { return this.socialName; }
 
     public getRace(): Race | undefined { return this.race; }
 
@@ -81,15 +79,15 @@ export class FamilyMemberEntity {
 
     public getEmploymentStatus(): EmploymentStatus | undefined { return this.employmentStatus; }
 
-    public setFullName(fullName: String): void { this.fullName = fullName; }
+    public setFullName(fullName: string): void { this.fullName = fullName; }
 
-    public setPhoneNumber(phoneNumber: String): void { this.phoneNumber = phoneNumber; }
+    public setPhoneNumber(phoneNumber: string): void { this.phoneNumber = phoneNumber; }
 
-    public setRelationship(relationship: String): void { this.relationship = relationship; }
+    public setRelationship(relationship: string): void { this.relationship = relationship; }
 
-    public setEmail(email: String): void { this.email = email; }
+    public setEmail(email: string): void { this.email = email; }
 
-    public setSocialName(socialName: String): void { this.socialName = socialName; }
+    public setSocialName(socialName: string): void { this.socialName = socialName; }
 
     public setRace(race: Race): void { this.race = race; }
 

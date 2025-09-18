@@ -6,6 +6,7 @@ import { ExampleEntityModule } from './modules/exampleEntity/exampleEntity.modul
 import { FirebaseModule } from './modules/firebase/firebase.module';
 import { FrequencyModule } from './modules/frequency/frequency.module';
 import { StudentModule } from './modules/student/student.module';
+import { FamilyMemberModule } from './modules/familyMember/familyMember.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { StudentModule } from './modules/student/student.module';
       isGlobal: true
     }),
     FrequencyModule,
-    StudentModule
+    StudentModule,
+    FamilyMemberModule
   ],
 })
 export class AppModule {}

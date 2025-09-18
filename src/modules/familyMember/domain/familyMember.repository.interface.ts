@@ -6,6 +6,7 @@ export interface IFamilyMemberRepository {
     create(familyMember: FamilyMemberEntity): Promise<FamilyMemberEntity>;
     delete(id: number): Promise<void>;
     findAllByStudentId(studentId: number): Promise<FamilyMemberEntity[]>;
-    findById(id: string): Promise<FamilyMemberEntity | null>;
+    findByEmail(email: string): Promise<FamilyMemberEntity | null>;
+    findById(id: number): Promise<FamilyMemberEntity | null>;
     update(familyMember: FamilyMemberEntity): Promise<FamilyMemberEntity>;
 }

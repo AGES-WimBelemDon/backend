@@ -111,8 +111,7 @@ model Frequency {
 
 model FamilyMember {
   id                Int               @id @default(autoincrement())
-  studentId         Int               @map("id_student")
-  addressId         Int               @map("address_id")
+  addressId         Int?               @map("address_id")
   fullName          String            @map("full_name")
   relationship      String
   phoneNumber       String            @map("phone_number")
@@ -124,8 +123,8 @@ model FamilyMember {
   dateOfBirth       DateTime?         @map("date_of_birth") @db.Date
   socialPrograms    SocialProgram?    @map("social_programs")
   employmentStatus  EmploymentStatus? @map("employment_status")
-  student Student[] @relation("StudentFamily")
-  address Address   @relation("FamilyAddress", fields: [addressId], references: [id])
+  student           Student[]         @relation("StudentFamily")
+  address           Address?          @relation("FamilyAddress", fields: [addressId], references: [id])
   @@map("family_member")
 }
 
