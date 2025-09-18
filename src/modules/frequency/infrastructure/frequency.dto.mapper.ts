@@ -22,7 +22,7 @@ export type PrismaStudentGeneralFrequency = {
 }
 export type PrismaStudentClassAttendance = {
       frequencyId: number;
-      stutentId: number;
+      studentId: number;
       fullName: string;
       attendance: number;
       status: string;
@@ -57,7 +57,7 @@ export class FrequencyDTOMapper {
         : '0.00';
         return {
             frequencyId: result.frequencyId,
-            studentId: result.stutentId,
+            studentId: result.studentId,
             studentFullName: result.fullName,
             attendancePercentage: +formattedAttendance,
             status: result.status,

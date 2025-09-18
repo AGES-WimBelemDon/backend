@@ -112,16 +112,16 @@ export class FrequencyService {
   ): Promise<{isValid:boolean, problematicId: number | null;}> {
     const attendanceListFromDb =
       await this.frequencyQueryService.getGeneralAttendance(date);
-    const stdntIdVsStatusMap: Map<number, boolean> = new Map();
+    const studentIdVsStatusMap: Map<number, boolean> = new Map();
     for (let i = 0; i < attendanceListFromDb.length; i++) {
       const item = attendanceListFromDb[i];
       const studentId = item.studentId;
       const isAllowed = item.generalAttendanceAllowed;
-      stdntIdVsStatusMap.set(studentId, isAllowed);
+      studentIdVsStatusMap.set(studentId, isAllowed);
     }
     for (let i = 0; i < frequencyList.length; i++) {
       const fqItem = frequencyList[i];
-      const statusDb = stdntIdVsStatusMap.get(fqItem.studentId);
+      const statusDb = studentIdVsStatusMap.get(fqItem.studentId);
       if (statusDb===undefined || !statusDb === fqItem.generalAttendanceAllowed) {
         return {isValid:false, problematicId: fqItem.studentId};
       }

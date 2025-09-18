@@ -135,7 +135,7 @@ export class PrismaFrequencyQueryService implements IFrequencyQueries {
         )
         SELECT
           d.id AS "frequencyId",
-          s.id AS "stutentId",
+          s.id AS "studentId",
           s.full_name AS "fullName",
           COALESCE(a.present_count, 0)/CAST((SELECT count FROM total_classes) AS DECIMAL(4,2)) AS attendance,
           d.status,
