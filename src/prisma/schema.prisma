@@ -101,7 +101,7 @@ model Frequency {
   classId   Int?              @map("id_class")
   date      DateTime          @db.Date
   status    FrequencyStatus   @default(PRESENTE)
-  notes     String?
+  notes     NoteTypes?
 
   student Student @relation("StudentFrequency",fields: [studentId], references: [id])
   class   Class?   @relation(fields: [classId], references: [id])
@@ -276,6 +276,11 @@ enum EducationLevel {
   SUPERIOR_INCOMPLETO
   SUPERIOR_COMPLETO
   POS_GRADUACAO
+}
+
+enum NoteTypes{
+  ATESTADO_MEDICO
+  SEM_JUSTIFICATIVA
 }
 
 model ExampleEntity {
