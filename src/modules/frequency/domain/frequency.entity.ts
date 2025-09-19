@@ -1,27 +1,24 @@
-export enum FrequencyStatus {
-  PRESENTE = "PRESENTE",
-  FALTA = "FALTA"
-}
+import { FrequencyStatus, NoteTypes } from "src/common/enums/domain.enums";
 
 export interface FrequencyProps {
-  id: number;
+  id: number | null;
   studentId: number;
   classId: number | null;
   date: Date;
   status: FrequencyStatus;
-  notes: string | null;
+  notes: NoteTypes | null;
 }
 
 
 export class Frequency {
-    private readonly id: number;
+    private readonly id: number | null;
     private readonly studentId: number;
     private readonly classId: number | null;
     private date:   Date;
     private status: FrequencyStatus;
-    private notes: string | null;
+    private notes: NoteTypes | null;
 
-    private constructor(props: FrequencyProps) {
+    public constructor(props: FrequencyProps) {
         if (!props.studentId || !props.date) {
         throw new Error("Frequency requires a studentId and a date.");
         }
@@ -34,7 +31,7 @@ export class Frequency {
         this.notes = props.notes;
     }
 
-    public getId(): number { return this.id; }
+    public getId(): number | null { return this.id; }
     
     public getStudentId(): number { return this.studentId; }
     
@@ -44,14 +41,14 @@ export class Frequency {
     
     public getStatus(): FrequencyStatus { return this.status; }
     
-    public getNotes(): string | null { return this.notes; }
+    public getNotes(): NoteTypes | null { return this.notes; }
     
     public setDate(newDate: Date): void {
         this.date = newDate;
     }
     
-    public setNotes(newNotes: string | null): void {
-        this.notes = newNotes ? newNotes.trim() : null;
+    public setNotes(newNotes: NoteTypes | null): void {
+        this.notes = newNotes;
     }
 
     public markPresent(): void {
@@ -59,8 +56,8 @@ export class Frequency {
         this.notes = null;
     }
 
-    public markAbsent(notes?: string): void {
-        this.status = FrequencyStatus.FALTA;
-        this.notes = notes?.trim() ?? null;
+    public markAbsent(notes?: NoteTypes): void {
+        this.status = FrequencyStatus.AUSENTE;
+        this.notes = notes ?? null;
     }
 }

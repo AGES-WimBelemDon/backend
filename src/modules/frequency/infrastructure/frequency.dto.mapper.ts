@@ -1,4 +1,9 @@
-import { UserClassesDTO } from "../application/frequency.dtos";
+import { FrequencyStatus, NoteTypes } from "src/common/enums/domain.enums";
+import {
+    StudentClassAttendanceItemDTO,
+    StudentGeneralAttendanceResponseDTO,
+    UserClassesDTO
+} from "../application/dtos";
 
 
 type PrismaTeacherClass = {
@@ -8,6 +13,21 @@ type PrismaTeacherClass = {
   level: { name: string } | null;
   activity: { id: number; name: string } | null;
 };
+export type PrismaStudentGeneralFrequency = {
+  studentid:   number;
+  fullname:    string;
+  date:        Date;
+  generalattendanceallowed: "false" | "true";
+  status: FrequencyStatus;
+}
+export type PrismaStudentClassAttendance = {
+      frequencyId: number;
+      studentId: number;
+      fullName: string;
+      attendance: number;
+      status: string;
+      notes: NoteTypes | null;
+    }
 export class FrequencyDTOMapper {
     static toUserClassesDTO(prismaClass: PrismaTeacherClass): UserClassesDTO {
         return {
@@ -21,5 +41,27 @@ export class FrequencyDTOMapper {
             activityName: prismaClass.activity?.name ?? "N/A",
         },
         };
-    }
+    };
+    static toStudentGeneralAttendanceDTO(prismaClass: PrismaStudentGeneralFrequency): StudentGeneralAttendanceResponseDTO {
+        const studentRef =  {
+            studentId: prismaClass.studentid,
+            fullName: prismaClass.fullname,
+            generalAttendanceAllowed: prismaClass.generalattendanceallowed==="true"?true:false,
+            status: prismaClass.status,
+    };
+        return studentRef;
+    };
+    static toStudentClassAttendanceItemDTO(result: PrismaStudentClassAttendance): StudentClassAttendanceItemDTO {
+        const formattedAttendance = result.attendance !== null 
+        ? (result.attendance * 100).toFixed(2)
+        : '0.00';
+        return {
+            frequencyId: result.frequencyId,
+            studentId: result.studentId,
+            studentFullName: result.fullName,
+            attendancePercentage: +formattedAttendance,
+            status: result.status,
+            notes: result.notes,
+        };
+        }
 }
