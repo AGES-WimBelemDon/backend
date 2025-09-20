@@ -27,10 +27,10 @@ export class FamilyMemberController {
 
     @Post()
     @HttpCode(HttpStatus.CREATED)
-    @ApiOperation({ summary: 'Cadastra um novo membro da família' })
+    @ApiOperation({ summary: 'Create new family member' })
     @ApiResponse({
         status: HttpStatus.CREATED,
-        description: 'O membro da família foi criado com sucesso.',
+        description: 'Family member successfully created',
         schema: {
             example: {
                 "id": 1,
@@ -41,6 +41,8 @@ export class FamilyMemberController {
                 "socialName": "Joana",
                 "race": "BRANCA",
                 "gender": "FEMININO",
+                "nis": "12345678900",
+                "registrationNumber": "98765432100",
                 "educationLevel": "SUPERIOR_COMPLETO",
                 "dateOfBirth": "1980-10-25T00:00:00.000Z",
                 "socialPrograms": "BOLSA_FAMILIA",
@@ -49,30 +51,29 @@ export class FamilyMemberController {
             }
         }
     })
-    @ApiResponse({ status: 400, description: "Dados inválidos (Bad Request)" })
-    @ApiResponse({ status: 404, description: "Dependência não encontrada (ex: Student ou Address)" })
-    @ApiResponse({ status: 409, description: "Conflito de dados (ex: e-mail já existe)" })
+    @ApiResponse({ status: 400, description: "Invalid Data (Bad Request)" })
+    @ApiResponse({ status: 409, description: "Email already exists!" })
     async createFamilyMember(@Body() createFamilyMemberDto: CreateFamilyMemberDTO) {
         const familyMember = await this.familyMemberService.create(createFamilyMemberDto);
         return FamilyMemberMapper.toResponse(familyMember);
     }
 
     @Get('student/:studentId')
-    @ApiOperation({ summary: 'Busca todos os membros da família de um estudante específico' })
-    @ApiParam({ name: 'studentId', description: 'ID do estudante', type: 'number' })
-    @ApiResponse({ status: 200, description: 'Lista de membros da família retornada com sucesso.'})
+    @ApiOperation({ summary: 'Search all family members from Student' })
+    @ApiParam({ name: 'studentId', description: 'Student ID', type: 'number' })
+    @ApiResponse({ status: 200, description: 'Family members retrieved successfully.'})
     async findByStudent(@Param('studentId', ParseIntPipe) studentId: number) {
         const familyMembers = await this.familyMemberService.findByStudentId(studentId);
         return familyMembers.map(member => FamilyMemberMapper.toResponse(member));
     }
 
     @Patch(':id')
-    @ApiOperation({ summary: 'Atualiza os dados de um membro da família' })
-    @ApiParam({ name: 'id', description: 'ID do membro da família', type: 'number' })
-    @ApiResponse({ status: 200, description: 'Membro da família atualizado com sucesso.'})
-    @ApiResponse({ status: 400, description: "Dados inválidos (Bad Request)" })
-    @ApiResponse({ status: 404, description: "Membro da família ou dependência não encontrada (ex: Student ou Address)" })
-    @ApiResponse({ status: 409, description: "Conflito de dados (ex: e-mail já existe)" })
+    @ApiOperation({ summary: 'Update Family Member Data' })
+    @ApiParam({ name: 'id', description: 'Family Member ID', type: 'number' })
+    @ApiResponse({ status: 200, description: 'Family member successfully updated',})
+    @ApiResponse({ status: 400, description: "Invalid Data! (Bad Request)" })
+    @ApiResponse({ status: 404, description: "Family Member not found!" })
+    @ApiResponse({ status: 409, description: "Email already exists!" })
     async updateFamilyMember(
         @Param('id', ParseIntPipe) id: number,
         @Body() updateFamilyMemberDto: UpdateFamilyMemberDTO,

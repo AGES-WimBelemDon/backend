@@ -115,12 +115,14 @@ model FamilyMember {
   fullName          String            @map("full_name")
   relationship      String
   phoneNumber       String            @map("phone_number")
+  nis               String?           
+  registrationNumber  String           @map("registration_number")
   email             String?
   socialName        String?           @map("social_name")
   race              Race?
   gender            Gender?
   educationLevel    EducationLevel?   @map("education_level")
-  dateOfBirth       DateTime?         @map("date_of_birth") @db.Date
+  dateOfBirth       DateTime         @map("date_of_birth") @db.Date
   socialPrograms    SocialProgram?    @map("social_programs")
   employmentStatus  EmploymentStatus? @map("employment_status")
   student           Student[]         @relation("StudentFamily")

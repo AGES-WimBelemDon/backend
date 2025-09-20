@@ -1,12 +1,12 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { FamilyMemberService } from './application/familyMember.service';
 import { FamilyMemberController } from './presentation/familyMember.controller';
 import { PrismaFamilyMemberRepository } from './infrastructure/familyMember.repository';
 import { FAMILY_MEMBER_REPOSITORY_TOKEN } from './domain/familyMember.repository.interface';
-import { PrismaModule } from 'src/prisma/prisma.module';
+import { StudentModule } from '../student/student.module';
 
 @Module({
-    imports: [PrismaModule],
+    imports: [StudentModule],
     controllers: [FamilyMemberController],
     providers: [FamilyMemberService,
         {

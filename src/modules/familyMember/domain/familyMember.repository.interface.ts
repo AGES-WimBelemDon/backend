@@ -8,5 +8,6 @@ export interface IFamilyMemberRepository {
     findAllByStudentId(studentId: number): Promise<FamilyMemberEntity[]>;
     findByEmail(email: string): Promise<FamilyMemberEntity | null>;
     findById(id: number): Promise<FamilyMemberEntity | null>;
+    findByRegistrationNumber(registrationNumber: string): Promise<FamilyMemberEntity | null>;
     update(familyMember: FamilyMemberEntity): Promise<FamilyMemberEntity>;
 }

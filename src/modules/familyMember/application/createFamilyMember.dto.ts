@@ -1,31 +1,75 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional, IsDateString, IsEnum, IsInt, IsArray, IsEmail, IsPhoneNumber } from 'class-validator';
-import { Race, Gender, EducationLevel, SocialProgram, EmploymentStatus } from '@prisma/client';
+import { 
+    IsString, 
+    IsNotEmpty, 
+    IsOptional, 
+    IsDateString, 
+    IsEnum, 
+    IsInt, 
+    IsArray, 
+    IsEmail, 
+    IsPhoneNumber, 
+    Matches
+} from 'class-validator';
+import { 
+    Race, 
+    Gender,
+    EducationLevel,
+    SocialProgram,
+    EmploymentStatus
+} from '@prisma/client';
+import { Transform } from 'class-transformer';
+
+function isValidCPF(cpf: string): boolean {
+    cpf = cpf.replace(/[^\d]+/g, '');
+    
+    if (cpf.length !== 11) return false;
+    
+    if (/^(\d)\1+$/.test(cpf)) return false;
+    
+    let sum = 0;
+    for (let i = 0; i < 9; i++) {
+        sum += parseInt(cpf.charAt(i)) * (10 - i);
+    }
+    let remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(cpf.charAt(9))) return false;
+    
+    sum = 0;
+    for (let i = 0; i < 10; i++) {
+        sum += parseInt(cpf.charAt(i)) * (11 - i);
+    }
+    remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(cpf.charAt(10))) return false;
+    
+    return true;
+}
 
 export class CreateFamilyMemberDTO {
-    @ApiProperty({ example: "Joana Oliveira", description: "Nome completo do membro da família" })
+    @ApiProperty({ example: "Joana Oliveira", description: "Family Member's full name" })
     @IsString()
-    @IsNotEmpty({ message: "Nome completo é obrigatório" })
+    @IsNotEmpty({ message: "Full name is required" })
     fullName: string;
 
     @ApiProperty({ example: "Mãe", description: "Relação de parentesco com o aluno" })
     @IsString()
-    @IsNotEmpty({ message: "Parentesco é obrigatório" })
+    @IsNotEmpty({ message: "Relationship is required" })
     relationship: string;
 
     @ApiProperty({ example: "51999999999", description: "Número de telefone" })
     @IsString()
-    @IsPhoneNumber("BR", { message: "Número de telefone inválido" })
-    @IsNotEmpty({ message: "Número de telefone é obrigatório" })
+    @IsPhoneNumber("BR", { message: "Invalid phone number" })
+    @IsNotEmpty({ message: "Phone number is required" })
     phoneNumber: string;
 
-    @ApiProperty({ type: [Number], example: [1], description: "IDs dos estudantes aos quais este membro da família está associado" })
+    @ApiProperty({ type: [Number], example: [1], description: "IDs of the students associated with this family member" })
     @IsArray()
     @IsInt({ each: true })
-    @IsNotEmpty()
+    @IsNotEmpty({ message: "Student IDs are required" })
     studentIds: number[];
 
-    @ApiProperty({ example: 100, description: "ID do endereço do membro da família" })
+    @ApiProperty({ example: 100, description: "ID of the family member's address" })
     @IsInt()
     @IsOptional()
     addressId?: number;
@@ -33,7 +77,7 @@ export class CreateFamilyMemberDTO {
     @ApiProperty({ example: "joana.o@email.com", required: false })
     @IsOptional()
     @IsString()
-    @IsEmail({},{ message: "Email inválido" })
+    @IsEmail({}, { message: "Invalid email" })
     email?: string;
 
     @ApiProperty({ example: "Joana", required: false })
@@ -56,10 +100,16 @@ export class CreateFamilyMemberDTO {
     @IsEnum(EducationLevel)
     educationLevel?: EducationLevel;
 
-    @ApiProperty({ example: "1980-10-25", required: false })
-    @IsOptional()
-    @IsDateString({}, { message: "Data de nascimento deve estar no formato YYYY-MM-DD" })
-    dateOfBirth?: string;
+    @ApiProperty({ 
+        example: "1980-10-25",
+        description: "Date of birth of the family member",
+        type: String,
+        format: 'date',
+    })
+    
+    @IsNotEmpty({ message: "Date of birth is required" })
+    @IsDateString({}, { message: "Date of birth must be in YYYY-MM-DD format" })
+    dateOfBirth: string;
 
     @ApiProperty({ enum: SocialProgram, required: false })
     @IsOptional()
@@ -70,4 +120,26 @@ export class CreateFamilyMemberDTO {
     @IsOptional()
     @IsEnum(EmploymentStatus)
     employmentStatus?: EmploymentStatus;
+
+    @ApiProperty({ 
+        example: "12345678900", 
+        required: false,
+        description: "NIS number of the family member" })
+    @IsOptional()
+    @IsString()
+    nis?: string;
+
+    @ApiProperty({ 
+        example: "12345678901", 
+        description: "CPF do aluno (apenas números)",
+        pattern: "^[0-9]{11}$"
+    })
+    @IsString()
+    @IsNotEmpty({ message: "CPF é obrigatório" })
+    @Matches(/^[0-9]{11}$/, { message: "CPF deve conter exatamente 11 dígitos numéricos" })
+    registrationNumber: string;
+
+    static validateCPF(registrationNumber: string): boolean {
+        return isValidCPF(registrationNumber);
+    }
 }

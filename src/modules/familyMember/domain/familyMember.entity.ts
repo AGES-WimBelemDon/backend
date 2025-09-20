@@ -11,9 +11,11 @@ interface familyMemberProps {
     race?: Race,
     gender?: Gender,
     educationLevel?: EducationLevel,
-    dateOfBirth?: Date,
+    dateOfBirth: Date,
     socialPrograms?: SocialProgram,
     employmentStatus?: EmploymentStatus,
+    nis?: string,
+    registrationNumber: string,
     studentIds: number[],
     addressId?: number,
 }
@@ -28,9 +30,11 @@ export class FamilyMemberEntity {
     private race?: Race;
     private gender?: Gender;
     private educationLevel?: EducationLevel;
-    private dateOfBirth?: Date;
+    private dateOfBirth: Date;
     private socialPrograms?: SocialProgram;
     private employmentStatus?: EmploymentStatus;
+    private nis?: string;
+    private registrationNumber: string;
     private studentIds: number[];
     private addressId?: number;
 
@@ -49,6 +53,8 @@ export class FamilyMemberEntity {
         this.dateOfBirth = props.dateOfBirth;
         this.socialPrograms = props.socialPrograms;
         this.employmentStatus = props.employmentStatus;
+        this.nis = props.nis;
+        this.registrationNumber = props.registrationNumber;
     }
 
     public getId(): number | undefined { return this.id; }
@@ -73,7 +79,11 @@ export class FamilyMemberEntity {
 
     public getEducationLevel(): EducationLevel | undefined { return this.educationLevel; }
 
-    public getDateOfBirth(): Date | undefined { return this.dateOfBirth; }
+    public getDateOfBirth(): Date{ return this.dateOfBirth; }
+
+    public getNis(): string | undefined { return this.nis; }
+
+    public getRegistrationNumber(): string { return this.registrationNumber; }
 
     public getSocialPrograms(): SocialProgram | undefined { return this.socialPrograms; }
 
@@ -100,5 +110,9 @@ export class FamilyMemberEntity {
     public setSocialPrograms(socialPrograms: SocialProgram): void { this.socialPrograms = socialPrograms; }
 
     public setEmploymentStatus(employmentStatus: EmploymentStatus): void { this.employmentStatus = employmentStatus; }
+
+    public setNis(nis: string): void { this.nis = nis; }
+
+    public setRegistrationNumber(registrationNumber: string): void { this.registrationNumber = registrationNumber; }
 }
 

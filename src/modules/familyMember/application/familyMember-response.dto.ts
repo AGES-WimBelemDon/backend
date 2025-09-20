@@ -1,4 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { 
+    EducationLevel, 
+    EmploymentStatus, 
+    Gender, 
+    Race, 
+    SocialProgram 
+} from "@prisma/client";
 
 export class FamilyMemberResponseDTO {
     @ApiProperty({ 
@@ -54,25 +61,28 @@ export class FamilyMemberResponseDTO {
     socialName?: string;
 
     @ApiProperty({ 
-        example: "BRANCA", 
+        example: Race.BRANCA, 
         description: "Family member's race",
-        required: false
+        required: false,
+        enum: Race
     })
-    color?: string;
+    race?: Race;
 
     @ApiProperty({ 
-        example: "FEMININO", 
+        example: Gender.FEMININO, 
         description: "Family member's gender",
-        required: false
+        required: false,
+        enum: Gender
     })
-    gender?: string;
+    gender?: Gender;
     
     @ApiProperty({ 
-        example: "SUPERIOR_COMPLETO", 
+        example: EducationLevel.SUPERIOR_COMPLETO, 
         description: "Family member's education level",
-        required: false
+        required: false,
+        enum: EducationLevel
     })
-    educationLevel?: string;
+    educationLevel?: EducationLevel;
 
     @ApiProperty({ 
         example: "1980-10-25T00:00:00.000Z", 
@@ -82,16 +92,31 @@ export class FamilyMemberResponseDTO {
     dateOfBirth?: Date;
 
     @ApiProperty({ 
-        example: "BOLSA_FAMILIA", 
+        example: SocialProgram.BOLSA_FAMILIA, 
         description: "Social programs the family member is enrolled in",
-        required: false
+        required: false,
+        enum: SocialProgram
     })
-    socialPrograms?: string;
+    socialPrograms?: SocialProgram;
 
     @ApiProperty({ 
-        example: "EMPREGADO", 
+        example: EmploymentStatus.EMPREGADO, 
         description: "Family member's employment status",
+        required: false,
+        enum: EmploymentStatus
+    })
+    employmentStatus?: EmploymentStatus;
+
+    @ApiProperty({ 
+        example: "12345678900", 
+        description: "NIS number of the family member",
         required: false
     })
-    employmentStatus?: string;
+    nis?: string;
+
+    @ApiProperty({ 
+        example: "12345678901", 
+        description: "CPF of the family member (only numbers)" 
+    })
+    registrationNumber: string;
 }   

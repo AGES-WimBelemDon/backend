@@ -19,9 +19,11 @@ export class FamilyMemberMapper {
             race: prismaFamilyMember.race || undefined,
             gender: prismaFamilyMember.gender || undefined,
             educationLevel: prismaFamilyMember.educationLevel || undefined,
-            dateOfBirth: prismaFamilyMember.dateOfBirth || undefined,
+            dateOfBirth: prismaFamilyMember.dateOfBirth,
             socialPrograms: prismaFamilyMember.socialPrograms || undefined,
             employmentStatus: prismaFamilyMember.employmentStatus || undefined,
+            nis: prismaFamilyMember.nis || undefined,
+            registrationNumber: prismaFamilyMember.registrationNumber,
         });
     }
 
@@ -41,6 +43,8 @@ export class FamilyMemberMapper {
             dateOfBirth: familyMember.getDateOfBirth(),
             socialPrograms: familyMember.getSocialPrograms(),
             employmentStatus: familyMember.getEmploymentStatus(),
+            nis: familyMember.getNis(),
+            registrationNumber: familyMember.getRegistrationNumber(),
         };
     }
 }
