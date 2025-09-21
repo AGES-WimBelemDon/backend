@@ -255,4 +255,37 @@ export class FrequencyService {
     );
     await Promise.all(updatePromises);
   }
+
+  public async getDetailedUserClasses(userId: number): Promise<any> {
+    try {
+      const user = await (this.frequencyQueryService as any).prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          classes: {
+            select: {
+              id: true,
+              name: true,
+              state: true,
+              activity: { select: { id: true, name: true } },
+              level: { select: { id: true, name: true } },
+              students: { select: { id: true, fullName: true } },
+              teachers: { select: { id: true, fullName: true } },
+            },
+          },
+        },
+      });
+      const turmas = (user?.classes ?? []).map((cls: any) => ({
+        id: cls.id,
+        name: cls.name,
+        state: cls.state,
+        activity: cls.activity ? { id: cls.activity.id, name: cls.activity.name } : null,
+        level: cls.level ? { id: cls.level.id, name: cls.level.name } : null,
+        students: (cls.students ?? []).map((s: any) => ({ id: s.id, fullName: s.fullName })),
+        teachers: (cls.teachers ?? []).map((t: any) => ({ id: t.id, fullName: t.fullName })),
+      }));
+      return { turmas };
+    } catch (e) {
+      throw new InternalServerErrorException('Internal server error');
+    }
+  }
 }
