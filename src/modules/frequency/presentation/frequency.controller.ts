@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable prettier/prettier */
 import {
   Controller,
   Get,
@@ -293,21 +296,21 @@ export class FrequencyConstroller {
   ): Promise<void> {
     await this.frequencyService.updateAttendanceList(updateDto);
   }
-  @Get("/classes/user/:userId")
+  @Get("/classes/:classId")
   @ApiOperation({
-    summary: "Listar turmas detalhadas do usuário",
+    summary: "List detailed classes by id",
     description:
-      "Retorna todas as turmas às quais o usuário tem acesso, incluindo alunos e professores.",
+      "Return the detailed class, including id, students, teachers and level",
   })
   @ApiParam({
-    name: "userId",
+    name: "classId",
     type: Number,
-    description: "ID do usuário",
+    description: "class ID",
     example: 10,
   })
   @ApiResponse({
     status: 200,
-    description: "Lista de turmas detalhadas do usuário",
+    description: "Detailed class",
     schema: {
       example: {
         turmas: [
@@ -325,6 +328,16 @@ export class FrequencyConstroller {
     },
   })
   @ApiResponse({
+    status: 204,
+    description: "Return an empty array if there is no classes with the id",
+    schema: {
+      example: {
+        statusCode: 204,
+        message: "turmas: []",
+      },
+    },
+  })
+  @ApiResponse({
     status: 500,
     description: "Internal server error",
     schema: {
@@ -335,7 +348,10 @@ export class FrequencyConstroller {
       },
     },
   })
-  async getUserDetailedClasses(@Param("userId", ParseIntPipe) userId: number) {
-    return await this.frequencyService.getDetailedUserClasses(userId);
+  async getClassDetailed(@Param("classId", ParseIntPipe) classId: number) {
+    const detailedClass =
+      await this.frequencyService.getDetailedUserClasses(classId);
+
+    return detailedClass;
   }
 }

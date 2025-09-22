@@ -1,15 +1,22 @@
+/* eslint-disable prettier/prettier */
 import {
   EnrolledStudentDTO,
   StudentClassAttendanceItemDTO,
   StudentGeneralAttendanceResponseDTO,
-  UserClassesDTO } from "./dtos";
+  UserClassesDTO,
+  ClassDetailedDTO,
+} from "./dtos";
 
 export const FREQUENCY_QUERIES_TOKEN = "IFrequencyQueries";
 export interface IFrequencyQueries {
   getMyClasses(userId: number): Promise<UserClassesDTO[]>;
   getGeneralAttendance(
-    date: Date,
+    date: Date
   ): Promise<StudentGeneralAttendanceResponseDTO[]>;
-  getStudentByClassAndDateAttendanceList(classId: number, date: Date): Promise<StudentClassAttendanceItemDTO[]>;
+  getStudentByClassAndDateAttendanceList(
+    classId: number,
+    date: Date
+  ): Promise<StudentClassAttendanceItemDTO[]>;
   getStudentsByClassId(classId: number): Promise<EnrolledStudentDTO[]>;
+  getDetailedUserClasses(classId: number): Promise<ClassDetailedDTO>;
 }

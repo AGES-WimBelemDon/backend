@@ -17,6 +17,7 @@ import {
   StudentListByClassAndDateResponseDTO,
   UpdateClassAttendanceRequestDTO,
   GeneralAttendanceResponseDTO,
+  ClassDetailedDTO,
 } from "./dtos";
 import { Frequency } from "../domain/frequency.entity";
 import {
@@ -50,7 +51,7 @@ export class FrequencyService {
     };
   }
   public async getGeneralAttendance(
-    date: Date,
+    date: Date
   ): Promise<GeneralAttendanceResponseDTO> {
     const studentList =
       await this.frequencyQueryService.getGeneralAttendance(date);
@@ -60,16 +61,16 @@ export class FrequencyService {
     };
   }
   public async updateGeneralAttendance(
-    data: UpdateGeneralAttendanceRequestDTO,
+    data: UpdateGeneralAttendanceRequestDTO
   ): Promise<boolean> {
     const date = data.date;
     const isConsistent = await this.isGeneralAttendanceConsistent(
       data["studentList"],
-      date,
+      date
     );
     if (!isConsistent.isValid) {
       throw new BadRequestException(
-        `Attendance permission conflict: The generalAttendanceAllowed values in your request don't match our system records. Problem with studentId: ${isConsistent.problematicId}`,
+        `Attendance permission conflict: The generalAttendanceAllowed values in your request don't match our system records. Problem with studentId: ${isConsistent.problematicId}`
       );
     }
     const validItems: UpdateGeneralAttendanceItemDTO[] = data[
@@ -86,7 +87,7 @@ export class FrequencyService {
           date: date,
           status: item.status,
           notes: null,
-        }),
+        })
     );
     for (let index = 0; index < domainItems.length; index++) {
       const element = domainItems[index];
@@ -98,7 +99,7 @@ export class FrequencyService {
     }
     if (notPresent.length) {
       await this.frequencyRepository.deleteManyByStudentAndClassAndDate(
-        notPresent,
+        notPresent
       );
     }
     for (let index = 0; index < present.length; index++) {
@@ -108,8 +109,8 @@ export class FrequencyService {
   }
   private async isGeneralAttendanceConsistent(
     frequencyList: UpdateGeneralAttendanceItemDTO[],
-    date: Date,
-  ): Promise<{isValid:boolean, problematicId: number | null;}> {
+    date: Date
+  ): Promise<{ isValid: boolean; problematicId: number | null }> {
     const attendanceListFromDb =
       await this.frequencyQueryService.getGeneralAttendance(date);
     const studentIdVsStatusMap: Map<number, boolean> = new Map();
@@ -122,20 +123,23 @@ export class FrequencyService {
     for (let i = 0; i < frequencyList.length; i++) {
       const fqItem = frequencyList[i];
       const statusDb = studentIdVsStatusMap.get(fqItem.studentId);
-      if (statusDb===undefined || !statusDb === fqItem.generalAttendanceAllowed) {
-        return {isValid:false, problematicId: fqItem.studentId};
+      if (
+        statusDb === undefined ||
+        !statusDb === fqItem.generalAttendanceAllowed
+      ) {
+        return { isValid: false, problematicId: fqItem.studentId };
       }
     }
-    return {isValid:true, problematicId: null};
+    return { isValid: true, problematicId: null };
   }
   public async getAttendanceListByClassAndDate(
     date: Date,
-    classId: number,
+    classId: number
   ): Promise<StudentListByClassAndDateResponseDTO> {
     const attendanceList =
       await this.frequencyQueryService.getStudentByClassAndDateAttendanceList(
         classId,
-        date,
+        date
       );
     return {
       classId: classId,
@@ -145,22 +149,22 @@ export class FrequencyService {
   }
   public async createAttendanceList(
     date: Date,
-    classId: number,
+    classId: number
   ): Promise<StudentListByClassAndDateResponseDTO> {
     const attendanceList = await this.frequencyRepository.getByClassIdAnDate(
       classId,
-      date,
+      date
     );
     if (attendanceList.length > 0) {
       throw new ConflictException(
-        `Class with ID ${classId} and date ${date.toISOString().split("T")[0]} was already created.`,
+        `Class with ID ${classId} and date ${date.toISOString().split("T")[0]} was already created.`
       );
     }
     const enrolledStudents =
       await this.frequencyQueryService.getStudentsByClassId(classId);
     if (enrolledStudents.length === 0) {
       throw new NotFoundException(
-        `The class with ID ${classId} has no enrolled students or wasn't found.`,
+        `The class with ID ${classId} has no enrolled students or wasn't found.`
       );
     }
     const frequencies: Frequency[] = [];
@@ -184,38 +188,40 @@ export class FrequencyService {
           date: frequency.getDate(),
           status: FrequencyStatus.PRESENTE,
           notes: null,
-        }),
+        })
     );
     const wasFrequencyDeleted =
       await this.frequencyRepository.deleteManyByStudentAndClassAndDate(
-        newFrequenciesArray,
+        newFrequenciesArray
       );
     if (!wasFrequencyDeleted) {
       throw new InternalServerErrorException(
-        "The system wasn't able to create a new class attendance",
+        "The system wasn't able to create a new class attendance"
       );
     }
     const wasCreated = await this.frequencyRepository.createMany(frequencies);
     if (!wasCreated) {
       throw new InternalServerErrorException(
-        "The system wasn't able to create a new class attendance",
+        "The system wasn't able to create a new class attendance"
       );
     }
     return await this.getAttendanceListByClassAndDate(date, classId);
   }
 
   public async updateAttendanceList(
-    updateDto: UpdateClassAttendanceRequestDTO,
+    updateDto: UpdateClassAttendanceRequestDTO
   ): Promise<void> {
     const { classId, date, studentList } = updateDto;
     if (studentList.length === 0) {
-      throw new BadRequestException("Invalid request: The 'studentList' field must contain at least one student attendance record.");
+      throw new BadRequestException(
+        "Invalid request: The 'studentList' field must contain at least one student attendance record."
+      );
     }
     const existingFrequencies =
       await this.frequencyRepository.getByClassIdAnDate(classId, date);
     if (existingFrequencies.length === 0) {
       throw new BadRequestException(
-        `Attendance list for class ID ${classId} on this date has not been created yet.`,
+        `Attendance list for class ID ${classId} on this date has not been created yet.`
       );
     }
     const frequencyMap = new Map<number, Frequency>();
@@ -228,7 +234,7 @@ export class FrequencyService {
       const frequencyToUpdate = frequencyMap.get(studentUpdate.frequencyId);
       if (!frequencyToUpdate) {
         throw new BadRequestException(
-          `Frequency record with ID ${studentUpdate.frequencyId} is not part of this attendance list.`,
+          `Frequency record with ID ${studentUpdate.frequencyId} is not part of this attendance list.`
         );
       }
       if (studentUpdate.status === FrequencyStatus.PRESENTE) {
@@ -248,44 +254,21 @@ export class FrequencyService {
           date: frequency.getDate(),
           status: FrequencyStatus.PRESENTE,
           notes: null,
-        }),
+        })
     );
     await this.frequencyRepository.deleteManyByStudentAndClassAndDate(
-      deleteList,
+      deleteList
     );
     await Promise.all(updatePromises);
   }
 
-  public async getDetailedUserClasses(userId: number): Promise<any> {
+  public async getDetailedUserClasses(
+    classId: number
+  ): Promise<ClassDetailedDTO> {
     try {
-      const user = await (this.frequencyQueryService as any).prisma.user.findUnique({
-        where: { id: userId },
-        select: {
-          classes: {
-            select: {
-              id: true,
-              name: true,
-              state: true,
-              activity: { select: { id: true, name: true } },
-              level: { select: { id: true, name: true } },
-              students: { select: { id: true, fullName: true } },
-              teachers: { select: { id: true, fullName: true } },
-            },
-          },
-        },
-      });
-      const turmas = (user?.classes ?? []).map((cls: any) => ({
-        id: cls.id,
-        name: cls.name,
-        state: cls.state,
-        activity: cls.activity ? { id: cls.activity.id, name: cls.activity.name } : null,
-        level: cls.level ? { id: cls.level.id, name: cls.level.name } : null,
-        students: (cls.students ?? []).map((s: any) => ({ id: s.id, fullName: s.fullName })),
-        teachers: (cls.teachers ?? []).map((t: any) => ({ id: t.id, fullName: t.fullName })),
-      }));
-      return { turmas };
-    } catch (e) {
-      throw new InternalServerErrorException('Internal server error');
+      return await this.frequencyQueryService.getDetailedUserClasses(classId);
+    } catch {
+      throw new InternalServerErrorException("Internal server error");
     }
   }
 }
