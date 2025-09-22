@@ -67,6 +67,14 @@ export class FamilyMemberController {
         return familyMembers.map(member => FamilyMemberMapper.toResponse(member));
     }
 
+    @Get(':id')
+    @ApiOperation({ summary: 'Get Family Member by ID' })
+    @ApiParam({ name: 'id', description: 'Family Member ID', type: 'number' })
+    async getById(@Param('id', ParseIntPipe) id: number) {
+        const familyMember = await this.familyMemberService.findById(id);
+        return FamilyMemberMapper.toResponse(familyMember);
+    }
+
     @Patch(':id')
     @ApiOperation({ summary: 'Update Family Member Data' })
     @ApiParam({ name: 'id', description: 'Family Member ID', type: 'number' })

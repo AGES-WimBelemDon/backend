@@ -47,10 +47,6 @@ export class FamilyMemberService {
         await this.validateStudentsById(dto.studentIds);
 
         const dateOfBirth = new Date(dto.dateOfBirth);
-        
-        if (isNaN(dateOfBirth.getTime())) {
-            throw new BadRequestException("Data de nascimento inválida");
-        }
 
         if (dateOfBirth > new Date()) {
             throw new BadRequestException("Data de nascimento não pode ser futura");
@@ -66,7 +62,12 @@ export class FamilyMemberService {
         if (!existingFamilyMember) {
             throw new NotFoundException(`Family member with ID ${id} not found.`);
         }
-
+        if (dto.registrationNumber) {
+            const regOwner = await this.familyMemberRepository.findByRegistrationNumber(dto.registrationNumber);
+            if (regOwner && regOwner.getId() !== id){
+                throw new ConflictException("CPF '${dto.registrationNumber}' already in use!");
+            }
+        }
         if (dto.email) {
             const emailOwner = await this.familyMemberRepository.findByEmail(dto.email);
             if (emailOwner && emailOwner.getId() !== id) {

@@ -126,7 +126,7 @@ model FamilyMember {
   socialPrograms    SocialProgram?    @map("social_programs")
   employmentStatus  EmploymentStatus? @map("employment_status")
   student           Student[]         @relation("StudentFamily")
-  address           Address?          @relation("FamilyAddress", fields: [addressId], references: [id])
+  address           Address?          @relation("FamilyAddress", fields: [addressId], references: [id], onDelete: Cascade)
   @@map("family_member")
 }
 

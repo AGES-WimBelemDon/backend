@@ -9,7 +9,8 @@ import {
     IsArray, 
     IsEmail, 
     IsPhoneNumber, 
-    Matches
+    Matches,
+    IsDate
 } from 'class-validator';
 import { 
     Race, 
@@ -19,6 +20,7 @@ import {
     EmploymentStatus
 } from '@prisma/client';
 import { Transform } from 'class-transformer';
+import { BadRequestException } from '@nestjs/common';
 
 function isValidCPF(cpf: string): boolean {
     cpf = cpf.replace(/[^\d]+/g, '');
@@ -100,16 +102,27 @@ export class CreateFamilyMemberDTO {
     @IsEnum(EducationLevel)
     educationLevel?: EducationLevel;
 
-    @ApiProperty({ 
-        example: "1980-10-25",
-        description: "Date of birth of the family member",
-        type: String,
-        format: 'date',
+    @ApiProperty({
+    example: "1990-09-11",
+    description: "Date of birth of the family member",
+    type: Date,
+    format: 'date',
+    required: true
+})
+    @Transform(({ value }) => {
+        if (!value) {
+            throw new BadRequestException("Date of birth cannot be empty");
+        }
+        const date = new Date(value);
+        if (isNaN(date.getTime())) {
+            throw new BadRequestException("Invalid date format");
+        }
+        return date;
     })
     
+    @IsDate({ message: "Date of birth must be a valid date" })
     @IsNotEmpty({ message: "Date of birth is required" })
-    @IsDateString({}, { message: "Date of birth must be in YYYY-MM-DD format" })
-    dateOfBirth: string;
+    dateOfBirth: Date;
 
     @ApiProperty({ enum: SocialProgram, required: false })
     @IsOptional()
