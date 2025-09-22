@@ -1,0 +1,23 @@
+FROM node:22.18.0-alpine AS base
+WORKDIR /usr/app
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+FROM base AS dependencies
+COPY package.json yarn.lock./
+RUN yarn install --frozen-lockfile
+
+FROM base AS build
+COPY --from=dependencies /usr/app/node_modules ./node_modules
+COPY . .
+RUN yarn prisma generate
+RUN yarn build
+
+FROM base AS production
+ENV NODE_ENV=production
+COPY package.json yarn.lock./
+RUN yarn install --frozen-lockfile --production
+COPY --from=build /usr/app/dist ./dist
+COPY --from=build /usr/app/node_modules/.prisma ./node_modules/.prisma
+USER appuser
+EXPOSE 3000
+CMD ["node", "dist/main.js"]
