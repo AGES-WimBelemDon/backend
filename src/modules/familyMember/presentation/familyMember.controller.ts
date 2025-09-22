@@ -8,6 +8,7 @@ import {
     Param,
     ParseIntPipe,
     Patch,
+    Delete,
 } from '@nestjs/common';
 import {
     ApiOperation,
@@ -74,6 +75,17 @@ export class FamilyMemberController {
         const familyMember = await this.familyMemberService.findById(id);
         return FamilyMemberMapper.toResponse(familyMember);
     }
+
+    @Delete(':id')
+    @ApiOperation({ summary: 'Delete Family Member by ID' })
+    @ApiParam({ name: 'id', description: 'Family Member ID', type: 'number' })
+    @ApiResponse({ status: 204, description: 'Family member successfully deleted.'})
+    @ApiResponse({ status: 404, description: "Family Member not found!" })
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async deleteById(@Param('id', ParseIntPipe) id: number) {
+        await this.familyMemberService.delete(id);
+    }
+
 
     @Patch(':id')
     @ApiOperation({ summary: 'Update Family Member Data' })
