@@ -12,6 +12,7 @@ import { LevelModule } from './modules/level/level.module';
 import { EnrollmentModule } from './modules/enrollment/enrollment.module';
 import { AssessmentModule } from './modules/assessment/assessment.module';
 import { ClassModule } from './modules/class/class.module';
+import { UserModule } from './modules/user/user.module';
 import { ActivityModule } from './modules/activity/activity.module';
 
 @Module({
@@ -33,6 +34,8 @@ import { ActivityModule } from './modules/activity/activity.module';
     EnrollmentModule,
     AssessmentModule,
     ClassModule,
+    AssessmentModule,
+    UserModule,
     ActivityModule
   ],
 })
