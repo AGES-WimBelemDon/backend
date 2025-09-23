@@ -3,7 +3,7 @@ WORKDIR /usr/app
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 FROM base AS dependencies
-COPY package.json yarn.lock./
+COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 
 FROM base AS build
