@@ -3,7 +3,7 @@ name: Deploy to AWS EC2
 on:
   push:
     branches:
-      - develop
+      - ci/setup-ci-pipeline
   workflow_dispatch:
 jobs:
   deploy:
