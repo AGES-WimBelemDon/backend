@@ -57,7 +57,7 @@ jobs:
             EOF
 
             aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
-            docker pull ${{ env.ECR_REGISTRY }}/${{ $ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+            docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
             sed -i 's|image:.*|image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}|' docker-compose.prod.yml
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
             docker image prune -af
