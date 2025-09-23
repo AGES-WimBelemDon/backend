@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   api-wbd:
-    image: <aws_account_id>.dkr.ecr.<aws-region>.amazonaws.com/wbd-api:latest
+    image: 179388324778.dkr.ecr.us-east-2.amazonaws.com/wbd-mais-ages:latest
     restart: unless-stopped
     ports:
       - "80:3000"
