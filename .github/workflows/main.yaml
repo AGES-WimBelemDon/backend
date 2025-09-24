@@ -44,6 +44,7 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
+            set -euo pipefail
             mkdir -p ~/app && cd ~/app
             echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env.production
             echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env.production
