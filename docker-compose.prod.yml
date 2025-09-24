@@ -7,7 +7,7 @@ services:
     ports:
       - "80:3000"
     env_file:
-      -.env.production
+      - .env.production
     depends_on:
       db-wbd:
         condition: service_healthy
@@ -17,7 +17,7 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     env_file:
-      -.env.production
+      - .env.production
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin -d wbd_database"]
       interval: 5s
