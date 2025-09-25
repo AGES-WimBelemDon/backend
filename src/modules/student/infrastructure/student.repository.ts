@@ -7,7 +7,7 @@ import { StudentMapper } from "./student.mapper";
 @Injectable()
 export class StudentRepository implements IStudentRepository {
     constructor(private readonly prisma: PrismaService) {}
-
+    
     async create(student: Student): Promise<Student> {
         const prismaStudent = await this.prisma.student.create({
             data: {
@@ -45,6 +45,18 @@ export class StudentRepository implements IStudentRepository {
         }
 
         return StudentMapper.toDomain(prismaStudent);
+    }
+
+    async findManyById(ids: number[]): Promise<Student[]> {
+        const prismaStudents = await this.prisma.student.findMany({
+            where: {
+                id: {
+                    in: ids
+                }
+            }
+        });
+
+        return prismaStudents.map(StudentMapper.toDomain);
     }
 
     async findAll(): Promise<Student[]> {
