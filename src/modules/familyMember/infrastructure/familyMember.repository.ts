@@ -10,9 +10,6 @@ export class PrismaFamilyMemberRepository implements IFamilyMemberRepository {
     constructor(private readonly prisma: PrismaService) { }
 
     async create(familyMember: FamilyMemberEntity): Promise<FamilyMemberEntity> {
-        const addressId = familyMember.getAddressId();
-        const studentIds = familyMember.getStudentIds();
-
         const data: Prisma.FamilyMemberCreateInput = {
             fullName: familyMember.getFullName(),
             relationship: familyMember.getRelationship(),
@@ -27,10 +24,11 @@ export class PrismaFamilyMemberRepository implements IFamilyMemberRepository {
             nis: familyMember.getNis(),
             registrationNumber: familyMember.getRegistrationNumber(),
             employmentStatus: familyMember.getEmploymentStatus(),
-            student: { connect: studentIds.map(id => ({ id })) }
+            student: { connect: familyMember.getStudentIds().map(id => ({ id })) }
         };
 
-        if (addressId) {
+        const addressId = familyMember.getAddressId();
+        if (typeof addressId === "number") {
             data.address = { connect: { id: addressId } };
         }
 
@@ -44,6 +42,9 @@ export class PrismaFamilyMemberRepository implements IFamilyMemberRepository {
 
     async update(familyMember: FamilyMemberEntity): Promise<FamilyMemberEntity> {
         const id = familyMember.getId();
+        if (!id) {
+            throw new Error("The FamilyMemberEntity must have an ID to be updated.");
+        }
         
         const updatedFamilyMember = await this.prisma.familyMember.update({
             where: { id },
@@ -59,6 +60,18 @@ export class PrismaFamilyMemberRepository implements IFamilyMemberRepository {
                 dateOfBirth: familyMember.getDateOfBirth(),
                 socialPrograms: familyMember.getSocialPrograms(),
                 employmentStatus: familyMember.getEmploymentStatus(),
+                nis: familyMember.getNis(),
+                registrationNumber: familyMember.getRegistrationNumber(),
+                
+                address: familyMember.getAddressId() === null
+                    ? { disconnect: true }
+                    : typeof familyMember.getAddressId() === "number"
+                        ? { connect: { id: familyMember.getAddressId() as number } }
+                        : undefined,
+
+                student: {
+                    set: familyMember.getStudentIds().map(studentId => ({ id: studentId }))
+                }
             },
             include: { student: true, address: true }
         });

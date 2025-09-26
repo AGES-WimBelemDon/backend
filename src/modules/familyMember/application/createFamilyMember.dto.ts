@@ -25,7 +25,6 @@ function isValidCPF(cpf: string): boolean {
     cpf = cpf.replace(/[^\d]+/g, '');
     
     if (cpf.length !== 11) return false;
-    
     if (/^(\d)\1+$/.test(cpf)) return false;
     
     let sum = 0;
@@ -70,7 +69,7 @@ export class CreateFamilyMemberDTO {
     @IsNotEmpty({ message: "Student IDs are required" })
     studentIds: number[];
 
-    @ApiProperty({ example: 100, description: "ID of the family member's address" })
+    @ApiProperty({ example: 100, description: "ID of the family member's address", required: false })
     @IsInt()
     @IsOptional()
     addressId?: number;
@@ -102,23 +101,20 @@ export class CreateFamilyMemberDTO {
     educationLevel?: EducationLevel;
 
     @ApiProperty({
-    example: "1990-09-11",
-    description: "Date of birth of the family member",
-    type: Date,
-    format: 'date',
-    required: true
-})
+        example: "1990-09-11",
+        description: "Date of birth of the family member (YYYY-MM-DD)",
+        type: String,
+        format: 'date',
+        required: true
+    })
     @Transform(({ value }) => {
-        if (!value) {
-            throw new BadRequestException("Date of birth cannot be empty");
-        }
+        if (!value) return null;
         const date = new Date(value);
         if (isNaN(date.getTime())) {
-            throw new BadRequestException("Invalid date format");
+            throw new BadRequestException("Data format invalid, use YYYY-MM-DD");
         }
         return date;
     })
-    
     @IsDate({ message: "Date of birth must be a valid date" })
     @IsNotEmpty({ message: "Date of birth is required" })
     dateOfBirth: Date;
@@ -133,22 +129,15 @@ export class CreateFamilyMemberDTO {
     @IsEnum(EmploymentStatus)
     employmentStatus?: EmploymentStatus;
 
-    @ApiProperty({ 
-        example: "12345678900", 
-        required: false,
-        description: "NIS number of the family member" })
+    @ApiProperty({ example: "12345678900", required: false })
     @IsOptional()
     @IsString()
     nis?: string;
 
-    @ApiProperty({ 
-        example: "12345678901", 
-        description: "CPF do aluno (apenas números)",
-        pattern: "^[0-9]{11}$"
-    })
+    @ApiProperty({ example: "12345678901", description: "Family member CPF (only numbers)" })
     @IsString()
-    @IsNotEmpty({ message: "CPF é obrigatório" })
-    @Matches(/^[0-9]{11}$/, { message: "CPF deve conter exatamente 11 dígitos numéricos" })
+    @IsNotEmpty()
+    @Matches(/^[0-9]{11}$/, { message: "CPF must have 11 numeric digits" })
     registrationNumber: string;
 
     static validateCPF(registrationNumber: string): boolean {
