@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  api-wbd:
+    image: 179388324778.dkr.ecr.us-east-2.amazonaws.com/wbd-mais-ages:latest
+    restart: unless-stopped
+    ports:
+      - "80:3000"
+    env_file:
+      - .env.production
+    depends_on:
+      db-wbd:
+        condition: service_healthy
+    command: sh -c "yarn prisma:migrate:prod && node dist/main.js"
+
+  db-wbd:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d wbd_database"]
+      interval: 5s
+      retries: 5
+    volumes:
+      - wbd_database:/var/lib/postgresql/data
+
+volumes:
+  wbd_database:
