@@ -1,4 +1,3 @@
-// src/modules/address/application/address.service.ts
 
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { ADDRESS_REPOSITORY_TOKEN, IAddressRepository } from "../domain/address.repository.interface";
@@ -21,7 +20,7 @@ export class AddressService {
     async findById(id: number): Promise<AddressEntity> {
         const address = await this.addressRepository.findById(id);
         if (!address) {
-            throw new NotFoundException(`Endereço com ID ${id} não encontrado.`);
+            throw new NotFoundException(`Address with ID ${id} not found.`);
         }
         return address;
     }

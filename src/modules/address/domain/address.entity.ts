@@ -1,4 +1,3 @@
-
 interface AddressProps {
     street: string;
     city: string;
