@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsString, IsNotEmpty, IsOptional, IsDateString, Matches, MinLength, MaxLength } from "class-validator";
+import { IsString, IsNotEmpty, IsOptional, IsDateString, Matches, MinLength, MaxLength, IsInt } from "class-validator";
 
 function isValidCPF(cpf: string): boolean {
     cpf = cpf.replace(/[^\d]+/g, '');
@@ -59,6 +59,11 @@ export class CreateStudentDTO {
     @IsOptional()
     @IsDateString({}, { message: "Data de nascimento deve estar no formato YYYY-MM-DD" })
     dateOfBirth?: string;
+
+     @ApiProperty({ example: 100, description: "ID of students's address", required: false })
+        @IsInt()
+        @IsOptional()
+        addressId?: number;
 
     @ApiProperty({ 
         example: "João", 

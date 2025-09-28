@@ -4,6 +4,7 @@ interface StudentProps {
     dateOfBirth?: Date;
     socialName?: string;
     id?: number;
+    addressId?: number | null,
 }
 
 export class Student {
@@ -14,6 +15,7 @@ export class Student {
     socialName?: string;
     enrollmentDate: Date;
     status: string;
+    addressId?: number | null
 
     constructor(props: StudentProps) {
         this.id = props.id;
@@ -23,6 +25,7 @@ export class Student {
         this.socialName = props.socialName;
         this.enrollmentDate = new Date();
         this.status = 'ATIVO';
+        this.addressId = props.addressId;
     }
 
     getId(): number | undefined {
@@ -53,6 +56,10 @@ export class Student {
         return this.status;
     }
 
+    public getAddressId(): number | null | undefined { 
+        return this.addressId; 
+    }
+
     setFullName(fullName: string): void {
         this.fullName = fullName;
     }
@@ -71,5 +78,9 @@ export class Student {
 
     setStatus(status: string): void {
         this.status = status;
+    }
+
+    public setAddressId(addressId: number | null | undefined): void { 
+        this.addressId = addressId;
     }
 }

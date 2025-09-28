@@ -68,14 +68,27 @@ export class StudentRepository implements IStudentRepository {
         return prismaStudents.map(StudentMapper.toDomain);
     }
 
-    async update(id: number, studentData: Partial<Student>): Promise<Student> {
+    async update(student: Student ): Promise<Student> {
+        const id = student.getId();
+        if (!id) {
+            throw new Error("Student entity must have an ID to be updated.");
+        }
         const prismaStudent = await this.prisma.student.update({
             where: { id },
             data: {
-                fullName: studentData.fullName,
-                socialName: studentData.socialName || null,
-                dateOfBirth: studentData.dateOfBirth || null,
+                fullName: student.fullName,
+                socialName: student.socialName || null,
+                dateOfBirth: student.dateOfBirth || null,
+
+                address: student.getAddressId() === null
+                    ? { disconnect: true }
+                    : typeof student.getAddressId() === "number"
+                        ? { connect: { id: student.getAddressId() as number } }
+                        : undefined,
             },
+            include: {
+                address: true,
+            }
         });
 
         return StudentMapper.toDomain(prismaStudent);

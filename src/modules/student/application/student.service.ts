@@ -1,13 +1,20 @@
-import { Injectable, Inject, ConflictException, BadRequestException } from "@nestjs/common";
+import { Injectable, Inject, ConflictException, BadRequestException, NotFoundException } from "@nestjs/common";
 import { IStudentRepository, STUDENT_REPOSITORY_TOKEN } from "../domain/student-repository.interface";
 import { CreateStudentDTO } from "./create-student.dto";
 import { Student } from "../domain/student.entity";
+import { UpdateStudentDTO } from "./update-student.dto";
+import { AddressService } from "src/modules/address/application/address.service";
+import { AddressEntity } from "src/modules/address/domain/address.entity";
+import { CreateAddressDTO } from "src/modules/address/application/create-address.dto";
 
 @Injectable()
 export class StudentService {
     constructor(
         @Inject(STUDENT_REPOSITORY_TOKEN)
         private readonly studentRepository: IStudentRepository,
+
+        private readonly addressService: AddressService,
+        
     ) {}
 
     async createStudent(createStudentDto: CreateStudentDTO): Promise<Student> {
@@ -56,5 +63,76 @@ export class StudentService {
 
     async findAll(): Promise<Student[]> {
         return await this.studentRepository.findAll();
+    }
+
+    async update(id: number, dto: UpdateStudentDTO){
+        const existingStudent = await this.studentRepository.findById(id);
+        if (!existingStudent) {
+            throw new NotFoundException(`Student with ID ${id} not found.`);
+        }
+
+        if (dto.registrationNumber) {
+            const regOwner = await this.studentRepository.findByRegistrationNumber(dto.registrationNumber);
+            if (regOwner && regOwner.getId() !== id) {
+                throw new ConflictException(`CPF '${dto.registrationNumber}' is already in use.`);
+            }
+        }
+
+        Object.keys(dto).forEach(key => {
+            const setterName = `set${key.charAt(0).toUpperCase() + key.slice(1)}`;
+            if (typeof existingStudent[setterName] === 'function') {
+                existingStudent[setterName](dto[key]);
+            }
+        });
+
+        return this.studentRepository.update(existingStudent);
+    }
+
+    async delete(id: number): Promise<void> {
+        await this.findById(id);
+        return this.studentRepository.delete(id);
+    }
+
+    async addAddressToStudent(studentId: number, dto: CreateAddressDTO): Promise<AddressEntity> {
+        const student = await this.findById(studentId);
+        if (!student) {
+            throw new NotFoundException(`Student with ID ${studentId} not found.`);
+        }
+        const newAddress = await this.addressService.create(dto);
+        
+        student.setAddressId(newAddress.id);
+        await this.studentRepository.update(student);
+        
+        return newAddress;
+    }
+
+    async getStudentAddress(studentId: number): Promise<AddressEntity> {
+        const student = await this.findById(studentId);
+        if (!student) {
+            throw new NotFoundException(`Student with ID ${studentId} not found.`);
+        }
+        const addressId = student.getAddressId();
+
+        if (!addressId) {
+            throw new NotFoundException(`Student with ID ${studentId} does not have an address.`);
+        }
+
+        return this.addressService.findById(addressId);
+    }
+
+    async removeAddressFromStudent(studentId: number): Promise<void> {
+        const student = await this.findById(studentId);
+        if (!student) {
+            throw new NotFoundException(`Student with ID ${studentId} not found.`);
+        }
+        const addressId = student.getAddressId();
+
+        if (addressId === null || addressId === undefined) {
+            throw new NotFoundException(`Student with ID ${studentId} does not have an address to remove.`);
+        }
+
+        student.setAddressId(null); 
+        await this.studentRepository.update(student);
+        await this.addressService.delete(addressId);
     }
 }

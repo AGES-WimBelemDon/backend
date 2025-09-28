@@ -6,7 +6,9 @@ import {
     HttpCode, 
     HttpStatus,
     Param,
-    ParseIntPipe
+    ParseIntPipe,
+    Patch,
+    Delete
 } from "@nestjs/common";
 import { 
     ApiOperation, 
@@ -17,6 +19,9 @@ import {
 import { StudentService } from "../application/student.service";
 import { CreateStudentDTO } from "../application/create-student.dto";
 import { StudentMapper } from "../infrastructure/student.mapper";
+import { UpdateStudentDTO } from "../application/update-student.dto";
+import { AddressMapper } from "src/modules/address/infrastructure/address.mapper";
+import { CreateAddressDTO } from "src/modules/address/application/create-address.dto";
 
 @ApiTags("students")
 @Controller("students")
@@ -142,5 +147,71 @@ export class StudentController {
             return { message: "Student not found" };
         }
         return StudentMapper.toResponse(student);
+    }
+
+    @Patch(':id')
+    @ApiOperation({ summary: 'Update Student Data' })
+    @ApiParam({ name: 'id', description: 'Student ID', type: 'number' })
+    @ApiResponse({ status: 200, description: 'Student successfully updated',})
+    @ApiResponse({ status: 400, description: "Invalid Data! (Bad Request)" })
+    @ApiResponse({ status: 404, description: "Student not found!" })
+    @ApiResponse({ status: 409, description: "Email already exists!" })
+    async updateFamilyMember(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() updateStudentDto: UpdateStudentDTO,
+    ) {
+        const updatedStudent = await this.studentService.update(id, updateStudentDto);
+        return StudentMapper.toResponse(updatedStudent);
+    }
+
+    @Delete(':id')
+    @ApiOperation({ summary: 'Delete Student by ID' })
+    @ApiParam({ name: 'id', description: 'Student ID', type: 'number' })
+    @ApiResponse({ status: 204, description: 'Student successfully deleted.'})
+    @ApiResponse({ status: 404, description: "Student not found!" })
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async deleteById(@Param('id', ParseIntPipe) id: number) {
+        await this.studentService.delete(id);
+    }
+
+    @Get(':id/address')
+    @ApiOperation({ summary: "Search for a student address" })
+    @ApiResponse({ status: 200, description: 'Address retrieved successfully.'})
+    @ApiResponse({ status: 404, description: "Address not found!" })
+    async getAddress(@Param('id', ParseIntPipe) id: number) {
+        const address = await this.studentService.getStudentAddress(id);
+        return AddressMapper.toResponse(address);
+    }
+
+    @Post(':id/address')
+    @ApiOperation({ summary: "Add a new address to a Student" })
+    @ApiResponse({
+        status: HttpStatus.CREATED,
+        description: "Address successfully created",
+        schema: {
+            example: {
+                    "street": "Avenida Ipiranga",
+                    "city": "Porto Alegre",
+                    "state": "RS",
+                    "cep": "92010-001",
+                    "neighborhood": "Centro"
+            }
+        }
+    })
+    async addAddress(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() dto: CreateAddressDTO,
+    ) {
+        const newAddress = await this.studentService.addAddressToStudent(id, dto);
+        return AddressMapper.toResponse(newAddress);
+    }
+
+    @Delete(':id/address')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiOperation({ summary: "Delete an address from a student" })
+    @ApiResponse({ status: 204, description: 'Address successfully deleted.'})
+    @ApiResponse({ status: 404, description: "Address not found!" })
+    async removeAddress(@Param('id', ParseIntPipe) id: number): Promise<void> {
+        return this.studentService.removeAddressFromStudent(id);
     }
 }

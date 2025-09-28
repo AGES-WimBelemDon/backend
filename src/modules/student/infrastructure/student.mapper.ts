@@ -9,6 +9,7 @@ export class StudentMapper {
             registrationNumber: prismaStudent.registrationNumber,
             dateOfBirth: prismaStudent.dateOfBirth || undefined,
             socialName: prismaStudent.socialName || undefined,
+            addressId: prismaStudent.addressId || undefined,
         });
     }
 
@@ -24,6 +25,7 @@ export class StudentMapper {
     static toResponse(student: Student) {
         return {
             id: student.getId(),
+            addressId: student.getAddressId(),
             fullName: student.getFullName(),
             registrationNumber: student.getRegistrationNumber(),
             dateOfBirth: student.getDateOfBirth(),
