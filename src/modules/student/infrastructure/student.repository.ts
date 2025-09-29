@@ -70,15 +70,12 @@ export class StudentRepository implements IStudentRepository {
 
     async update(student: Student ): Promise<Student> {
         const id = student.getId();
-        if (!id) {
-            throw new Error("Student entity must have an ID to be updated.");
-        }
         const prismaStudent = await this.prisma.student.update({
             where: { id },
             data: {
-                fullName: student.fullName,
-                socialName: student.socialName || null,
-                dateOfBirth: student.dateOfBirth || null,
+                fullName: student.getFullName(),
+                socialName: student.getSocialName() || null,
+                dateOfBirth: student.getDateOfBirth() || null,
 
                 address: student.getAddressId() === null
                     ? { disconnect: true }

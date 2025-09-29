@@ -42,9 +42,6 @@ export class PrismaFamilyMemberRepository implements IFamilyMemberRepository {
 
     async update(familyMember: FamilyMemberEntity): Promise<FamilyMemberEntity> {
         const id = familyMember.getId();
-        if (!id) {
-            throw new Error("The FamilyMemberEntity must have an ID to be updated.");
-        }
         
         const updatedFamilyMember = await this.prisma.familyMember.update({
             where: { id },

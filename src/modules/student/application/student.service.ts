@@ -1,4 +1,10 @@
-import { Injectable, Inject, ConflictException, BadRequestException, NotFoundException } from "@nestjs/common";
+import { 
+    Injectable, 
+    Inject, 
+    ConflictException, 
+    BadRequestException, 
+    NotFoundException 
+} from "@nestjs/common";
 import { IStudentRepository, STUDENT_REPOSITORY_TOKEN } from "../domain/student-repository.interface";
 import { CreateStudentDTO } from "./create-student.dto";
 import { Student } from "../domain/student.entity";
@@ -72,11 +78,21 @@ export class StudentService {
         }
 
         if (dto.registrationNumber) {
+            if (!UpdateStudentDTO.validateCPF(dto.registrationNumber)) {
+                throw new BadRequestException("Invalid CPF");
+            }
             const regOwner = await this.studentRepository.findByRegistrationNumber(dto.registrationNumber);
             if (regOwner && regOwner.getId() !== id) {
                 throw new ConflictException(`CPF '${dto.registrationNumber}' is already in use.`);
             }
         }
+
+         if (dto.dateOfBirth) {
+            if (dto.dateOfBirth > new Date()) {
+                throw new BadRequestException('Date of birth cannot be in the future.');
+            }
+        }
+
 
         Object.keys(dto).forEach(key => {
             const setterName = `set${key.charAt(0).toUpperCase() + key.slice(1)}`;
@@ -85,7 +101,7 @@ export class StudentService {
             }
         });
 
-        return this.studentRepository.update(existingStudent);
+        return await this.studentRepository.update(existingStudent);
     }
 
     async delete(id: number): Promise<void> {
@@ -104,6 +120,18 @@ export class StudentService {
         await this.studentRepository.update(student);
         
         return newAddress;
+    }
+
+    async validateStudentsById(studentIds: number[]): Promise<void> {
+        if (studentIds.length === 0) {
+            throw new BadRequestException("At least one student ID is required.");
+        };
+        const foundStudents = await this.studentRepository.findManyById(studentIds);
+        if (foundStudents.length !== studentIds.length) {
+            const foundIds = foundStudents.map(s => s.id);
+            const notFoundIds = studentIds.filter(id => !foundIds.includes(id));
+            throw new NotFoundException(`Student(s) with ID(s) ${notFoundIds.join(", ")} not found.`);
+        }
     }
 
     async getStudentAddress(studentId: number): Promise<AddressEntity> {

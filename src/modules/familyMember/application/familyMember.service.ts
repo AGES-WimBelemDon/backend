@@ -9,10 +9,10 @@ import { FAMILY_MEMBER_REPOSITORY_TOKEN, IFamilyMemberRepository } from "../doma
 import { CreateFamilyMemberDTO } from "./createFamilyMember.dto";
 import { UpdateFamilyMemberDTO } from "./updateFamilyMember.dto";
 import { FamilyMemberEntity } from "../domain/familyMember.entity";
-import { IStudentRepository, STUDENT_REPOSITORY_TOKEN } from "src/modules/student/domain/student-repository.interface";
 import { AddressEntity } from "src/modules/address/domain/address.entity";
 import { CreateAddressDTO } from "src/modules/address/application/create-address.dto";
 import { AddressService } from "src/modules/address/application/address.service";
+import { StudentService } from "src/modules/student/application/student.service";
 
 @Injectable()
 export class FamilyMemberService {
@@ -22,8 +22,7 @@ export class FamilyMemberService {
 
         private readonly addressService: AddressService,
 
-        @Inject(STUDENT_REPOSITORY_TOKEN)
-        private readonly studentRepository: IStudentRepository,
+        private readonly studentService: StudentService,
     ) {}
 
     async create(dto: CreateFamilyMemberDTO): Promise<FamilyMemberEntity> {
@@ -46,7 +45,7 @@ export class FamilyMemberService {
         if (dto.addressId !== undefined) {
             await this.validateAddressById(dto.addressId);
         }
-        await this.validateStudentsById(dto.studentIds);
+        await this.studentService.validateStudentsById(dto.studentIds);
 
         if (dto.dateOfBirth > new Date()) {
             throw new BadRequestException("Date of birth cannot be in the future.");
@@ -63,6 +62,9 @@ export class FamilyMemberService {
         }
 
         if (dto.registrationNumber) {
+            if (!UpdateFamilyMemberDTO.validateCPF(dto.registrationNumber)) {
+                throw new BadRequestException("Invalid CPF");
+            }
             const regOwner = await this.familyMemberRepository.findByRegistrationNumber(dto.registrationNumber);
             if (regOwner && regOwner.getId() !== id){
                 throw new ConflictException(`CPF '${dto.registrationNumber}' is already in use.`);
@@ -74,7 +76,13 @@ export class FamilyMemberService {
                 throw new ConflictException(`Email '${dto.email}' is already in use.`);
             }
         }
-        
+
+        if (dto.dateOfBirth) {
+            if (dto.dateOfBirth > new Date()) {
+                throw new BadRequestException('Date of birth cannot be in the future.');
+            }
+        }
+
         Object.keys(dto).forEach(key => {
             const setterName = `set${key.charAt(0).toUpperCase() + key.slice(1)}`;
             if (typeof existingFamilyMember[setterName] === 'function') {
@@ -87,7 +95,11 @@ export class FamilyMemberService {
 
     async addAddressToFamilyMember(familyMemberId: number, dto: CreateAddressDTO): Promise<AddressEntity> {
         const familyMember = await this.findById(familyMemberId);
-        
+         if(familyMember.getAddressId() != null) {
+            throw new ConflictException(
+                `Family member with ID ${familyMember.getId()} already has an address in the database.`
+            );
+        }
         const newAddress = await this.addressService.create(dto);
         
         familyMember.setAddressId(newAddress.id);
@@ -104,14 +116,14 @@ export class FamilyMemberService {
             throw new NotFoundException(`Family member with ID ${familyMemberId} does not have an address.`);
         }
 
-        return this.addressService.findById(addressId);
+        return await this.addressService.findById(addressId);
     }
 
     async removeAddressFromFamilyMember(familyMemberId: number): Promise<void> {
         const familyMember = await this.findById(familyMemberId);
         const addressId = familyMember.getAddressId();
 
-        if (addressId === null || addressId === undefined) {
+        if (addressId == null) {
             throw new NotFoundException(`Family member with ID ${familyMemberId} does not have an address to remove.`);
         }
 
@@ -134,7 +146,7 @@ export class FamilyMemberService {
     }
 
     async findByStudentId(studentId: number): Promise<FamilyMemberEntity[]> {
-        const student = await this.studentRepository.findById(studentId);
+        const student = await this.studentService.findById(studentId);
         if (!student) {
             throw new NotFoundException(`Student with ID ${studentId} not found.`);
         }
@@ -145,15 +157,5 @@ export class FamilyMemberService {
         await this.addressService.findById(addressId);
     }
 
-    private async validateStudentsById(studentIds: number[]): Promise<void> {
-        if (studentIds.length === 0) {
-            throw new BadRequestException("At least one student ID is required.");
-        };
-        const foundStudents = await this.studentRepository.findManyById(studentIds);
-        if (foundStudents.length !== studentIds.length) {
-            const foundIds = foundStudents.map(s => s.id);
-            const notFoundIds = studentIds.filter(id => !foundIds.includes(id));
-            throw new NotFoundException(`Student(s) with ID(s) ${notFoundIds.join(", ")} not found.`);
-        }
-    }
+    
 }

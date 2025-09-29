@@ -1,6 +1,17 @@
+import { BadRequestException } from "@nestjs/common";
 import { ApiProperty } from "@nestjs/swagger";
-import { Type } from "class-transformer";
-import { IsString, IsNotEmpty, IsOptional, IsDateString, Matches, MinLength, MaxLength, IsInt } from "class-validator";
+import { Transform } from "class-transformer";
+import {
+    IsString,
+    IsNotEmpty,
+    IsOptional, 
+    IsDateString, 
+    Matches, 
+    MinLength, 
+    MaxLength, 
+    IsInt, 
+    IsDate
+} from "class-validator";
 
 function isValidCPF(cpf: string): boolean {
     cpf = cpf.replace(/[^\d]+/g, '');
@@ -51,19 +62,28 @@ export class CreateStudentDTO {
     @Matches(/^[0-9]{11}$/, { message: "CPF deve conter exatamente 11 dígitos numéricos" })
     registrationNumber: string;
 
-    @ApiProperty({ 
-        example: "2010-05-15", 
-        description: "Data de nascimento do aluno (formato YYYY-MM-DD)",
-        required: false
-    })
-    @IsOptional()
-    @IsDateString({}, { message: "Data de nascimento deve estar no formato YYYY-MM-DD" })
-    dateOfBirth?: string;
-
-     @ApiProperty({ example: 100, description: "ID of students's address", required: false })
-        @IsInt()
+    @ApiProperty({
+            example: "1990-09-11",
+            description: "Date of birth of the student (YYYY-MM-DD)",
+            type: String,
+            format: 'date',
+        })
+        @Transform(({ value }) => {
+            if (!value) return null;
+            const date = new Date(value);
+            if (isNaN(date.getTime())) {
+                throw new BadRequestException("Data format invalid, use YYYY-MM-DD");
+            }
+            return date;
+        })
+        @IsDate({ message: "Date of birth must be a valid date" })
         @IsOptional()
-        addressId?: number;
+        dateOfBirth?: Date;
+
+    @ApiProperty({ example: 100, description: "ID of students's address", required: false })
+    @IsInt()
+    @IsOptional()
+    addressId?: number;
 
     @ApiProperty({ 
         example: "João", 
