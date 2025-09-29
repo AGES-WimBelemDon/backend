@@ -7,6 +7,7 @@ import { FirebaseModule } from './modules/firebase/firebase.module';
 import { FrequencyModule } from './modules/frequency/frequency.module';
 import { StudentModule } from './modules/student/student.module';
 import { ClassModule } from './modules/class/class.module';
+import { FamilyMemberModule } from './modules/familyMember/familyMember.module';
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import { ClassModule } from './modules/class/class.module';
     }),
     FrequencyModule,
     StudentModule,
-    ClassModule
+    ClassModule,
+    FamilyMemberModule
   ],
 })
 export class AppModule {}

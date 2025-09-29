@@ -1,5 +1,6 @@
 # Git and system files
 .git
+.github
 .DS_Store
 
 # Local dependencies and build artifacts
@@ -11,3 +12,6 @@ coverage
 .env*
 !.env.example
 npm-debug.log
+yarn-debug.log*
+yarn-error.log*
+*.md

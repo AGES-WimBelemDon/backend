@@ -6,6 +6,7 @@ export interface IStudentRepository {
     create(student: Student): Promise<Student>;
     findByRegistrationNumber(registrationNumber: string): Promise<Student | null>;
     findById(id: number): Promise<Student | null>;
+    findManyById(ids: number[]): Promise<Student[]>;
     findAll(): Promise<Student[]>;
     update(id: number, student: Partial<Student>): Promise<Student>;
     delete(id: number): Promise<void>;
