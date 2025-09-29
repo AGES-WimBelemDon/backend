@@ -7,42 +7,36 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id            Int      @id @default(autoincrement())
+  uidFirebase   String   @unique @map("uid_firebase")
+  fullName      String   @map("full_name")
+  email         String   @unique
+  roleId        Int?     @map("role_id")
+  addressId     Int      @map("address_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+  status        UserStatus @default(ATIVO)
+  role          Role?    @relation("Roles", fields: [roleId], references: [id])
+  address       Address  @relation(fields: [addressId], references: [id])
+  classes       Class[]  @relation("ClassTeacher")
 
-model Form {
-  id        Int      @id @default(autoincrement())
-  title     String
-  type      FormType @unique
-  questions Question[]
-  @@map("form")
+  @@map("user")
 }
 
-model Question {
-  id        Int      @id @default(autoincrement())
-  formId    Int
-  text      String
-  helpText  String?
-  required  Boolean @default(false)
-  order     Int
-  form      Form     @relation(fields: [formId], references: [id])
-  answers   Answer[] @relation("AnswersQuestions")
-  @@index([formId, order])
-  @@map("question")
+model Role {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+
+  users User[]  @relation("Roles")
+
+  @@map("role")
 }
 
-model Answer {
-  id              Int      @id @default(autoincrement())
-  studentId       Int
-  questionId      Int      @map("id_question")
-  submission_date DateTime
-  content         String
-
-  student   Student  @relation("StudentAnswers", fields: [studentId], references: [id])
-  question  Question @relation("AnswersQuestions", fields: [questionId], references: [id])
-
-  @@index([studentId, submission_date])
-  @@index([questionId, submission_date])
-  @@map("answer")
-}
+model Student {
+  id                  Int               @id @default(autoincrement())
+  addressId           Int?              @map("address_id")
+  fullName            String            @map("full_name")
   dateOfBirth         DateTime?         @map("date_of_birth") @db.Date
   registrationNumber  String            @unique @map("registration_number")
   enrollmentDate      DateTime          @default(now()) @map("enrollment_date") @db.Date
@@ -182,6 +176,7 @@ model Question {
 
 model Answer {
   id         Int    @id @default(autoincrement())
+  submissionDate DateTime @default(now()) @map("submission_date")
   questionId Int    @map("id_question")
   studentId  Int
   content    String
@@ -193,7 +188,6 @@ model Answer {
 }
 model Form {
   id             Int      @id @default(autoincrement())
-  submissionDate DateTime @default(now()) @map("submission_date")
   type           FormType
   title          String
   questions      Question[]

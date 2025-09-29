@@ -5,5 +5,4 @@ export interface AnswerRepository {
   findBySubmissionDate(studentId: number, submission_date: Date): Promise<Answer[]>;
   createMany(answers: Answer[]): Promise<void>;
   updateContent(answerId: number, submission_date: Date, content: string): Promise<Answer | null>;
-  // outros métodos conforme necessidade
 }

@@ -1,43 +1,47 @@
-import { PrismaClient, FormType } from '@prisma/client';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from 'src/prisma/prisma.service';
+import { FormType } from 'src/common/enums/domain.enums';
 import { Form, Question, Answer } from '../domain/form.entity';
+import { AnswerMapper, QuestionMapper, FormMapper } from "./assessment.mapper";
 
+@Injectable()
 export class AssessmentRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  // GET /form/
   async findAllForms(): Promise<Form[]> {
-    const forms = await this.prisma.form.findMany();
-    return forms.map(f => new Form(f.id, f.title, f.type));
+    const forms = await this.prisma.form.findMany({
+      include: {
+        questions: {
+          include: {
+            answers: true
+          }
+        }
+      }
+    });
+    return forms.map(FormMapper.toDomain);
   }
 
-  // GET /form/:formType/questions
   async findQuestionsByFormType(formType: FormType): Promise<Question[]> {
     const form = await this.prisma.form.findFirst({
       where: { type: formType },
-      include: { questions: true },
+      include: {
+        questions: {
+          include: {
+            answers: true
+          }
+        }
+      }
     });
-    if (!form) return [];
-    return form.questions
-      .map(q => new Question(
-        q.id,
-        q.formId,
-        q.statement,
-        q.isRequired ?? false
-      ));
+    if (!form || !form.questions) return [];
+    return form.questions.map(QuestionMapper.toDomain);
   }
 
-  // POST /student/:id/assessments
   async createAnswers(answers: Answer[]): Promise<void> {
     await this.prisma.answer.createMany({
-      data: answers.map(a => ({
-        studentId: a.studentId,
-        questionId: a.questionId,
-        content: a.content,
-      })),
+      data: answers.map(AnswerMapper.toPersistence),
     });
   }
 
-  // GET /student/:id/assessments?formType=PSICOLOGIA
   async findAnswersByStudentAndFormType(studentId: number, formType: FormType): Promise<Answer[]> {
     const rows = await this.prisma.answer.findMany({
       where: {
@@ -46,20 +50,14 @@ export class AssessmentRepository {
       },
       include: { question: true },
     });
-    return rows.map(r => new Answer(
-      r.id,
-      r.studentId,
-      r.questionId,
-      r.content
-    ));
+    return rows.map(AnswerMapper.toDomain);
   }
 
-  // PATCH /student/:id/assessments/:answerId
   async updateAnswerContent(answerId: number, content: string): Promise<Answer | null> {
     const r = await this.prisma.answer.update({
       where: { id: answerId },
       data: { content },
     });
-  return r ? new Answer(r.id, r.studentId, r.questionId, r.content) : null;
+    return r ? AnswerMapper.toDomain(r) : null;
   }
 }
