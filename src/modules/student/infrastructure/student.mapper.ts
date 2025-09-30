@@ -25,11 +25,11 @@ export class StudentMapper {
     static toResponse(student: Student) {
         return {
             id: student.getId(),
-            addressId: student.getAddressId(),
+            addressId: student.getAddressId() || null,
             fullName: student.getFullName(),
             registrationNumber: student.getRegistrationNumber(),
-            dateOfBirth: student.getDateOfBirth(),
-            socialName: student.getSocialName(),
+            dateOfBirth: student.getDateOfBirth() || null,
+            socialName: student.getSocialName() || null,
             enrollmentDate: student.getEnrollmentDate(),
             status: student.getStatus(),
         };
