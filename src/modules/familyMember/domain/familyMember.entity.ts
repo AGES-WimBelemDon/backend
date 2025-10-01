@@ -116,5 +116,7 @@ export class FamilyMemberEntity {
     public setRegistrationNumber(registrationNumber: string): void { this.registrationNumber = registrationNumber; }
 
     public setAddressId(addressId: number | null | undefined): void { this.addressId = addressId; }
+    
+    public setStudentIds(studentsId: number[]): void { this. studentIds = studentsId};
 }
 

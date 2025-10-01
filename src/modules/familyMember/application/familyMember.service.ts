@@ -76,7 +76,15 @@ export class FamilyMemberService {
                 throw new ConflictException(`Email '${dto.email}' is already in use.`);
             }
         }
-
+        if (dto.studentIds && dto.studentIds.length>0){
+            for (let index = 0; index < dto.studentIds.length; index++) {
+                const id = dto.studentIds[index];
+                const student = await this.studentService.findById(id);
+                if(!student){
+                    throw new NotFoundException(`Student with ID ${id} not found.`);
+                }
+            }
+        }
         if (dto.dateOfBirth) {
             if (dto.dateOfBirth > new Date()) {
                 throw new BadRequestException('Date of birth cannot be in the future.');
