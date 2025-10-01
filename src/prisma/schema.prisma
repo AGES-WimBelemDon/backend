@@ -53,7 +53,7 @@ model Student {
   employmentStatus    EmploymentStatus? @map("employment_status")
   gradeGap            Boolean?          @map("grade_gap") // defasagem escolar
 
-  address            Address?           @relation(fields: [addressId], references: [id])
+  address            Address?           @relation(fields: [addressId], references: [id], onDelete: Cascade)
   level              Level?             @relation("LevelRelation",fields: [levelId], references: [id])
   family             FamilyMember[]     @relation("StudentFamily")
   frequencies        Frequency[]        @relation("StudentFrequency")

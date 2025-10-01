@@ -20,6 +20,13 @@ export class StudentResponseDTO {
     registrationNumber: string;
 
     @ApiProperty({ 
+        example: 100, 
+        description: "ID of the family member's address",
+        required: false
+    })
+    addressId?: number;
+
+    @ApiProperty({ 
         example: "2010-05-15T00:00:00.000Z", 
         description: "Data de nascimento do aluno",
         required: false

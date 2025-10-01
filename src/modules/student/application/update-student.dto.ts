@@ -1,15 +1,14 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { CreateFamilyMemberDTO } from './createFamilyMember.dto';
+import { CreateStudentDTO } from './create-student.dto';
 import { 
     IsDate,
     IsEmail, 
     IsOptional, 
     IsString, 
-    Matches
+    Matches 
 } from 'class-validator';
-import { BadRequestException } from '@nestjs/common';
 import { Transform } from 'class-transformer';
-
+import { BadRequestException } from '@nestjs/common';
 function isValidCPF(cpf: string): boolean {
     cpf = cpf.replace(/[^\d]+/g, '');
     
@@ -35,13 +34,7 @@ function isValidCPF(cpf: string): boolean {
     return true;
 }
 
-export class UpdateFamilyMemberDTO extends PartialType(CreateFamilyMemberDTO) {
-
-    @IsOptional()
-    @IsString()
-    @IsEmail({}, { message: "Invalid email" })
-    email?: string;
-
+export class UpdateStudentDTO extends PartialType(CreateStudentDTO) {
     @IsOptional()
     @Matches(/^\d{11}$/, { message: 'CPF must have exactly 11 digits' })
     registrationNumber?: string;
@@ -62,7 +55,7 @@ export class UpdateFamilyMemberDTO extends PartialType(CreateFamilyMemberDTO) {
         })
     @IsOptional()
     @IsDate({ message: "Date of birth must be a valid date" })
-    dateOfBirth: Date;
+    dateOfBirth?: Date;
 
     static validateCPF(registrationNumber: string): boolean {
         return isValidCPF(registrationNumber);
