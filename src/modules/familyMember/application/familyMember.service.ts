@@ -42,7 +42,7 @@ export class FamilyMemberService {
             }
         }
         
-        if (dto.addressId !== undefined) {
+        if (dto.addressId != undefined) {
             await this.validateAddressById(dto.addressId);
         }
         await this.studentService.validateStudentsById(dto.studentIds);
