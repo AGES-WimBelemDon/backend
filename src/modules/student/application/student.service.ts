@@ -114,6 +114,9 @@ export class StudentService {
         if (!student) {
             throw new NotFoundException(`Student with ID ${studentId} not found.`);
         }
+        if(student.getAddressId()){
+            throw new ConflictException(`Address assignment failed: Student ${studentId} already has an associated address. To change it, update the existing address or remove it first.`);
+        }
         const newAddress = await this.addressService.create(dto);
         
         student.setAddressId(newAddress.id);
