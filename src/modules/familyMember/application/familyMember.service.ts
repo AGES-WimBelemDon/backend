@@ -84,9 +84,11 @@ export class FamilyMemberService {
         }
 
         Object.keys(dto).forEach(key => {
-            const setterName = `set${key.charAt(0).toUpperCase() + key.slice(1)}`;
-            if (typeof existingFamilyMember[setterName] === 'function') {
-                existingFamilyMember[setterName](dto[key]);
+            if(dto[key]){
+                const setterName = `set${key.charAt(0).toUpperCase() + key.slice(1)}`;
+                if (typeof existingFamilyMember[setterName] === 'function') {
+                    existingFamilyMember[setterName](dto[key]);
+                }
             }
         });
         
