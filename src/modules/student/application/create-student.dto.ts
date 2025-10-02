@@ -4,8 +4,7 @@ import { Transform } from "class-transformer";
 import {
     IsString,
     IsNotEmpty,
-    IsOptional, 
-    IsDateString, 
+    IsOptional,
     Matches, 
     MinLength, 
     MaxLength, 
@@ -68,17 +67,17 @@ export class CreateStudentDTO {
             type: String,
             format: 'date',
         })
-        @Transform(({ value }) => {
-            if (!value) return null;
-            const date = new Date(value);
-            if (isNaN(date.getTime())) {
-                throw new BadRequestException("Data format invalid, use YYYY-MM-DD");
-            }
-            return date;
-        })
-        @IsDate({ message: "Date of birth must be a valid date" })
-        @IsOptional()
-        dateOfBirth?: Date;
+    @Transform(({ value }) => {
+        if (!value) return null;
+        const date = new Date(value);
+        if (isNaN(date.getTime())) {
+            throw new BadRequestException("Data format invalid, use YYYY-MM-DD");
+        }
+        return date;
+    })
+    @IsDate({ message: "Date of birth must be a valid date" })
+    @IsOptional()
+    dateOfBirth?: Date;
 
     @ApiProperty({ example: 100, description: "ID of students's address", required: false })
     @IsInt()

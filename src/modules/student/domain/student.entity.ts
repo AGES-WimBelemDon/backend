@@ -1,86 +1,199 @@
+import { EmploymentStatus, Gender, Race, SchoolYear, SocialProgram, StudentStatus } from "src/common/enums/domain.enums";
+
 interface StudentProps {
     fullName: string;
     registrationNumber: string;
-    dateOfBirth?: Date;
-    socialName?: string;
     id?: number;
-    addressId?: number | null,
+    enrollmentDate?: Date;
+    disenrollmentDate?: Date | null;
+    status?: StudentStatus;
+    dateOfBirth?: Date | null;
+    socialName?: string | null;
+    race?: Race | null;
+    gender?: Gender | null;
+    levelId?: number | null;
+    schoolName?: string | null;
+    schoolShift?: string | null;
+    schoolYear?: SchoolYear | null;
+    gradeGap?: boolean | null;
+    socialPrograms?: SocialProgram | null;
+    employmentStatus?: EmploymentStatus | null;
+    addressId?: number | null;
 }
-
 export class Student {
     id?: number;
     fullName: string;
     registrationNumber: string;
-    dateOfBirth?: Date;
-    socialName?: string;
     enrollmentDate: Date;
-    status: string;
-    addressId?: number | null
+    disenrollmentDate?: Date | null;
+    status: StudentStatus;
+    dateOfBirth?: Date | null;
+    socialName?: string | null;
+    race?: Race | null;
+    gender?: Gender | null;
+    levelId?: number | null;
+    schoolName?: string | null;
+    schoolShift?: string | null;
+    schoolYear?: SchoolYear | null;
+    gradeGap?: boolean | null;
+    socialPrograms?: SocialProgram | null;
+    employmentStatus?: EmploymentStatus | null;
+    addressId?: number | null;
 
     constructor(props: StudentProps) {
         this.id = props.id;
         this.fullName = props.fullName;
         this.registrationNumber = props.registrationNumber;
+        this.enrollmentDate = props.enrollmentDate ?? new Date();
+        this.status = props.status ?? StudentStatus.ATIVO;
+        this.disenrollmentDate = props.disenrollmentDate;
         this.dateOfBirth = props.dateOfBirth;
         this.socialName = props.socialName;
-        this.enrollmentDate = new Date();
-        this.status = 'ATIVO';
+        this.race = props.race;
+        this.gender = props.gender;
+        this.levelId = props.levelId;
+        this.schoolName = props.schoolName;
+        this.schoolShift = props.schoolShift;
+        this.schoolYear = props.schoolYear;
+        this.gradeGap = props.gradeGap;
+        this.socialPrograms = props.socialPrograms;
+        this.employmentStatus = props.employmentStatus;
         this.addressId = props.addressId;
     }
 
-    getId(): number | undefined {
+    public getId(): number | undefined {
         return this.id;
     }
 
-    getFullName(): string {
+    public getFullName(): string {
         return this.fullName;
     }
 
-    getRegistrationNumber(): string {
+    public getRegistrationNumber(): string {
         return this.registrationNumber;
     }
 
-    getDateOfBirth(): Date | undefined {
-        return this.dateOfBirth;
-    }
-
-    getSocialName(): string | undefined {
-        return this.socialName;
-    }
-
-    getEnrollmentDate(): Date {
+    public getEnrollmentDate(): Date {
         return this.enrollmentDate;
     }
 
-    getStatus(): string {
+    public getDisenrollmentDate(): Date | null | undefined {
+        return this.disenrollmentDate;
+    }
+
+    public getStatus(): StudentStatus {
         return this.status;
     }
 
-    public getAddressId(): number | null | undefined { 
-        return this.addressId; 
+    public getDateOfBirth(): Date | null | undefined {
+        return this.dateOfBirth;
     }
 
-    setFullName(fullName: string): void {
-        this.fullName = fullName;
+    public getSocialName(): string | null | undefined {
+        return this.socialName;
     }
 
-    setRegistrationNumber(registrationNumber: string): void {
-        this.registrationNumber = registrationNumber;
+    public getRace(): Race | null | undefined {
+        return this.race;
     }
 
-    setDateOfBirth(dateOfBirth: Date): void {
-        this.dateOfBirth = dateOfBirth;
+    public getGender(): Gender | null | undefined {
+        return this.gender;
     }
 
-    setSocialName(socialName: string): void {
-        this.socialName = socialName;
+    public getLevelId(): number | null | undefined {
+        return this.levelId;
     }
 
-    setStatus(status: string): void {
+    public getSchoolName(): string | null | undefined {
+        return this.schoolName;
+    }
+
+    public getSchoolShift(): string | null | undefined {
+        return this.schoolShift;
+    }
+
+    public getSchoolYear(): SchoolYear | null | undefined {
+        return this.schoolYear;
+    }
+
+    public getGradeGap(): boolean | null | undefined {
+        return this.gradeGap;
+    }
+
+    public getSocialPrograms(): SocialProgram | null | undefined {
+        return this.socialPrograms;
+    }
+
+    public getEmploymentStatus(): EmploymentStatus | null | undefined {
+        return this.employmentStatus;
+    }
+
+    public getAddressId(): number | null | undefined {
+        return this.addressId;
+    }
+
+    public setFullName(name: string): void {
+        this.fullName = name;
+    }
+
+    public setRegistrationNumber(regNum: string): void {
+        this.registrationNumber = regNum;
+    }
+
+    public setStatus(status: StudentStatus): void {
         this.status = status;
     }
 
-    public setAddressId(addressId: number | null | undefined): void { 
+    public setDisenrollmentDate(date: Date | null): void {
+        this.disenrollmentDate = date;
+    }
+
+    public setDateOfBirth(date: Date | null): void {
+        this.dateOfBirth = date;
+    }
+
+    public setSocialName(name: string | null): void {
+        this.socialName = name;
+    }
+
+    public setRace(race: Race | null): void {
+        this.race = race;
+    }
+
+    public setGender(gender: Gender | null): void {
+        this.gender = gender;
+    }
+
+    public setLevelId(id: number | null): void {
+        this.levelId = id;
+    }
+
+    public setSchoolName(name: string | null): void {
+        this.schoolName = name;
+    }
+
+    public setSchoolShift(shift: string | null): void {
+        this.schoolShift = shift;
+    }
+
+    public setSchoolYear(year: SchoolYear | null): void {
+        this.schoolYear = year;
+    }
+
+    public setGradeGap(gap: boolean | null): void {
+        this.gradeGap = gap;
+    }
+
+    public setSocialPrograms(program: SocialProgram | null): void {
+        this.socialPrograms = program;
+    }
+
+    public setEmploymentStatus(status: EmploymentStatus | null): void {
+        this.employmentStatus = status;
+    }
+
+    public setAddressId(addressId: number | null): void {
         this.addressId = addressId;
     }
-}
+};

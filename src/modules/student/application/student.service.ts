@@ -119,7 +119,7 @@ export class StudentService {
         }
         const newAddress = await this.addressService.create(dto);
         
-        student.setAddressId(newAddress.id);
+        student.setAddressId(newAddress.id ?? null);
         await this.studentRepository.update(student);
         
         return newAddress;
