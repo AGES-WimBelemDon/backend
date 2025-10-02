@@ -50,42 +50,6 @@ export class ClassController {
         return ClassMapper.toResponse(classEntity);
     }
 
-    @Get()
-    @ApiOperation({ 
-        summary: "List all classes",
-        description: "Returns a list of all classes in the system"
-    })
-    @ApiResponse({ 
-        status: 200, 
-        description: "Class list successfully retrieved"
-    })
-    async findAllClasses() {
-        const classes = await this.classService.findAll();
-        return classes.map(ClassMapper.toResponse);
-    }
-
-    @Get(':id')
-    @ApiOperation({ 
-        summary: "Find class by ID",
-        description: "Returns the data of a specific class"
-    })
-    @ApiParam({ name: 'id', description: 'Class ID', type: 'number' })
-    @ApiResponse({ 
-        status: 200, 
-        description: "Class successfully found"
-    })
-    @ApiResponse({ 
-        status: 404, 
-        description: "Class not found"
-    })
-    async findClassById(@Param('id', ParseIntPipe) id: number) {
-        const classEntity = await this.classService.findById(id);
-        if (!classEntity) {
-            return { message: "Class not found" };
-        }
-        return ClassMapper.toResponse(classEntity);
-    }
-
     @Delete(':id')
     @ApiOperation({ 
         summary: "Delete a existing class",
@@ -103,21 +67,4 @@ export class ClassController {
         return await this.classService.deleteClass(id)
     }
 
-
-    @ApiOperation({ 
-        summary: "Update a existing class",
-        description: "Update a class from the database"
-    })
-    @ApiResponse({ 
-        status: 204, 
-        description: "Class was successfully updated"
-    })
-    @ApiResponse({ 
-        status: 404, 
-        description: "Class not found"
-    })
-    @Patch(':id')
-    async updateClass(@Param('id', ParseIntPipe) id: number, body: Partial<Class>){
-        return await this.classService.updateClass(id, body)
-    }
 }

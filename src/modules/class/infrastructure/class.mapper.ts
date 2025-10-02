@@ -1,6 +1,7 @@
 
 import { Class as PrismaClass } from "@prisma/client";
 import { Class } from "../domain/class.entity";
+import { ClassResponseDTO } from "../application/class-response.dto";
 
 export class ClassMapper {
     static toDomain(prismaClass: PrismaClass): Class {
@@ -10,8 +11,8 @@ export class ClassMapper {
             activityId: prismaClass.activityId,
             levelId: prismaClass.levelId,
             state: prismaClass.state,
-            studentsIds: [], // This needs to be fetched separately
-            teacherIds: [], // This needs to be fetched separately
+            studentsIds: [], 
+            teacherIds: [], 
         });
     }
 
@@ -24,15 +25,16 @@ export class ClassMapper {
         };
     }
 
-    static toResponse(classEntity: Class) {
-        return {
-            id: classEntity.getId(),
-            name: classEntity.getName(),
-            activityId: classEntity.getActivityId(),
-            levelId: classEntity.getLevelId(),
-            state: classEntity.getState(),
-            studentsIds: classEntity.getStudentsIds(),
-            teacherIds: classEntity.getTeacherIds(),
-        };
-    }
+    static toResponse(classEntity: Class): ClassResponseDTO {  
+        const responseDto = new ClassResponseDTO();  
+        responseDto.id = classEntity.getId()|| 0;  
+        responseDto.name = classEntity.getName();  
+        responseDto.activityId = classEntity.getActivityId();  
+        responseDto.levelId = classEntity.getLevelId();  
+        responseDto.state = classEntity.getState();  
+        responseDto.studentsIds = classEntity.getStudentsIds();  
+        responseDto.teacherIds = classEntity.getTeacherIds();  
+        
+        return responseDto;  
+    }  
 }
