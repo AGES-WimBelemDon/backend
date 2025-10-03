@@ -17,11 +17,12 @@ import {
     ApiParam
 } from "@nestjs/swagger";
 import { StudentService } from "../application/student.service";
-import { CreateStudentDTO } from "../application/create-student.dto";
+import { CreateStudentRequestDTO } from "../application/create-student.request.dto";
 import { StudentMapper } from "../infrastructure/student.mapper";
 import { UpdateStudentDTO } from "../application/update-student.dto";
 import { AddressMapper } from "src/modules/address/infrastructure/address.mapper";
 import { CreateAddressDTO } from "src/modules/address/application/create-address.dto";
+import { StudentResponseDTO } from "../application/student.response.dto";
 
 @ApiTags("students")
 @Controller("students")
@@ -37,16 +38,28 @@ export class StudentController {
     @ApiResponse({ 
         status: 201, 
         description: "Student successfully created",
+        type: StudentResponseDTO,
         schema: {
-            example: {
-                id: 1,
-                fullName: "John Silva Santos",
-                registrationNumber: "12345678901",
-                dateOfBirth: "2010-05-15T00:00:00.000Z",
-                socialName: "John",
-                enrollmentDate: "2025-09-07T15:30:00.000Z",
-                status: "ACTIVE"
-            }
+        example: {
+            id: 1,
+            fullName: "John Silva Santos",
+            registrationNumber: "12345678901",
+            enrollmentDate: "2023-01-15T00:00:00.000Z",
+            disenrollmentDate: null,
+            status: "ATIVO",
+            dateOfBirth: "2010-05-15T00:00:00.000Z",
+            socialName: "John",
+            race: "PARDA",
+            gender: "MASCULINO",
+            levelId: 2,
+            schoolName: "Escola Municipal João da Silva",
+            schoolShift: "Matutino",
+            schoolYear: "ENSINO_MEDIO_1",
+            gradeGap: true,
+            socialPrograms: "BOLSA_FAMILIA",
+            employmentStatus: "DESEMPREGADO",
+            addressId: 100
+        }
         }
     })
     @ApiResponse({ 
@@ -61,6 +74,17 @@ export class StudentController {
                     "Date of birth must be in YYYY-MM-DD format"
                 ],
                 error: "Bad Request"
+            }
+        }
+    })
+    @ApiResponse({ 
+        status: 404, 
+        description: "Invalid addressId",
+        schema: {
+            example: {
+                statusCode: 404,
+                message: "Address with ID 100 not found",
+                error: "Not Found"
             }
         }
     })
@@ -86,7 +110,7 @@ export class StudentController {
             }
         }
     })
-    async createStudent(@Body() createStudentDto: CreateStudentDTO) {
+    async createStudent(@Body() createStudentDto: CreateStudentRequestDTO): Promise<StudentResponseDTO> {
         const student = await this.studentService.createStudent(createStudentDto);
         return StudentMapper.toResponse(student);
     }

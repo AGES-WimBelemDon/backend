@@ -1,5 +1,5 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { CreateStudentDTO } from './create-student.dto';
+import { CreateStudentRequestDTO } from './create-student.request.dto';
 import { 
     IsDate,
     IsEmail, 
@@ -34,7 +34,7 @@ function isValidCPF(cpf: string): boolean {
     return true;
 }
 
-export class UpdateStudentDTO extends PartialType(CreateStudentDTO) {
+export class UpdateStudentDTO extends PartialType(CreateStudentRequestDTO) {
     @IsOptional()
     @Matches(/^\d{11}$/, { message: 'CPF must have exactly 11 digits' })
     registrationNumber?: string;

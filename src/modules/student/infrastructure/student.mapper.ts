@@ -1,5 +1,6 @@
 import { Student as PrismaStudent } from "@prisma/client";
 import { Student } from "../domain/student.entity";
+import { StudentResponseDTO } from "../application/student.response.dto";
 
 export class StudentMapper {
     static toDomain(prismaStudent: PrismaStudent): Student {
@@ -22,16 +23,26 @@ export class StudentMapper {
         };
     }
 
-    static toResponse(student: Student) {
-        return {
-            id: student.getId(),
-            addressId: student.getAddressId() || null,
-            fullName: student.getFullName(),
-            registrationNumber: student.getRegistrationNumber(),
-            dateOfBirth: student.getDateOfBirth() || null,
-            socialName: student.getSocialName() || null,
-            enrollmentDate: student.getEnrollmentDate(),
-            status: student.getStatus(),
-        };
-    }
+    static toResponse(student: Student): StudentResponseDTO  {
+    return {
+        id: student.getId() ?? -1,
+        fullName: student.getFullName(),
+        registrationNumber: student.getRegistrationNumber(),
+        dateOfBirth: student.getDateOfBirth() ?? null,
+        enrollmentDate: student.getEnrollmentDate(),
+        disenrollmentDate: student.getDisenrollmentDate() ?? null,
+        status: student.getStatus(),
+        addressId: student.getAddressId() || null,
+        socialName: student.getSocialName() || null,
+        race: student.getRace() || null,
+        gender: student.getGender() || null,
+        levelId: student.getLevelId() || null,
+        schoolName: student.getSchoolName() || null,
+        schoolShift: student.getSchoolShift() || null,
+        schoolYear: student.getSchoolYear() || null,
+        gradeGap: student.getGradeGap() || null,
+        socialPrograms: student.getSocialPrograms() || null,
+        employmentStatus: student.getEmploymentStatus() || null
+    };
+}
 }

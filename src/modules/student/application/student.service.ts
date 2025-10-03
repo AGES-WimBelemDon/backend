@@ -6,7 +6,7 @@ import {
     NotFoundException 
 } from "@nestjs/common";
 import { IStudentRepository, STUDENT_REPOSITORY_TOKEN } from "../domain/student-repository.interface";
-import { CreateStudentDTO } from "./create-student.dto";
+import { CreateStudentRequestDTO } from "./create-student.request.dto";
 import { Student } from "../domain/student.entity";
 import { UpdateStudentDTO } from "./update-student.dto";
 import { AddressService } from "src/modules/address/application/address.service";
@@ -23,37 +23,31 @@ export class StudentService {
         
     ) {}
 
-    async createStudent(createStudentDto: CreateStudentDTO): Promise<Student> {
-        if (!CreateStudentDTO.validateCPF(createStudentDto.registrationNumber)) {
-            throw new BadRequestException("CPF inválido");
-        }
-
+    async createStudent(createStudentDto: CreateStudentRequestDTO): Promise<Student> {
         const existingStudent = await this.studentRepository.findByRegistrationNumber(
             createStudentDto.registrationNumber
         );
-        
+        if(createStudentDto.addressId){
+            const addressId = createStudentDto.addressId;
+            await this.addressService.findById(addressId);
+        }
         if (existingStudent) {
-            throw new ConflictException("CPF já está em uso");
+            throw new ConflictException("The cpf number is already in use");
         }
 
-        let dateOfBirth: Date | undefined;
         if (createStudentDto.dateOfBirth) {
-            dateOfBirth = new Date(createStudentDto.dateOfBirth);
-            
-            if (isNaN(dateOfBirth.getTime())) {
-                throw new BadRequestException("Data de nascimento inválida");
-            }
 
-            if (dateOfBirth > new Date()) {
-                throw new BadRequestException("Data de nascimento não pode ser futura");
+            if (createStudentDto.dateOfBirth > new Date()) {
+                throw new BadRequestException("Date of birth cannot be in the future.");
             }
         }
 
         const student = new Student({
             fullName: createStudentDto.fullName,
             registrationNumber: createStudentDto.registrationNumber,
-            dateOfBirth,
+            dateOfBirth: createStudentDto.dateOfBirth,
             socialName: createStudentDto.socialName,
+            race: createStudentDto.race
         });
 
         return await this.studentRepository.create(student);

@@ -1,6 +1,6 @@
 import { StudentService } from './student.service';
 import { IStudentRepository } from '../domain/student-repository.interface';
-import { CreateStudentDTO } from './create-student.dto';
+import { CreateStudentRequestDTO } from './create-student.request.dto';
 import { ConflictException, BadRequestException } from '@nestjs/common';
 import { Student } from '../domain/student.entity';
 
@@ -21,7 +21,7 @@ describe('StudentService', () => {
   });
 
   it('deve cadastrar aluno com sucesso', async () => {
-    const dto: CreateStudentDTO = {
+    const dto: CreateStudentRequestDTO = {
       fullName: 'João Silva',
       registrationNumber: '11144477735',
       dateOfBirth: '2010-05-15',
@@ -36,7 +36,7 @@ describe('StudentService', () => {
   });
 
   it('deve lançar erro se CPF já cadastrado', async () => {
-    const dto: CreateStudentDTO = {
+    const dto: CreateStudentRequestDTO = {
       fullName: 'Maria',
       registrationNumber: '11144477735',
       dateOfBirth: '2010-05-15',
@@ -50,7 +50,7 @@ describe('StudentService', () => {
   });
 
   it('deve lançar erro se CPF inválido', async () => {
-    const dto: CreateStudentDTO = {
+    const dto: CreateStudentRequestDTO = {
       fullName: 'Pedro',
       registrationNumber: '123',
       dateOfBirth: '2010-05-15',
