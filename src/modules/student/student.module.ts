@@ -6,9 +6,9 @@ import { STUDENT_REPOSITORY_TOKEN } from "./domain/student-repository.interface"
 import { PrismaModule } from "src/prisma/prisma.module";
 import { FirebaseModule } from "../firebase/firebase.module";
 import { AddressModule } from "../address/address.module";
-
+import { LevelModule } from "../level/level.module";
 @Module({
-    imports: [PrismaModule, FirebaseModule, AddressModule],
+    imports: [PrismaModule, FirebaseModule, AddressModule, LevelModule],
     controllers: [StudentController],
     providers: [
         StudentService,

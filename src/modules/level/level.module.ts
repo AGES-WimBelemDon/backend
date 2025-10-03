@@ -14,4 +14,4 @@ import { LevelService } from './application/level.service';
         LevelService
     ],
 })
-export class FrequencyModule {}
+export class LevelModule {}
