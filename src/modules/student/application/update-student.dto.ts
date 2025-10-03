@@ -2,9 +2,7 @@ import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { CreateStudentRequestDTO } from './create-student.request.dto';
 import { 
     IsDate,
-    IsEmail, 
     IsOptional, 
-    IsString, 
     Matches 
 } from 'class-validator';
 import { Transform } from 'class-transformer';

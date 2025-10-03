@@ -12,13 +12,14 @@ import { UpdateStudentDTO } from "./update-student.dto";
 import { AddressService } from "src/modules/address/application/address.service";
 import { AddressEntity } from "src/modules/address/domain/address.entity";
 import { CreateAddressDTO } from "src/modules/address/application/create-address.dto";
+import { LevelService } from "src/modules/level/application/level.service";
 
 @Injectable()
 export class StudentService {
     constructor(
         @Inject(STUDENT_REPOSITORY_TOKEN)
         private readonly studentRepository: IStudentRepository,
-
+        private readonly levelService: LevelService,
         private readonly addressService: AddressService,
         
     ) {}
@@ -30,6 +31,10 @@ export class StudentService {
         if(createStudentDto.addressId){
             const addressId = createStudentDto.addressId;
             await this.addressService.findById(addressId);
+        }
+        if(createStudentDto.levelId){
+            const levelId = createStudentDto.levelId;
+            await this.levelService.getById(levelId);
         }
         if (existingStudent) {
             throw new ConflictException("The cpf number is already in use");

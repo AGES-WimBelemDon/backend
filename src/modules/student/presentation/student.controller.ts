@@ -79,6 +79,17 @@ export class StudentController {
     })
     @ApiResponse({ 
         status: 404, 
+        description: "Invalid levelId",
+        schema: {
+            example: {
+                statusCode: 404,
+                message: "The levelId wasn't found in the database",
+                error: "Not Found"
+            }
+        }
+    })
+    @ApiResponse({ 
+        status: 404, 
         description: "Invalid addressId",
         schema: {
             example: {
