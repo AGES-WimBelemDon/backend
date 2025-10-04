@@ -61,8 +61,7 @@ export class StudentRepository implements IStudentRepository {
 
     async findAll(): Promise<Student[]> {
         const prismaStudents = await this.prisma.student.findMany({
-            where: { status: 'ATIVO' },
-            orderBy: { enrollmentDate: 'desc' },
+            orderBy: { id: 'asc' },
         });
 
         return prismaStudents.map(StudentMapper.toDomain);

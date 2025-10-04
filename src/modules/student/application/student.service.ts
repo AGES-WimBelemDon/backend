@@ -71,9 +71,6 @@ export class StudentService {
         }
 
         if (dto.registrationNumber) {
-            if (!UpdateStudentDTO.validateCPF(dto.registrationNumber)) {
-                throw new BadRequestException("Invalid CPF");
-            }
             const regOwner = await this.studentRepository.findByRegistrationNumber(dto.registrationNumber);
             if (regOwner && regOwner.getId() !== id) {
                 throw new ConflictException(`CPF '${dto.registrationNumber}' is already in use.`);
@@ -88,9 +85,11 @@ export class StudentService {
 
 
         Object.keys(dto).forEach(key => {
-            const setterName = `set${key.charAt(0).toUpperCase() + key.slice(1)}`;
-            if (typeof existingStudent[setterName] === 'function') {
-                existingStudent[setterName](dto[key]);
+            if(dto[key]){
+                const setterName = `set${key.charAt(0).toUpperCase() + key.slice(1)}`;
+                if (typeof existingStudent[setterName] === 'function') {
+                    existingStudent[setterName](dto[key]);
+                }
             }
         });
 
