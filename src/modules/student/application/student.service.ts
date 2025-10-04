@@ -47,13 +47,7 @@ export class StudentService {
             }
         }
 
-        const student = new Student({
-            fullName: createStudentDto.fullName,
-            registrationNumber: createStudentDto.registrationNumber,
-            dateOfBirth: createStudentDto.dateOfBirth,
-            socialName: createStudentDto.socialName,
-            race: createStudentDto.race
-        });
+        const student = new Student({...createStudentDto});
 
         return await this.studentRepository.create(student);
     }

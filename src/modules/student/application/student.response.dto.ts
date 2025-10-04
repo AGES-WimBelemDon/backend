@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Transform } from "class-transformer";
 import {
   Gender,
   Race,
@@ -28,14 +29,14 @@ export class StudentResponseDTO {
     example: "2023-01-15",
     description: "Date when student enrolled",
   })
-  enrollmentDate: Date;
+  enrollmentDate: string | null;
 
   @ApiProperty({
     example: null,
     description: "Date when student left the program",
     nullable: true,
   })
-  disenrollmentDate: Date | null;
+  disenrollmentDate: String | null;
 
   @ApiProperty({
     example: "ATIVO",
@@ -49,7 +50,8 @@ export class StudentResponseDTO {
     description: "Student's date of birth",
     nullable: true,
   })
-  dateOfBirth: Date | null;
+  @Transform(({value})=>value ? value.toISOString().split('T')[0] : null)
+  dateOfBirth: String | null;
 
   @ApiProperty({
     example: "João",
