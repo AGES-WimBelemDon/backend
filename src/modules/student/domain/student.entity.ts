@@ -1,4 +1,10 @@
-import { EmploymentStatus, Gender, Race, SchoolYear, SocialProgram, StudentStatus } from "src/common/enums/domain.enums";
+import { EmploymentStatus,
+         Gender,
+         Race,
+         SchoolYear,
+         SocialProgram,
+         StudentStatus
+        } from "src/common/enums/domain.enums";
 
 interface StudentProps {
     fullName: string;
@@ -19,26 +25,34 @@ interface StudentProps {
     socialPrograms?: SocialProgram | null;
     employmentStatus?: EmploymentStatus | null;
     addressId?: number | null;
+    familyMembersId?: number[];
+    frequenciesId?: number[];
+    classesId?: number[];
+    answersId?:   number[];
 }
 export class Student {
-    id?: number;
-    fullName: string;
-    registrationNumber: string;
-    enrollmentDate: Date;
-    disenrollmentDate?: Date | null;
-    status: StudentStatus;
-    dateOfBirth?: Date | null;
-    socialName?: string | null;
-    race?: Race | null;
-    gender?: Gender | null;
-    levelId?: number | null;
-    schoolName?: string | null;
-    schoolShift?: string | null;
-    schoolYear?: SchoolYear | null;
-    gradeGap?: boolean | null;
-    socialPrograms?: SocialProgram | null;
-    employmentStatus?: EmploymentStatus | null;
-    addressId?: number | null;
+    private readonly id?: number;
+    private fullName: string;
+    private registrationNumber: string;
+    private enrollmentDate: Date;
+    private disenrollmentDate?: Date | null;
+    private status: StudentStatus;
+    private dateOfBirth?: Date | null;
+    private socialName?: string | null;
+    private race?: Race | null;
+    private gender?: Gender | null;
+    private levelId?: number | null;
+    private schoolName?: string | null;
+    private schoolShift?: string | null;
+    private schoolYear?: SchoolYear | null;
+    private gradeGap?: boolean | null;
+    private socialPrograms?: SocialProgram | null;
+    private employmentStatus?: EmploymentStatus | null;
+    private addressId?: number | null;
+    private familyMembersId?: number[];
+    private frequenciesId?: number[];
+    private classesId?: number[];
+    private answersId?:   number[];
 
     constructor(props: StudentProps) {
         this.id = props.id;
@@ -59,6 +73,10 @@ export class Student {
         this.socialPrograms = props.socialPrograms;
         this.employmentStatus = props.employmentStatus;
         this.addressId = props.addressId;
+        this.familyMembersId = props.familyMembersId;
+        this.frequenciesId = props.frequenciesId;
+        this.classesId = props.classesId;
+        this.answersId = props.answersId;
     }
 
     public getId(): number | undefined {
@@ -132,7 +150,21 @@ export class Student {
     public getAddressId(): number | null | undefined {
         return this.addressId;
     }
+    public getFamilyMembersId(): number[] | undefined {
+        return this.familyMembersId;
+    }
 
+    public getFrequenciesId(): number[] | undefined {
+        return this.frequenciesId;
+    }
+
+    public getClassesId(): number[] | undefined {
+        return this.classesId;
+    }
+
+    public getAnswers(): number[] | undefined {
+        return this.answersId;
+    }
     public setFullName(name: string): void {
         this.fullName = name;
     }
@@ -195,5 +227,21 @@ export class Student {
 
     public setAddressId(addressId: number | null): void {
         this.addressId = addressId;
+    }
+
+    public setFamilyMembersId(ids: number[] | undefined): void {
+        this.familyMembersId = ids;
+    }
+
+    public setFrequenciesId(ids: number[] | undefined): void {
+        this.frequenciesId = ids;
+    }
+
+    public setClassesId(ids: number[] | undefined): void {
+        this.classesId = ids;
+    }
+
+    public setAnswers(ids: number[] | undefined): void {
+        this.answersId = ids;
     }
 };

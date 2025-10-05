@@ -8,7 +8,7 @@ import { AddressModule } from '../address/address.module';
 
 @Module({
     imports: [
-        StudentModule,
+        forwardRef(() => StudentModule),
         AddressModule
     ],
     controllers: [FamilyMemberController],

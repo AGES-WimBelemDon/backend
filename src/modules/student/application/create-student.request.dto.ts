@@ -1,6 +1,6 @@
 import { BadRequestException } from "@nestjs/common";
 import { ApiProperty } from "@nestjs/swagger";
-import { Transform } from "class-transformer";
+import { Transform, Type } from "class-transformer";
 import {
     IsString,
     IsNotEmpty,
@@ -11,7 +11,9 @@ import {
     IsDate,
     Validate,
     IsEnum,
-    IsBoolean
+    IsBoolean,
+    IsArray,
+    ValidateNested
 } from "class-validator";
 import { 
     Gender, 
@@ -173,4 +175,12 @@ export class CreateStudentRequestDTO {
     @IsOptional()
     @IsEnum(EmploymentStatus)
     employmentStatus?: EmploymentStatus;
+    @ApiProperty({
+        type: [Number],
+        description: "List of family members related to the student"
+      })
+    @IsOptional()
+    @IsArray()
+    @Type(() => Number)
+    familyMembersId: number[];
 }

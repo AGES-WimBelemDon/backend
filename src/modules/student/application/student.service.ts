@@ -3,7 +3,8 @@ import {
     Inject, 
     ConflictException, 
     BadRequestException, 
-    NotFoundException 
+    NotFoundException, 
+    forwardRef
 } from "@nestjs/common";
 import { IStudentRepository, STUDENT_REPOSITORY_TOKEN } from "../domain/student-repository.interface";
 import { CreateStudentRequestDTO } from "./create-student.request.dto";
@@ -13,6 +14,7 @@ import { AddressService } from "src/modules/address/application/address.service"
 import { AddressEntity } from "src/modules/address/domain/address.entity";
 import { CreateAddressDTO } from "src/modules/address/application/create-address.dto";
 import { LevelService } from "src/modules/level/application/level.service";
+import { FamilyMemberService } from "src/modules/familyMember/application/familyMember.service";
 
 @Injectable()
 export class StudentService {
@@ -21,6 +23,8 @@ export class StudentService {
         private readonly studentRepository: IStudentRepository,
         private readonly levelService: LevelService,
         private readonly addressService: AddressService,
+        @Inject(forwardRef(()=>FamilyMemberService))
+        private readonly familyMemberService: FamilyMemberService
         
     ) {}
 
@@ -82,8 +86,12 @@ export class StudentService {
                 throw new BadRequestException('Date of birth cannot be in the future.');
             }
         }
-
-
+        if(dto.familyMembersId){
+            for (let i = 0; i < dto.familyMembersId.length; i++) {
+                var id = dto.familyMembersId[i];
+                await this.familyMemberService.findById(id);
+            }
+        }
         Object.keys(dto).forEach(key => {
             if(dto[key]){
                 const setterName = `set${key.charAt(0).toUpperCase() + key.slice(1)}`;
@@ -123,7 +131,7 @@ export class StudentService {
         };
         const foundStudents = await this.studentRepository.findManyById(studentIds);
         if (foundStudents.length !== studentIds.length) {
-            const foundIds = foundStudents.map(s => s.id);
+            const foundIds = foundStudents.map(s => s.getId());
             const notFoundIds = studentIds.filter(id => !foundIds.includes(id));
             throw new NotFoundException(`Student(s) with ID(s) ${notFoundIds.join(", ")} not found.`);
         }

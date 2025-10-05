@@ -36,32 +36,36 @@ export class StudentController {
         description: "Registers a new student in the system with unique CPF validation"
     })
     @ApiResponse({ 
-        status: 201, 
-        description: "Student successfully created",
-        type: StudentResponseDTO,
-        schema: {
-        example: {
-            id: 1,
-            fullName: "John Silva Santos",
-            registrationNumber: "12345678901",
-            enrollmentDate: "2023-01-15T00:00:00.000Z",
-            disenrollmentDate: null,
-            status: "ATIVO",
-            dateOfBirth: "2010-05-15T00:00:00.000Z",
-            socialName: "John",
-            race: "PARDA",
-            gender: "MASCULINO",
-            levelId: 2,
-            schoolName: "Escola Municipal João da Silva",
-            schoolShift: "Matutino",
-            schoolYear: "ENSINO_MEDIO_1",
-            gradeGap: true,
-            socialPrograms: "BOLSA_FAMILIA",
-            employmentStatus: "DESEMPREGADO",
-            addressId: 100
-        }
-        }
-    })
+    status: 201, 
+    description: "Student successfully created",
+    type: StudentResponseDTO,
+    schema: {
+      example: {
+          id: 1,
+          fullName: "John Silva Santos",
+          registrationNumber: "12345678901",
+          enrollmentDate: "2023-01-15T00:00:00.000Z",
+          disenrollmentDate: null,
+          status: "ATIVO",
+          dateOfBirth: "2010-05-15T00:00:00.000Z",
+          socialName: "John",
+          race: "PARDA",
+          gender: "MASCULINO",
+          levelId: 2,
+          schoolName: "Escola Municipal João da Silva",
+          schoolShift: "Matutino",
+          schoolYear: "ENSINO_MEDIO_1",
+          gradeGap: true,
+          socialPrograms: "BOLSA_FAMILIA",
+          employmentStatus: "DESEMPREGADO",
+          addressId: 100,
+          familyMembersId: [1, 2],
+          frequenciesId: [1, 2, 3],
+          answersId: [1, 2],
+          classesId: [1, 2]
+      }
+    }
+})
     @ApiResponse({ 
         status: 400, 
         description: "Invalid data",
@@ -132,8 +136,60 @@ export class StudentController {
         description: "Returns a list of all active students in the system"
     })
     @ApiResponse({ 
-        status: 200, 
-        description: "Student list successfully retrieved"
+    status: 200, 
+    description: "Student list successfully retrieved",
+    schema: {
+        example: [
+            {
+            id: 1,
+            fullName: "John Silva Santos",
+            registrationNumber: "12345678901",
+            enrollmentDate: "2023-01-15T00:00:00.000Z",
+            disenrollmentDate: null,
+            status: "ATIVO",
+            dateOfBirth: "2010-05-15T00:00:00.000Z",
+            socialName: "John",
+            race: "PARDA",
+            gender: "MASCULINO",
+            levelId: 2,
+            schoolName: "Escola Municipal João da Silva",
+            schoolShift: "Matutino",
+            schoolYear: "ENSINO_MEDIO_1",
+            gradeGap: true,
+            socialPrograms: "BOLSA_FAMILIA",
+            employmentStatus: "DESEMPREGADO",
+            addressId: 100,
+            familyMembersId: [101, 102],
+            frequenciesId: [201, 202],
+            answersId: [301],
+            classesId: [401]
+            },
+            {
+            id: 2,
+            fullName: "Maria Oliveira",
+            registrationNumber: "98765432109",
+            enrollmentDate: "2023-02-20T00:00:00.000Z",
+            disenrollmentDate: null,
+            status: "ATIVO",
+            dateOfBirth: "2009-11-10T00:00:00.000Z",
+            socialName: null,
+            race: "BRANCA",
+            gender: "FEMININO",
+            levelId: 3,
+            schoolName: "Colégio Estadual Santos Dumont",
+            schoolShift: "Vespertino",
+            schoolYear: "FUNDAMENTAL_2",
+            gradeGap: false,
+            socialPrograms: null,
+            employmentStatus: null,
+            addressId: 105,
+            familyMembersId: [103],
+            frequenciesId: [203, 204, 205],
+            answersId: [302, 303],
+            classesId: [402, 403]
+            }
+        ]
+        }
     })
     async findAllStudents() {
         const students = await this.studentService.findAll();
@@ -147,12 +203,34 @@ export class StudentController {
     })
     @ApiParam({ name: 'id', description: 'Student ID', type: 'number' })
     @ApiResponse({ 
-        status: 200, 
-        description: "Student successfully found"
-    })
-    @ApiResponse({ 
-        status: 404, 
-        description: "Student not found"
+    status: 200, 
+    description: "Student successfully found",
+    schema: {
+        example: {
+            id: 1,
+            fullName: "John Silva Santos",
+            registrationNumber: "12345678901",
+            enrollmentDate: "2023-01-15T00:00:00.000Z",
+            disenrollmentDate: null,
+            status: "ATIVO",
+            dateOfBirth: "2010-05-15T00:00:00.000Z",
+            socialName: "John",
+            race: "PARDA",
+            gender: "MASCULINO",
+            levelId: 2,
+            schoolName: "Escola Municipal João da Silva",
+            schoolShift: "Matutino",
+            schoolYear: "ENSINO_MEDIO_1",
+            gradeGap: true,
+            socialPrograms: "BOLSA_FAMILIA",
+            employmentStatus: "DESEMPREGADO",
+            addressId: 100,
+            familyMembersId: [101, 102],
+            frequenciesId: [201, 202],
+            answersId: [301],
+            classesId: [401]
+        }
+        }
     })
     async findStudentById(@Param('id', ParseIntPipe) id: number) {
         const student = await this.studentService.findById(id);
@@ -169,12 +247,45 @@ export class StudentController {
     })
     @ApiParam({ name: 'registrationNumber', description: 'Student CPF (11 digits)', type: 'string' })
     @ApiResponse({ 
-        status: 200, 
-        description: "Student successfully found"
+    status: 200, 
+    description: "Student successfully found",
+    schema: {
+            example: {
+                id: 1,
+                fullName: "John Silva Santos",
+                registrationNumber: "12345678901",
+                enrollmentDate: "2023-01-15T00:00:00.000Z",
+                disenrollmentDate: null,
+                status: "ATIVO",
+                dateOfBirth: "2010-05-15T00:00:00.000Z",
+                socialName: "John",
+                race: "PARDA",
+                gender: "MASCULINO",
+                levelId: 2,
+                schoolName: "Escola Municipal João da Silva",
+                schoolShift: "Matutino",
+                schoolYear: "ENSINO_MEDIO_1",
+                gradeGap: true,
+                socialPrograms: "BOLSA_FAMILIA",
+                employmentStatus: "DESEMPREGADO",
+                addressId: 100,
+                familyMembersId: [101, 102],
+                frequenciesId: [201, 202],
+                answersId: [301],
+                classesId: [401]
+            }
+        }
     })
     @ApiResponse({ 
         status: 404, 
-        description: "Student not found"
+        description: "Student not found",
+        schema: {
+            example: {
+                statusCode: 404,
+                message: "Student not found",
+                error: "Not Found"
+            }
+        }
     })
     async findStudentByRegistrationNumber(@Param('registrationNumber') registrationNumber: string) {
         const student = await this.studentService.findByRegistrationNumber(registrationNumber);

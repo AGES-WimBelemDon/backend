@@ -9,6 +9,7 @@ export class StudentRepository implements IStudentRepository {
     constructor(private readonly prisma: PrismaService) {}
     
     async create(student: Student): Promise<Student> {
+        const familyMemberIds = student.getFamilyMembersId()?.map(idValue => ({id : idValue})) ?? []
         const prismaStudent = await this.prisma.student.create({
             data: {
                 fullName: student.getFullName(),
@@ -16,8 +17,30 @@ export class StudentRepository implements IStudentRepository {
                 dateOfBirth: student.getDateOfBirth() || null,
                 socialName: student.getSocialName() || null,
                 enrollmentDate: student.getEnrollmentDate(),
-                status: 'ATIVO' as any,
+                status: student.getStatus(),
+                disenrollmentDate: student.getDisenrollmentDate() ?? null,
+                race : student.getRace(),
+                gender : student.getGender(),
+                levelId : student.getLevelId(),
+                schoolName : student.getSchoolName(),
+                schoolShift : student.getSchoolShift(),
+                schoolYear : student.getSchoolYear(),
+                gradeGap : student.getGradeGap(),
+                socialPrograms : student.getSocialPrograms(),
+                employmentStatus : student.getEmploymentStatus(),
+                addressId : student.getAddressId(),
+                family : {
+                    connect: familyMemberIds
+                }
             },
+            include: {
+                family: true,
+                frequencies: true,
+                answers: true,
+                docs: true,
+                classes: true
+            }
+           
         });
 
         return StudentMapper.toDomain(prismaStudent);
@@ -26,6 +49,13 @@ export class StudentRepository implements IStudentRepository {
     async findByRegistrationNumber(registrationNumber: string): Promise<Student | null> {
         const prismaStudent = await this.prisma.student.findUnique({
             where: { registrationNumber },
+            include: {
+                family: true,
+                frequencies: true,
+                answers: true,
+                docs: true,
+                classes: true
+            }
         });
 
         if (!prismaStudent) {
@@ -38,6 +68,13 @@ export class StudentRepository implements IStudentRepository {
     async findById(id: number): Promise<Student | null> {
         const prismaStudent = await this.prisma.student.findUnique({
             where: { id },
+            include: {
+                family: true,
+                frequencies: true,
+                answers: true,
+                docs: true,
+                classes: true
+            }
         });
 
         if (!prismaStudent) {
@@ -53,6 +90,13 @@ export class StudentRepository implements IStudentRepository {
                 id: {
                     in: ids
                 }
+            },
+            include: {
+                family: true,
+                frequencies: true,
+                answers: true,
+                docs: true,
+                classes: true
             }
         });
 
@@ -62,6 +106,13 @@ export class StudentRepository implements IStudentRepository {
     async findAll(): Promise<Student[]> {
         const prismaStudents = await this.prisma.student.findMany({
             orderBy: { id: 'asc' },
+            include: {
+                family: true,
+                frequencies: true,
+                answers: true,
+                docs: true,
+                classes: true
+            }
         });
 
         return prismaStudents.map(StudentMapper.toDomain);
@@ -76,11 +127,9 @@ export class StudentRepository implements IStudentRepository {
                 socialName: student.getSocialName() || null,
                 dateOfBirth: student.getDateOfBirth() || null,
 
-                address: student.getAddressId() === null
+                address: student.getAddressId() == null
                     ? { disconnect: true }
-                    : typeof student.getAddressId() === "number"
-                        ? { connect: { id: student.getAddressId() as number } }
-                        : undefined,
+                    : { connect: { id: student.getAddressId() as number }}
             },
             include: {
                 address: true,

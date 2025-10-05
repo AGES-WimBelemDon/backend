@@ -134,4 +134,37 @@ export class StudentResponseDTO {
     nullable: true,
   })
   addressId: number | null;
+
+  @ApiProperty({ 
+  example: [101, 102, 103], 
+  description: "IDs of family members associated with this student",
+  type: [Number],
+  isArray: true
+  })
+  familyMembersId: number[];
+
+  @ApiProperty({ 
+    example: [201, 202, 203], 
+    description: "IDs of attendance/frequency records for this student",
+    type: [Number],
+    isArray: true
+  })
+  frequenciesId: number[];
+
+  @ApiProperty({ 
+    example: [301, 302, 303], 
+    description: "IDs of answers/responses submitted by this student",
+    type: [Number],
+    isArray: true
+  })
+  answersId: number[];
+
+  @ApiProperty({ 
+    example: [401, 402], 
+    description: "IDs of classes in which this student is enrolled",
+    type: [Number],
+    isArray: true
+  })
+  classesId: number[];
+
 }
