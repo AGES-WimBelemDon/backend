@@ -3,6 +3,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { IStudentRepository } from "../domain/student-repository.interface";
 import { Student } from "../domain/student.entity";
 import { StudentMapper } from "./student.mapper";
+import { disconnect } from "process";
 
 @Injectable()
 export class StudentRepository implements IStudentRepository {
@@ -126,13 +127,34 @@ export class StudentRepository implements IStudentRepository {
                 fullName: student.getFullName(),
                 socialName: student.getSocialName() || null,
                 dateOfBirth: student.getDateOfBirth() || null,
+                registrationNumber: student.getRegistrationNumber(),
+                enrollmentDate: student.getEnrollmentDate(),
+                disenrollmentDate: student.getDisenrollmentDate(),
+                race: student.getRace(),
+                schoolName: student.getSchoolName(),
+                status: student.getStatus(),
+                schoolShift: student.getSchoolShift(),
+                schoolYear: student.getSchoolYear(),
+                gender: student.getGender(),
+                employmentStatus: student.getEmploymentStatus(),
+                gradeGap: student.getGradeGap(),
 
                 address: student.getAddressId() == null
                     ? { disconnect: true }
-                    : { connect: { id: student.getAddressId() as number }}
+                    : { connect: { id: student.getAddressId() as number }},
+                level: student.getLevelId() == null
+                    ? {disconnect : true}
+                    : {connect: {id: student.getLevelId() as number}},
+                family: {
+                    set: student.getFamilyMembersId()?.map(item=>({id : item})) ?? []
+                }
             },
             include: {
-                address: true,
+                family: true,
+                frequencies: true,
+                answers: true,
+                docs: true,
+                classes: true
             }
         });
 

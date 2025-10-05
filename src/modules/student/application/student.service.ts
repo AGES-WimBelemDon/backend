@@ -89,7 +89,7 @@ export class StudentService {
         if(dto.familyMembersId){
             for (let i = 0; i < dto.familyMembersId.length; i++) {
                 var id = dto.familyMembersId[i];
-                await this.familyMemberService.findById(id);
+                await this.familyMemberService.findById(id)
             }
         }
         Object.keys(dto).forEach(key => {
