@@ -298,11 +298,43 @@ export class StudentController {
     @Patch(':id')
     @ApiOperation({ summary: 'Update Student Data' })
     @ApiParam({ name: 'id', description: 'Student ID', type: 'number' })
-    @ApiResponse({ status: 200, description: 'Student successfully updated',})
+    @ApiResponse({ 
+        status: 204, 
+        description: 'Student successfully updated',
+        schema: {
+            example: {
+                id: 15,
+                fullName: "Bart Simpson",
+                registrationNumber: "11915612675",
+                dateOfBirth: "1991-09-11",
+                enrollmentDate: "2025-10-04",
+                disenrollmentDate: null,
+                status: "ATIVO",
+                addressId: null,
+                socialName: "Bart",
+                race: null,
+                gender: null,
+                levelId: null,
+                schoolName: null,
+                schoolShift: null,
+                schoolYear: null,
+                gradeGap: null,
+                socialPrograms: null,
+                employmentStatus: null,
+                familyMembersId: [4],
+                frequenciesId: [],
+                answersId: [],
+                classesId: []
+            }
+        }
+    })
     @ApiResponse({ status: 400, description: "Invalid Data! (Bad Request)" })
     @ApiResponse({ status: 404, description: "Student not found!" })
+    @ApiResponse({ status: 404, description: "Family member not found!" })
+    @ApiResponse({ status: 404, description: "Invalid levelId." })
+    @ApiResponse({ status: 404, description: "Invalid addressId" })
     @ApiResponse({ status: 409, description: "Email already exists!" })
-    async updateFamilyMember(
+    async updateStudent(
         @Param('id', ParseIntPipe) id: number,
         @Body() updateStudentDto: UpdateStudentDTO,
     ) {
