@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { forwardRef, Module } from '@nestjs/common';
 import { FamilyMemberService } from './application/familyMember.service';
 import { FamilyMemberController } from './presentation/familyMember.controller';
@@ -15,4 +16,27 @@ import { StudentModule } from '../student/student.module';
         }],
     exports: [FamilyMemberService, FAMILY_MEMBER_REPOSITORY_TOKEN],
 })
+=======
+import { forwardRef, Module } from '@nestjs/common';
+import { FamilyMemberService } from './application/familyMember.service';
+import { FamilyMemberController } from './presentation/familyMember.controller';
+import { PrismaFamilyMemberRepository } from './infrastructure/familyMember.repository';
+import { FAMILY_MEMBER_REPOSITORY_TOKEN } from './domain/familyMember.repository.interface';
+import { StudentModule } from '../student/student.module';
+import { AddressModule } from '../address/address.module';
+
+@Module({
+    imports: [
+        StudentModule,
+        AddressModule
+    ],
+    controllers: [FamilyMemberController],
+    providers: [FamilyMemberService,
+        {
+            provide: FAMILY_MEMBER_REPOSITORY_TOKEN,
+            useClass: PrismaFamilyMemberRepository,
+        }],
+    exports: [FamilyMemberService, FAMILY_MEMBER_REPOSITORY_TOKEN],
+})
+>>>>>>> develop
 export class FamilyMemberModule { }

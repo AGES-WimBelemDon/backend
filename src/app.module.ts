@@ -8,6 +8,7 @@ import { FrequencyModule } from './modules/frequency/frequency.module';
 import { StudentModule } from './modules/student/student.module';
 import { FamilyMemberModule } from './modules/familyMember/familyMember.module';
 import { AssessmentModule } from './modules/assessment/assessment.module';
+import { AddressModule } from './modules/address/address.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { AssessmentModule } from './modules/assessment/assessment.module';
     FrequencyModule,
     StudentModule,
     FamilyMemberModule,
-    AssessmentModule
+    AssessmentModule,
+    AddressModule
   ],
 })
 export class AppModule {}

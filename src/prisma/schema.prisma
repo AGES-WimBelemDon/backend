@@ -61,6 +61,16 @@ model Student {
   answers     Answer[]       @relation("StudentAnswers")
   docs        Doc[]          @relation("StudentDocs")
 
+<<<<<<< HEAD
+=======
+  address            Address?           @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  level              Level?             @relation("LevelRelation",fields: [levelId], references: [id])
+  family             FamilyMember[]     @relation("StudentFamily")
+  frequencies        Frequency[]        @relation("StudentFrequency")
+  classes            Enrollment[]
+  answers            Answer[]           @relation("StudentAnswers")
+  docs               Doc[]              @relation("StudentDocs")
+>>>>>>> develop
   @@map("student")
 }
 

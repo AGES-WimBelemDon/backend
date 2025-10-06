@@ -9,6 +9,7 @@ export class StudentMapper {
             registrationNumber: prismaStudent.registrationNumber,
             dateOfBirth: prismaStudent.dateOfBirth || undefined,
             socialName: prismaStudent.socialName || undefined,
+            addressId: prismaStudent.addressId || undefined,
         });
     }
 
@@ -24,10 +25,11 @@ export class StudentMapper {
     static toResponse(student: Student) {
         return {
             id: student.getId(),
+            addressId: student.getAddressId() || null,
             fullName: student.getFullName(),
             registrationNumber: student.getRegistrationNumber(),
-            dateOfBirth: student.getDateOfBirth(),
-            socialName: student.getSocialName(),
+            dateOfBirth: student.getDateOfBirth() || null,
+            socialName: student.getSocialName() || null,
             enrollmentDate: student.getEnrollmentDate(),
             status: student.getStatus(),
         };
