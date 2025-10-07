@@ -8,13 +8,15 @@ import {
     Param,
     ParseIntPipe,
     Patch,
-    Delete
+    Delete,
+    Query
 } from "@nestjs/common";
 import { 
     ApiOperation, 
     ApiResponse, 
     ApiTags,
-    ApiParam
+    ApiParam,
+    ApiQuery
 } from "@nestjs/swagger";
 import { StudentService } from "../application/student.service";
 import { CreateStudentRequestDTO } from "../application/create-student.request.dto";
@@ -23,6 +25,8 @@ import { UpdateStudentDTO } from "../application/update-student.dto";
 import { AddressMapper } from "src/modules/address/infrastructure/address.mapper";
 import { CreateAddressDTO } from "src/modules/address/application/create-address.dto";
 import { StudentResponseDTO } from "../application/student.response.dto";
+import { ListStudentsQueryDto } from "../application/list-students.query.dto";
+import { StudentStatus } from "src/common/enums/domain.enums";
 
 @ApiTags("students")
 @Controller("students")
@@ -36,111 +40,11 @@ export class StudentController {
         description: "Registers a new student in the system with unique CPF validation"
     })
     @ApiResponse({ 
-    status: 201, 
-    description: "Student successfully created",
-    type: StudentResponseDTO,
-    schema: {
-      example: {
-          id: 1,
-          fullName: "John Silva Santos",
-          registrationNumber: "12345678901",
-          enrollmentDate: "2023-01-15T00:00:00.000Z",
-          disenrollmentDate: null,
-          status: "ATIVO",
-          dateOfBirth: "2010-05-15T00:00:00.000Z",
-          socialName: "John",
-          race: "PARDA",
-          gender: "MASCULINO",
-          levelId: 2,
-          schoolName: "Escola Municipal João da Silva",
-          schoolShift: "Matutino",
-          schoolYear: "ENSINO_MEDIO_1",
-          gradeGap: true,
-          socialPrograms: "BOLSA_FAMILIA",
-          employmentStatus: "DESEMPREGADO",
-          addressId: 100,
-          familyMembersId: [1, 2],
-          frequenciesId: [1, 2, 3],
-          answersId: [1, 2],
-          classesId: [1, 2]
-      }
-    }
-})
-    @ApiResponse({ 
-        status: 400, 
-        description: "Invalid data",
+        status: HttpStatus.CREATED, 
+        description: "Student successfully created",
+        type: StudentResponseDTO,
         schema: {
-            example: {
-                statusCode: 400,
-                message: [
-                    "Full name is required",
-                    "CPF must contain exactly 11 numeric digits",
-                    "Date of birth must be in YYYY-MM-DD format"
-                ],
-                error: "Bad Request"
-            }
-        }
-    })
-    @ApiResponse({ 
-        status: 404, 
-        description: "Invalid levelId",
-        schema: {
-            example: {
-                statusCode: 404,
-                message: "The levelId wasn't found in the database",
-                error: "Not Found"
-            }
-        }
-    })
-    @ApiResponse({ 
-        status: 404, 
-        description: "Invalid addressId",
-        schema: {
-            example: {
-                statusCode: 404,
-                message: "Address with ID 100 not found",
-                error: "Not Found"
-            }
-        }
-    })
-    @ApiResponse({ 
-        status: 409, 
-        description: "CPF already registered",
-        schema: {
-            example: {
-                statusCode: 409,
-                message: "CPF is already in use",
-                error: "Conflict"
-            }
-        }
-    })
-    @ApiResponse({ 
-        status: 500, 
-        description: "Internal server error",
-        schema: {
-            example: {
-                statusCode: 500,
-                message: "Internal server error",
-                error: "Internal Server Error"
-            }
-        }
-    })
-    async createStudent(@Body() createStudentDto: CreateStudentRequestDTO): Promise<StudentResponseDTO> {
-        const student = await this.studentService.createStudent(createStudentDto);
-        return StudentMapper.toResponse(student);
-    }
-
-    @Get()
-    @ApiOperation({ 
-        summary: "List all students",
-        description: "Returns a list of all active students in the system"
-    })
-    @ApiResponse({ 
-    status: 200, 
-    description: "Student list successfully retrieved",
-    schema: {
-        example: [
-            {
+        example: {
             id: 1,
             fullName: "John Silva Santos",
             registrationNumber: "12345678901",
@@ -159,40 +63,133 @@ export class StudentController {
             socialPrograms: "BOLSA_FAMILIA",
             employmentStatus: "DESEMPREGADO",
             addressId: 100,
-            familyMembersId: [101, 102],
-            frequenciesId: [201, 202],
-            answersId: [301],
-            classesId: [401]
-            },
-            {
-            id: 2,
-            fullName: "Maria Oliveira",
-            registrationNumber: "98765432109",
-            enrollmentDate: "2023-02-20T00:00:00.000Z",
-            disenrollmentDate: null,
-            status: "ATIVO",
-            dateOfBirth: "2009-11-10T00:00:00.000Z",
-            socialName: null,
-            race: "BRANCA",
-            gender: "FEMININO",
-            levelId: 3,
-            schoolName: "Colégio Estadual Santos Dumont",
-            schoolShift: "Vespertino",
-            schoolYear: "FUNDAMENTAL_2",
-            gradeGap: false,
-            socialPrograms: null,
-            employmentStatus: null,
-            addressId: 105,
-            familyMembersId: [103],
-            frequenciesId: [203, 204, 205],
-            answersId: [302, 303],
-            classesId: [402, 403]
-            }
-        ]
+            familyMembersId: [1, 2],
+            frequenciesId: [1, 2, 3],
+            answersId: [1, 2],
+            classesId: [1, 2]
+        }
         }
     })
-    async findAllStudents() {
-        const students = await this.studentService.findAll();
+    @ApiResponse({ 
+        status: HttpStatus.BAD_REQUEST, 
+        description: "Invalid data",
+        schema: {
+            example: {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: [
+                    "Full name is required",
+                    "CPF must contain exactly 11 numeric digits",
+                    "Date of birth must be in YYYY-MM-DD format"
+                ],
+                error: "Bad Request"
+            }
+        }
+    })
+    @ApiResponse({ 
+        status: HttpStatus.NOT_FOUND, 
+        description: "Invalid levelId",
+        schema: {
+            example: {
+                statusCode: HttpStatus.NOT_FOUND,
+                message: "The levelId wasn't found in the database",
+                error: "Not Found"
+            }
+        }
+    })
+    @ApiResponse({ 
+        status: HttpStatus.CONFLICT, 
+        description: "CPF already registered",
+        schema: {
+            example: {
+                statusCode: HttpStatus.CONFLICT,
+                message: "CPF is already in use",
+                error: "Conflict"
+            }
+        }
+    })
+    @ApiResponse({status: HttpStatus.INTERNAL_SERVER_ERROR, description: "Internal server error"})
+    async createStudent(@Body() createStudentDto: CreateStudentRequestDTO): Promise<StudentResponseDTO> {
+        const student = await this.studentService.createStudent(createStudentDto);
+        return StudentMapper.toResponse(student);
+    }
+
+    @Get()
+    @ApiOperation({ 
+        summary: "List all students",
+        description: "Returns a list of students with optional filtering parameters"
+    })
+    @ApiQuery({ 
+        name: 'status', 
+        required: false, 
+        description: 'Filter by student status', 
+        enum: StudentStatus,
+        example: StudentStatus.ATIVO
+    })
+    @ApiQuery({ 
+        name: 'levelId', 
+        required: false, 
+        description: 'Filter by education level ID', 
+        type: Number 
+    })
+    @ApiResponse({ 
+        status: HttpStatus.OK, 
+        description: "Student list successfully retrieved",
+        schema: {
+            example: [
+                {
+                    id: 1,
+                    fullName: "John Silva Santos",
+                    registrationNumber: "12345678901",
+                    enrollmentDate: "2023-01-15T00:00:00.000Z",
+                    disenrollmentDate: null,
+                    status: "ATIVO",
+                    dateOfBirth: "2010-05-15T00:00:00.000Z",
+                    socialName: "John",
+                    race: "PARDA",
+                    gender: "MASCULINO",
+                    levelId: 2,
+                    schoolName: "Escola Municipal João da Silva",
+                    schoolShift: "Matutino",
+                    schoolYear: "ENSINO_MEDIO_1",
+                    gradeGap: true,
+                    socialPrograms: "BOLSA_FAMILIA",
+                    employmentStatus: "DESEMPREGADO",
+                    addressId: 100,
+                    familyMembersId: [101, 102],
+                    frequenciesId: [201, 202],
+                    answersId: [301],
+                    classesId: [401]
+                },
+                {
+                    id: 2,
+                    fullName: "Maria Oliveira",
+                    registrationNumber: "98765432109",
+                    enrollmentDate: "2023-02-20T00:00:00.000Z",
+                    disenrollmentDate: null,
+                    status: "ATIVO",
+                    dateOfBirth: "2009-11-10T00:00:00.000Z",
+                    socialName: null,
+                    race: "BRANCA",
+                    gender: "FEMININO",
+                    levelId: 3,
+                    schoolName: "Colégio Estadual Santos Dumont",
+                    schoolShift: "Vespertino",
+                    schoolYear: "FUNDAMENTAL_2",
+                    gradeGap: false,
+                    socialPrograms: null,
+                    employmentStatus: null,
+                    addressId: 105,
+                    familyMembersId: [103],
+                    frequenciesId: [203, 204, 205],
+                    answersId: [302, 303],
+                    classesId: [402, 403]
+                }
+            ]
+            }
+    })
+    @ApiResponse({status: HttpStatus.INTERNAL_SERVER_ERROR, description: "Internal server error"})
+    async findAllStudents(@Query() query: ListStudentsQueryDto): Promise<StudentResponseDTO[]> {
+        const students = await this.studentService.findAll(query);
         return students.map(StudentMapper.toResponse);
     }
 
@@ -203,7 +200,7 @@ export class StudentController {
     })
     @ApiParam({ name: 'id', description: 'Student ID', type: 'number' })
     @ApiResponse({ 
-    status: 200, 
+    status: HttpStatus.OK, 
     description: "Student successfully found",
     schema: {
         example: {
@@ -232,11 +229,9 @@ export class StudentController {
         }
         }
     })
+    @ApiResponse({status: HttpStatus.INTERNAL_SERVER_ERROR, description: "Internal server error"})
     async findStudentById(@Param('id', ParseIntPipe) id: number) {
-        const student = await this.studentService.findById(id);
-        if (!student) {
-            return { message: "Student not found" };
-        }
+        const student = await this.studentService.findByIdServeController(id);
         return StudentMapper.toResponse(student);
     }
 
@@ -247,9 +242,9 @@ export class StudentController {
     })
     @ApiParam({ name: 'registrationNumber', description: 'Student CPF (11 digits)', type: 'string' })
     @ApiResponse({ 
-    status: 200, 
-    description: "Student successfully found",
-    schema: {
+        status: HttpStatus.OK, 
+        description: "Student successfully found",
+        schema: {
             example: {
                 id: 1,
                 fullName: "John Silva Santos",
@@ -277,85 +272,69 @@ export class StudentController {
         }
     })
     @ApiResponse({ 
-        status: 404, 
+        status: HttpStatus.NOT_FOUND, 
         description: "Student not found",
         schema: {
             example: {
-                statusCode: 404,
+                statusCode: HttpStatus.NOT_FOUND,
                 message: "Student not found",
                 error: "Not Found"
             }
         }
     })
+    @ApiResponse({status: HttpStatus.INTERNAL_SERVER_ERROR, description: "Internal server error"})
     async findStudentByRegistrationNumber(@Param('registrationNumber') registrationNumber: string) {
-        const student = await this.studentService.findByRegistrationNumber(registrationNumber);
-        if (!student) {
-            return { message: "Student not found" };
-        }
+        const student = await this.studentService.findByRegistrationNumberServeController(registrationNumber);
         return StudentMapper.toResponse(student);
     }
 
     @Patch(':id')
+    @HttpCode(HttpStatus.NO_CONTENT)
     @ApiOperation({ summary: 'Update Student Data' })
     @ApiParam({ name: 'id', description: 'Student ID', type: 'number' })
     @ApiResponse({ 
-        status: 204, 
-        description: 'Student successfully updated',
+        status: HttpStatus.NO_CONTENT, 
+        description: 'Student successfully updated'
+    })
+    @ApiResponse({ 
+        status: HttpStatus.CONFLICT, 
+        description: "Invalid data provided",
         schema: {
             example: {
-                id: 15,
-                fullName: "Bart Simpson",
-                registrationNumber: "11915612675",
-                dateOfBirth: "1991-09-11",
-                enrollmentDate: "2025-10-04",
-                disenrollmentDate: null,
-                status: "ATIVO",
-                addressId: null,
-                socialName: "Bart",
-                race: null,
-                gender: null,
-                levelId: null,
-                schoolName: null,
-                schoolShift: null,
-                schoolYear: null,
-                gradeGap: null,
-                socialPrograms: null,
-                employmentStatus: null,
-                familyMembersId: [4],
-                frequenciesId: [],
-                answersId: [],
-                classesId: []
+                statusCode: HttpStatus.CONFLICT, 
+                message: "CPF is already in use",
+                error: "Not Found"
             }
         }
     })
-    @ApiResponse({ status: 400, description: "Invalid Data! (Bad Request)" })
-    @ApiResponse({ status: 404, description: "Student not found!" })
-    @ApiResponse({ status: 404, description: "Family member not found!" })
-    @ApiResponse({ status: 404, description: "Invalid levelId." })
-    @ApiResponse({ status: 404, description: "Invalid addressId" })
-    @ApiResponse({ status: 409, description: "Email already exists!" })
+    @ApiResponse({ 
+        status: HttpStatus.NOT_FOUND, 
+        description: "Resource not found - Could be: Student not found, Family member not found, Invalid levelId, or Invalid addressId",
+    })
+    @ApiResponse({status: HttpStatus.INTERNAL_SERVER_ERROR, description: "Internal server error"})
     async updateStudent(
         @Param('id', ParseIntPipe) id: number,
         @Body() updateStudentDto: UpdateStudentDTO,
-    ) {
-        const updatedStudent = await this.studentService.update(id, updateStudentDto);
-        return StudentMapper.toResponse(updatedStudent);
+    ): Promise<void> {
+        await this.studentService.update(id, updateStudentDto);
     }
 
     @Delete(':id')
+    @HttpCode(HttpStatus.NO_CONTENT)
     @ApiOperation({ summary: 'Delete Student by ID' })
     @ApiParam({ name: 'id', description: 'Student ID', type: 'number' })
-    @ApiResponse({ status: 204, description: 'Student successfully deleted.'})
-    @ApiResponse({ status: 404, description: "Student not found!" })
-    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiResponse({ status: HttpStatus.NO_CONTENT, description: 'Student successfully deleted.'})
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Student not found!" })
+    @ApiResponse({status: HttpStatus.INTERNAL_SERVER_ERROR, description: "Internal server error"})
     async deleteById(@Param('id', ParseIntPipe) id: number) {
         await this.studentService.delete(id);
     }
 
     @Get(':id/address')
     @ApiOperation({ summary: "Search for a student address" })
-    @ApiResponse({ status: 200, description: 'Address retrieved successfully.'})
-    @ApiResponse({ status: 404, description: "Address not found!" })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Address retrieved successfully.'})
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Address not found!" })
+    @ApiResponse({status: HttpStatus.INTERNAL_SERVER_ERROR, description: "Internal server error"})
     async getAddress(@Param('id', ParseIntPipe) id: number) {
         const address = await this.studentService.getStudentAddress(id);
         return AddressMapper.toResponse(address);
@@ -376,6 +355,7 @@ export class StudentController {
             }
         }
     })
+    @ApiResponse({status: HttpStatus.INTERNAL_SERVER_ERROR, description: "Internal server error"})
     async addAddress(
         @Param('id', ParseIntPipe) id: number,
         @Body() dto: CreateAddressDTO,
@@ -387,8 +367,9 @@ export class StudentController {
     @Delete(':id/address')
     @HttpCode(HttpStatus.NO_CONTENT)
     @ApiOperation({ summary: "Delete an address from a student" })
-    @ApiResponse({ status: 204, description: 'Address successfully deleted.'})
-    @ApiResponse({ status: 404, description: "Address not found!" })
+    @ApiResponse({ status: HttpStatus.NO_CONTENT, description: 'Address successfully deleted.'})
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Address not found!" })
+    @ApiResponse({status: HttpStatus.INTERNAL_SERVER_ERROR, description: "Internal server error"})
     async removeAddress(@Param('id', ParseIntPipe) id: number): Promise<void> {
         return this.studentService.removeAddressFromStudent(id);
     }

@@ -15,6 +15,7 @@ import { AddressEntity } from "src/modules/address/domain/address.entity";
 import { CreateAddressDTO } from "src/modules/address/application/create-address.dto";
 import { LevelService } from "src/modules/level/application/level.service";
 import { FamilyMemberService } from "src/modules/familyMember/application/familyMember.service";
+import { ListStudentsQueryDto } from "./list-students.query.dto";
 
 @Injectable()
 export class StudentService {
@@ -59,16 +60,31 @@ export class StudentService {
     async findById(id: number): Promise<Student | null> {
         return await this.studentRepository.findById(id);
     }
-
+    async findByIdServeController(id: number): Promise<Student>{
+        const student = await this.findById(id);
+        if(!student){
+            throw new NotFoundException(`Student with id ${id} not found`)
+        }
+        return student;
+    }
     async findByRegistrationNumber(registrationNumber: string): Promise<Student | null> {
         return await this.studentRepository.findByRegistrationNumber(registrationNumber);
     }
-
-    async findAll(): Promise<Student[]> {
-        return await this.studentRepository.findAll();
+    async findByRegistrationNumberServeController(registrationNumber: string): Promise<Student>{
+        const student = await this.findByRegistrationNumber(registrationNumber);
+        if(!student){
+            throw new NotFoundException(`Student with registration number ${registrationNumber} not found`)
+        }
+        return student;
+    }
+    async findAll(query: ListStudentsQueryDto): Promise<Student[]> {
+        if(query.levelId){
+            await this.levelService.getById(query.levelId);
+        }
+        return await this.studentRepository.findAll(query);
     }
 
-    async update(id: number, dto: UpdateStudentDTO){
+    async update(id: number, dto: UpdateStudentDTO): Promise<void>{
         const existingStudent = await this.studentRepository.findById(id);
         if (!existingStudent) {
             throw new NotFoundException(`Student with ID ${id} not found.`);
@@ -101,7 +117,7 @@ export class StudentService {
             }
         });
 
-        return await this.studentRepository.update(existingStudent);
+        await this.studentRepository.update(existingStudent);
     }
 
     async delete(id: number): Promise<void> {

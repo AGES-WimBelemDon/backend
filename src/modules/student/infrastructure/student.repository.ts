@@ -4,6 +4,7 @@ import { IStudentRepository } from "../domain/student-repository.interface";
 import { Student } from "../domain/student.entity";
 import { StudentMapper } from "./student.mapper";
 import { disconnect } from "process";
+import { ListStudentsQueryDto } from "../application/list-students.query.dto";
 
 @Injectable()
 export class StudentRepository implements IStudentRepository {
@@ -104,8 +105,16 @@ export class StudentRepository implements IStudentRepository {
         return prismaStudents.map(StudentMapper.toDomain);
     }
 
-    async findAll(): Promise<Student[]> {
+    async findAll(query: ListStudentsQueryDto): Promise<Student[]> {
+        const where: any = {}
+        if(query.levelId){
+            where.levelId = query.levelId
+        }
+        if(query.status){
+            where.status = query.status
+        }
         const prismaStudents = await this.prisma.student.findMany({
+            where,
             orderBy: { id: 'asc' },
             include: {
                 family: true,

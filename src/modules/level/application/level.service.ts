@@ -10,7 +10,7 @@ export class LevelService{
     public async getById(id: number):Promise<Level>{
         const level = await this.levelRepository.getById(id);
         if(!level){
-            throw new NotFoundException(`The levelId ${id} wasn't found in the database`);
+            throw new NotFoundException(`Level with ID ${id} not found`);
         };
         return level;
     }

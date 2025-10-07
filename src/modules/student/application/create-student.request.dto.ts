@@ -12,8 +12,7 @@ import {
     Validate,
     IsEnum,
     IsBoolean,
-    IsArray,
-    ValidateNested
+    IsArray
 } from "class-validator";
 import { 
     Gender, 
