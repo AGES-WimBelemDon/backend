@@ -33,6 +33,9 @@ export class StudentService {
         const existingStudent = await this.studentRepository.findByRegistrationNumber(
             createStudentDto.registrationNumber
         );
+        if (existingStudent) {
+            throw new ConflictException("The cpf number is already in use");
+        }
         if(createStudentDto.addressId){
             const addressId = createStudentDto.addressId;
             await this.addressService.findById(addressId);
@@ -41,17 +44,21 @@ export class StudentService {
             const levelId = createStudentDto.levelId;
             await this.levelService.getById(levelId);
         }
-        if (existingStudent) {
-            throw new ConflictException("The cpf number is already in use");
-        }
-
         if (createStudentDto.dateOfBirth) {
 
             if (createStudentDto.dateOfBirth > new Date()) {
                 throw new BadRequestException("Date of birth cannot be in the future.");
             }
         }
+        const family = createStudentDto.familyMembersId;
+        if(family && family.length>0){
+            for (let i = 0; i < family.length; i++) {
+                const id = family[i];
+                await this.familyMemberService.findById(id);
+            }
+        }
 
+        
         const student = new Student({...createStudentDto});
 
         return await this.studentRepository.create(student);
