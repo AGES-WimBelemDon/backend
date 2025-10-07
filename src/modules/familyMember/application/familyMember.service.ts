@@ -1,6 +1,7 @@
 import { 
     BadRequestException,
     ConflictException, 
+    forwardRef, 
     Inject, 
     Injectable, 
     NotFoundException 
@@ -21,7 +22,7 @@ export class FamilyMemberService {
         private readonly familyMemberRepository: IFamilyMemberRepository,
 
         private readonly addressService: AddressService,
-
+        @Inject(forwardRef(() => StudentService))
         private readonly studentService: StudentService,
     ) {}
 

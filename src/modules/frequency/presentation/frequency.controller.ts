@@ -31,6 +31,32 @@ export class FrequencyConstroller{
         status: 200,
         description: "Successfully retrieved the list of classes.",
         type: UserClassesResponseDTO,
+        example:{
+            "classes": [
+                {
+                    "classId": null,
+                    "className": "Geral",
+                    "classState": "ATIVA",
+                    "levelName": null,
+                    "isGeral": true,
+                    "activity": {
+                        "activityId": null,
+                        "activityName": "Atividade geral"
+                    }
+                },
+                {
+                    "classId": 1,
+                    "className": "Tênis I",
+                    "classState": "ATIVA",
+                    "levelName": "Iniciante",
+                    "isGeral": false,
+                    "activity": {
+                        "activityId": 1,
+                        "activityName": "Esportes"
+                    }
+                }
+        ]
+    }
     })
     @ApiResponse({ status: 404, description: "User with the specified ID was not found." })
     @ApiResponse({ status: 500, description: "An unexpected internal server error occurred." })
