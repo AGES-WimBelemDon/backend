@@ -14,4 +14,8 @@ export class LevelService{
         };
         return level;
     }
+    public async findAll(): Promise<Level[]>{
+        return await this.levelRepository.findAll();
+    }
+    
 }

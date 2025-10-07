@@ -17,4 +17,11 @@ export class PrismaLevelRepository implements ILevelRepositoryInterface {
     }
     return LevelMapper.toDomain(level);
   }
+  public async findAll(): Promise<Level[]> {
+      const levelList = await this.prisma.level.findMany();
+      if(levelList.length==0){
+        return [];
+      }
+      return levelList.map(LevelMapper.toDomain);
+  }
 }
