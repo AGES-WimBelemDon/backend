@@ -175,11 +175,12 @@ model Question {
 }
 
 model Answer {
-  id         Int    @id @default(autoincrement())
-  questionId Int    @map("id_question")
-  studentId  Int
-  content    String
-  
+  id             Int      @id @default(autoincrement())
+  submissionDate DateTime @default(now()) @map("submission_date")
+  questionId     Int      @map("id_question")
+  studentId      Int
+  content        String
+
   question Question @relation("AnswersQuestions", fields: [questionId], references: [id])
   student  Student  @relation("StudentAnswers",fields: [studentId], references: [id])
 
