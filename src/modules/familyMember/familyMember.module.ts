@@ -4,9 +4,13 @@ import { FamilyMemberController } from './presentation/familyMember.controller';
 import { PrismaFamilyMemberRepository } from './infrastructure/familyMember.repository';
 import { FAMILY_MEMBER_REPOSITORY_TOKEN } from './domain/familyMember.repository.interface';
 import { StudentModule } from '../student/student.module';
+import { AddressModule } from '../address/address.module';
 
 @Module({
-    imports: [StudentModule],
+    imports: [
+        forwardRef(() => StudentModule),
+        AddressModule
+    ],
     controllers: [FamilyMemberController],
     providers: [FamilyMemberService,
         {

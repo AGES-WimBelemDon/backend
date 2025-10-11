@@ -20,6 +20,8 @@ import { FamilyMemberService } from '../application/familyMember.service';
 import { CreateFamilyMemberDTO } from '../application/createFamilyMember.dto';
 import { FamilyMemberMapper } from '../infrastructure/familyMember.mapper';
 import { UpdateFamilyMemberDTO } from '../application/updateFamilyMember.dto';
+import { AddressMapper } from 'src/modules/address/infrastructure/address.mapper';
+import { CreateAddressDTO } from 'src/modules/address/application/create-address.dto';
 
 @ApiTags('family-member')
 @Controller('family-member')
@@ -71,6 +73,7 @@ export class FamilyMemberController {
     @Get(':id')
     @ApiOperation({ summary: 'Get Family Member by ID' })
     @ApiParam({ name: 'id', description: 'Family Member ID', type: 'number' })
+    @ApiResponse({ status: 200, description: 'Family Member retrieved successfully.'})
     async getById(@Param('id', ParseIntPipe) id: number) {
         const familyMember = await this.familyMemberService.findById(id);
         return FamilyMemberMapper.toResponse(familyMember);
@@ -100,5 +103,46 @@ export class FamilyMemberController {
     ) {
         const updatedFamilyMember = await this.familyMemberService.update(id, updateFamilyMemberDto);
         return FamilyMemberMapper.toResponse(updatedFamilyMember);
+    }
+
+    @Get(':id/address')
+    @ApiOperation({ summary: "Search for a family member address" })
+    @ApiResponse({ status: 200, description: 'Address retrieved successfully.'})
+    @ApiResponse({ status: 404, description: "Address not found!" })
+    async getAddress(@Param('id', ParseIntPipe) id: number) {
+        const address = await this.familyMemberService.getFamilyMemberAddress(id);
+        return AddressMapper.toResponse(address);
+    }
+
+    @Post(':id/address')
+    @ApiOperation({ summary: "Add a new address to a family member" })
+    @ApiResponse({
+        status: HttpStatus.CREATED,
+        description: "Address successfully created",
+        schema: {
+            example: {
+                    "street": "Avenida Ipiranga",
+                    "city": "Porto Alegre",
+                    "state": "RS",
+                    "cep": "92010-001",
+                    "neighborhood": "Centro"
+            }
+        }
+    })
+    async addAddress(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() dto: CreateAddressDTO,
+    ) {
+        const newAddress = await this.familyMemberService.addAddressToFamilyMember(id, dto);
+        return AddressMapper.toResponse(newAddress);
+    }
+
+    @Delete(':id/address')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiOperation({ summary: "Delete an address from a family member" })
+    @ApiResponse({ status: 204, description: 'Address successfully deleted.'})
+    @ApiResponse({ status: 404, description: "Address not found!" })
+    async removeAddress(@Param('id', ParseIntPipe) id: number): Promise<void> {
+        return this.familyMemberService.removeAddressFromFamilyMember(id);
     }
 }

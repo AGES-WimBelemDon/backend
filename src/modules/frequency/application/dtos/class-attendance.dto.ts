@@ -107,7 +107,7 @@ export class UpdateAttendanceItemDTO {
   @ApiProperty({
     example: FrequencyStatus.PRESENTE,
     description: "The updated attendance status",
-    enum: [FrequencyStatus.PRESENTE, FrequencyStatus.AUSENTE],
+    enum: FrequencyStatus,
     nullable: false
   })
   @IsEnum(FrequencyStatus)
@@ -117,7 +117,7 @@ export class UpdateAttendanceItemDTO {
   @ApiProperty({
     example: NoteTypes.ATESTADO_MEDICO,
     description: "Additional notes about the attendance",
-    enum: [NoteTypes.SEM_JUSTIFICATIVA,NoteTypes.ATESTADO_MEDICO],
+    enum: NoteTypes,
     nullable: true
   })
   @IsEnum(NoteTypes)

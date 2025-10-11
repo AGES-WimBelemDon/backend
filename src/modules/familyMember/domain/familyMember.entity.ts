@@ -17,7 +17,7 @@ interface familyMemberProps {
     nis?: string,
     registrationNumber: string,
     studentIds: number[],
-    addressId?: number,
+    addressId?: number | null,
 }
 
 export class FamilyMemberEntity {
@@ -36,7 +36,7 @@ export class FamilyMemberEntity {
     private nis?: string;
     private registrationNumber: string;
     private studentIds: number[];
-    private addressId?: number;
+     private addressId?: number | null;
 
     constructor(props: familyMemberProps) {
         this.id = props.id;
@@ -61,7 +61,7 @@ export class FamilyMemberEntity {
 
     public getStudentIds(): number[] { return this.studentIds; }
 
-    public getAddressId(): number | undefined { return this.addressId; } 
+    public getAddressId(): number | null | undefined { return this.addressId; }
 
     public getFullName(): string { return this.fullName; }
 
@@ -114,5 +114,9 @@ export class FamilyMemberEntity {
     public setNis(nis: string): void { this.nis = nis; }
 
     public setRegistrationNumber(registrationNumber: string): void { this.registrationNumber = registrationNumber; }
+
+    public setAddressId(addressId: number | null | undefined): void { this.addressId = addressId; }
+    
+    public setStudentIds(studentsId: number[]): void { this. studentIds = studentsId};
 }
 
