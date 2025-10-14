@@ -1,8 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FormType } from 'src/common/enums/domain.enums';
-import { Form, Question, Answer } from '../domain/form.entity';
+import { Form } from '../domain/form.entity';
 import { AnswerMapper, QuestionMapper, FormMapper } from "./assessment.mapper";
+import { Answer } from "../domain/answer.entity";
+import { Question } from "../domain/question.entity";
 
 @Injectable()
 export class AssessmentRepository {

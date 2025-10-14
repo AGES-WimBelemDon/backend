@@ -1,4 +1,4 @@
-import { Answer } from './form.entity';
+import { Answer } from "./answer.entity";
 
 export interface AnswerRepository {
   findByStudentId(studentId: number, formType?: string): Promise<Answer[]>;

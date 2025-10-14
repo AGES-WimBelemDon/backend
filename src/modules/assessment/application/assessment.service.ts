@@ -1,9 +1,15 @@
-import { Injectable, Inject, NotFoundException, BadRequestException, InternalServerErrorException } from "@nestjs/common";
+import { Injectable,
+         Inject,
+         NotFoundException,
+         BadRequestException
+        } from "@nestjs/common";
 import { AssessmentRepository } from "../infrastructure/assessment.repository";
 import { CreateAssessmentDto } from "./create-assessment.dto";
 import { UpdateAnswerDto } from "./update-answer.dto";
-import { Form, Question, Answer } from "../domain/form.entity";
+import { Form} from "../domain/form.entity";
 import { FormType } from "src/common/enums/domain.enums";
+import { Answer } from "../domain/answer.entity";
+import { Question } from "../domain/question.entity";
 
 @Injectable()
 export class AssessmentService {
@@ -23,21 +29,17 @@ export class AssessmentService {
   }
 
   async createAnswers(studentId: number, dto: CreateAssessmentDto): Promise<Answer[]> {
-    try {
-      await this.assessmentRepository.createAnswers(
+    await this.assessmentRepository.createAnswers(
         dto.answers.map(a => new Answer(
-          0, // id será gerado pelo banco
+          0,
           studentId,
           a.id_question,
           a.content,
           dto.submission_date ? new Date(dto.submission_date) : new Date()
         ))
       );
-      const typeEnum = FormType[dto.formType as keyof typeof FormType];
-      return await this.getAnswersByStudentAndFormType(studentId, typeEnum);
-    } catch (err) {
-      throw new InternalServerErrorException("Erro ao registrar anamnese");
-    }
+    const typeEnum = FormType[dto.formType as keyof typeof FormType];
+    return await this.getAnswersByStudentAndFormType(studentId, typeEnum);
   }
 
   async getAnswersByStudentAndFormType(studentId: number, formType: string | FormType): Promise<Answer[]> {
@@ -52,16 +54,12 @@ export class AssessmentService {
     return answers;
   }
 
-  async updateAnswerContent(studentId: number, answerId: number, dto: UpdateAnswerDto, submissionDate?: string): Promise<Answer | null> {
-    try {
-      const updated = await this.assessmentRepository.updateAnswerContent(answerId, dto.content);
-      if (!updated) {
-        throw new NotFoundException("Resposta não encontrada");
-      }
-      return updated;
-    } catch (err) {
-      throw new InternalServerErrorException("Erro ao atualizar resposta");
+  async updateAnswerContent(answerId: number, dto: UpdateAnswerDto): Promise<Answer | null> {
+    const updated = await this.assessmentRepository.updateAnswerContent(answerId, dto.content);
+    if (!updated) {
+      throw new NotFoundException(``);
     }
+    return updated;
   }
 }
 

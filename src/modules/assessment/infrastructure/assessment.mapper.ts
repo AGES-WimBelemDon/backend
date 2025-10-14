@@ -1,5 +1,11 @@
-import { Answer as PrismaAnswer, Question as PrismaQuestion, Form as PrismaForm } from '@prisma/client';
-import { Answer, Question, Form } from '../domain/form.entity';
+import {
+  Answer as PrismaAnswer,
+  Question as PrismaQuestion,
+  Form as PrismaForm } from '@prisma/client';
+import { Answer } from '../domain/answer.entity';
+import { Question } from '../domain/question.entity';
+import { Form } from '../domain/form.entity';
+
 
 export class AnswerMapper {
   static toDomain(prismaAnswer: PrismaAnswer): Answer {

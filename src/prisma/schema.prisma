@@ -166,10 +166,10 @@ model Enrollment {
 }
 model Question {
   id         Int      @id @default(autoincrement())
-  formId     Int
+  formId     Int      @map("form_id")
   statement  String
   isRequired Boolean? @default(false) @map("is_required")
-  form       Form     @relation(fields: [formId], references: [id])
+  form       Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
   answers    Answer[] @relation("AnswersQuestions")
   @@map("question")
 }
@@ -177,15 +177,16 @@ model Question {
 model Answer {
   id             Int      @id @default(autoincrement())
   submissionDate DateTime @default(now()) @map("submission_date")
-  questionId     Int      @map("id_question")
-  studentId      Int
+  questionId     Int      @map("question_id")
+  studentId      Int      @map("student_id")
   content        String
 
-  question Question @relation("AnswersQuestions", fields: [questionId], references: [id])
-  student  Student  @relation("StudentAnswers",fields: [studentId], references: [id])
+  question Question @relation("AnswersQuestions", fields: [questionId], references: [id], onDelete: Cascade)
+  student  Student  @relation("StudentAnswers", fields: [studentId], references: [id], onDelete: Cascade)
 
   @@map("answer")
 }
+
 model Form {
   id             Int      @id @default(autoincrement())
   submissionDate DateTime @default(now()) @map("submission_date")

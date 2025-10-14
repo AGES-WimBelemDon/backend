@@ -3,9 +3,12 @@ import { Controller, Get, Post, Patch, Param, Query, Body, HttpCode,
 import { AssessmentService } from '../application/assessment.service';
 import { CreateAssessmentDto } from '../application/create-assessment.dto';
 import { UpdateAnswerDto } from '../application/update-answer.dto';
-import { Form, Question, Answer } from '../domain/form.entity';
+import { Form } from '../domain/form.entity';
+import { Answer } from '../domain/answer.entity';
+import { Question } from '../domain/question.entity';
 
-@Controller('')
+
+@Controller('assessment')
 export class AssessmentController {
   constructor(private readonly assessmentService: AssessmentService) {}
 
@@ -43,6 +46,6 @@ export class AssessmentController {
     @Body() dto: UpdateAnswerDto,
     @Query('submission_date') submissionDate?: string
   ): Promise<Answer | null> {
-    return await this.assessmentService.updateAnswerContent(studentId, answerId, dto, submissionDate);
+    return await this.assessmentService.updateAnswerContent(answerId, dto);
   }
 }
