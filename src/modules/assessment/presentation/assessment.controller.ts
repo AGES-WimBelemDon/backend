@@ -3,18 +3,54 @@ import { Controller, Get, Post, Patch, Param, Query, Body, HttpCode,
 import { AssessmentService } from '../application/assessment.service';
 import { CreateAssessmentDto } from '../application/create-assessment.dto';
 import { UpdateAnswerDto } from '../application/update-answer.dto';
-import { Form } from '../domain/form.entity';
 import { Answer } from '../domain/answer.entity';
 import { Question } from '../domain/question.entity';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { FormResponseDTO } from '../application/form.response.dto';
+import { FormType } from 'src/common/enums/domain.enums';
 
 
 @Controller('assessment')
 export class AssessmentController {
   constructor(private readonly assessmentService: AssessmentService) {}
 
-  @Get('form')
-  async getAllForms(): Promise<Form[]> {
-    return await this.assessmentService.getAllForms();
+  @Get('forms')
+  @ApiOperation({ 
+    summary: 'Get all assessment forms',
+    description: 'Retrieves all available assessment forms in the system without their questions'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Forms successfully retrieved',
+    type: [FormResponseDTO],
+    schema: {
+      example: [
+        {
+          id: 1,
+          title: 'Initial Psichology form',
+          type: FormType.PSICOLOGIA
+        },
+        {
+          id: 2,
+          title: 'Initial social form',
+          type: FormType.SOCIAL
+        }
+      ]
+    }
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    schema: {
+      example: {
+        statusCode: 500,
+        message: 'Internal server error',
+        error: 'Error retrieving forms from database'
+      }
+    }
+  })
+  async getAllForms(): Promise<FormResponseDTO[]> {
+    return this.assessmentService.getAllForms();
   }
 
   @Get('form/:formType/questions')

@@ -15,7 +15,7 @@ export class AssessmentRepository {
       include: {
         questions: {
           include: {
-            answers: true
+            answers: false
           }
         }
       }

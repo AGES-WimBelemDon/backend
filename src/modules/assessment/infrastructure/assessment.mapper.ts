@@ -5,6 +5,7 @@ import {
 import { Answer } from '../domain/answer.entity';
 import { Question } from '../domain/question.entity';
 import { Form } from '../domain/form.entity';
+import { FormResponseDTO } from '../application/form.response.dto';
 
 
 export class AnswerMapper {
@@ -51,5 +52,12 @@ export class FormMapper {
       prismaForm.type,
       prismaForm.questions ? prismaForm.questions.map(QuestionMapper.toDomain) : []
     );
+  }
+  static toResponse(form: Form): FormResponseDTO {
+    return {
+      id: form.id,
+      title: form.title,
+      type: form.type
+    };
   }
 }
