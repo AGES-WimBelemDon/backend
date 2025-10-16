@@ -9,7 +9,8 @@ import { Question } from '../domain/question.entity';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { FormResponseDTO } from '../application/form.response.dto';
 import { FormType } from 'src/common/enums/domain.enums';
-import { FormMapper } from '../infrastructure/assessment.mapper';
+import { FormMapper, QuestionMapper } from '../infrastructure/assessment.mapper';
+import { QuestionsResponseDTO } from '../application/questions.response.dto';
 
 
 @Controller('assessment')
@@ -55,35 +56,72 @@ export class AssessmentController {
     const list = await this.assessmentService.getAllForms();
     return list.map(FormMapper.toResponse);
   }
-
   @Get('form/:formType/questions')
   @ApiOperation({ 
     summary: 'Get questions by form type',
-    description: 'Retrieves all questions for a specific form type'
+    description: 'Retrieves all questions associated with a specific form type'
   })
   @ApiParam({ 
     name: 'formType', 
     enum: FormType,
-    description: 'The type of form to retrieve questions for'
+    description: 'The type of form to retrieve questions for',
+    example: 'PSICOLOGIA',
+    required: true
   })
   @ApiResponse({
     status: 200,
     description: 'Questions successfully retrieved',
+    type: [QuestionsResponseDTO],
     schema: {
       example: [
         {
-          id: 1,
+          questionId: 1,
+          formId: 1,
           statement: 'How would you rate your overall experience?',
-          isRequired: true,
-          formId: 1
+          isRequired: true
+        },
+        {
+          questionId: 2,
+          formId: 1,
+          statement: 'What aspects of the program have been most helpful?',
+          isRequired: true
+        },
+        {
+          questionId: 3,
+          formId: 1,
+          statement: 'Do you have any suggestions for improvement?',
+          isRequired: false
         }
       ]
     }
   })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid form type provided',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: 'formType must be a valid enum value',
+        error: 'Bad Request'
+      }
+    }
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    schema: {
+      example: {
+        statusCode: 500,
+        message: 'Internal server error',
+        error: 'Failed to retrieve questions'
+      }
+    }
+  })
   async getQuestionsByFormType(
     @Param('formType', new ParseEnumPipe(FormType)) formType: FormType
-  ): Promise<Question[]> {
-    return await this.assessmentService.getQuestionsByFormType(formType);
+  ): Promise<QuestionsResponseDTO[]> {
+    const questions = await this.assessmentService.getQuestionsByFormType(formType);
+    return questions.map(QuestionMapper.toResponse);
   }
 
   @Post('student/:id/assessments')

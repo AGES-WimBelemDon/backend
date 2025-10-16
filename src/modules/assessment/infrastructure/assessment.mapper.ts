@@ -6,6 +6,7 @@ import { Answer } from '../domain/answer.entity';
 import { Question } from '../domain/question.entity';
 import { Form } from '../domain/form.entity';
 import { FormResponseDTO } from '../application/form.response.dto';
+import { QuestionsResponseDTO } from '../application/questions.response.dto';
 
 
 export class AnswerMapper {
@@ -41,6 +42,14 @@ export class QuestionMapper {
       prismaQuestion.isRequired ?? false,
       prismaQuestion.answers ? prismaQuestion.answers.map(AnswerMapper.toDomain) : []
     );
+  }
+  static toResponse(question: Question): QuestionsResponseDTO {
+    return {
+      "formId" : question.formId,
+      "isRequired" : question.isRequired,
+      "questionId" : question.id,
+      "statement" : question.statement
+    }
   }
 }
 
