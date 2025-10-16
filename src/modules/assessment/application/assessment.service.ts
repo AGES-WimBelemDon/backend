@@ -20,12 +20,8 @@ export class AssessmentService {
     return await this.assessmentRepository.findAllForms();
   }
 
-  async getQuestionsByFormType(formType: string): Promise<Question[]> {
-    const typeEnum = FormType[formType as keyof typeof FormType];
-    if (!typeEnum) {
-      throw new BadRequestException("Tipo de formulário inválido");
-    }
-    return await this.assessmentRepository.findQuestionsByFormType(typeEnum);
+  async getQuestionsByFormType(formType: FormType): Promise<Question[]> {
+    return await this.assessmentRepository.findQuestionsByFormType(formType);
   }
 
   async createAnswers(studentId: number, dto: CreateAssessmentDto): Promise<Answer[]> {

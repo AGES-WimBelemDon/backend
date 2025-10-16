@@ -11,16 +11,8 @@ export class AssessmentRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAllForms(): Promise<Form[]> {
-    const forms = await this.prisma.form.findMany({
-      include: {
-        questions: {
-          include: {
-            answers: false
-          }
-        }
-      }
-    });
-    return forms.map(FormMapper.toDomain);
+    const forms = await this.prisma.form.findMany();
+    return forms?.map(FormMapper.toDomain) || [];
   }
 
   async findQuestionsByFormType(formType: FormType): Promise<Question[]> {
@@ -29,13 +21,12 @@ export class AssessmentRepository {
       include: {
         questions: {
           include: {
-            answers: true
+            answers: false
           }
         }
       }
     });
-    if (!form || !form.questions) return [];
-    return form.questions.map(QuestionMapper.toDomain);
+    return form?.questions?.map(QuestionMapper.toDomain) || [];
   }
 
   async createAnswers(answers: Answer[]): Promise<void> {

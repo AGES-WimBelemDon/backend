@@ -1,13 +1,15 @@
 import { Controller, Get, Post, Patch, Param, Query, Body, HttpCode,
-     HttpStatus, ParseIntPipe } from '@nestjs/common';
+     HttpStatus, ParseIntPipe, 
+     ParseEnumPipe} from '@nestjs/common';
 import { AssessmentService } from '../application/assessment.service';
 import { CreateAssessmentDto } from '../application/create-assessment.dto';
 import { UpdateAnswerDto } from '../application/update-answer.dto';
 import { Answer } from '../domain/answer.entity';
 import { Question } from '../domain/question.entity';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { FormResponseDTO } from '../application/form.response.dto';
 import { FormType } from 'src/common/enums/domain.enums';
+import { FormMapper } from '../infrastructure/assessment.mapper';
 
 
 @Controller('assessment')
@@ -50,11 +52,37 @@ export class AssessmentController {
     }
   })
   async getAllForms(): Promise<FormResponseDTO[]> {
-    return this.assessmentService.getAllForms();
+    const list = await this.assessmentService.getAllForms();
+    return list.map(FormMapper.toResponse);
   }
 
   @Get('form/:formType/questions')
-  async getQuestionsByFormType(@Param('formType') formType: string): Promise<Question[]> {
+  @ApiOperation({ 
+    summary: 'Get questions by form type',
+    description: 'Retrieves all questions for a specific form type'
+  })
+  @ApiParam({ 
+    name: 'formType', 
+    enum: FormType,
+    description: 'The type of form to retrieve questions for'
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Questions successfully retrieved',
+    schema: {
+      example: [
+        {
+          id: 1,
+          statement: 'How would you rate your overall experience?',
+          isRequired: true,
+          formId: 1
+        }
+      ]
+    }
+  })
+  async getQuestionsByFormType(
+    @Param('formType', new ParseEnumPipe(FormType)) formType: FormType
+  ): Promise<Question[]> {
     return await this.assessmentService.getQuestionsByFormType(formType);
   }
 
