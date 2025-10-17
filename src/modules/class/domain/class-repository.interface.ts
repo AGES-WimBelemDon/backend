@@ -6,6 +6,8 @@ export const CLASS_REPOSITORY_TOKEN = "ClassRepository";
 
 export interface IClassRepository {
     create(classEntity: Class): Promise<Class>
-    findById(classId: number): Promise<Class | null>
+    findAll(activityId?: number, levelId?: number, state?: string): Promise<Class[] | []>
+    findById(id: number, activityId?: number, levelId?: number, state?: string): Promise<Class | null>
+    update(id: number, classEntity: Class)
     delete(classId: number): Promise<void>
 }

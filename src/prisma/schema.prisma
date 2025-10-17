@@ -7,18 +7,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum DayOfWeek {
+  SEGUNDA
+  TERCA
+  QUARTA
+  QUINTA
+  SEXTA
+  SABADO
+  DOMINGO
+}
+
 model User {
-  id            Int      @id @default(autoincrement())
-  uidFirebase   String   @unique @map("uid_firebase")
-  fullName      String   @map("full_name")
-  email         String   @unique
-  roleId        Int?     @map("role_id")
-  addressId     Int      @map("address_id")
-  createdAt     DateTime @default(now()) @map("created_at")
-  status        UserStatus @default(ATIVO)
-  role          Role?    @relation("Roles", fields: [roleId], references: [id])
-  address       Address  @relation(fields: [addressId], references: [id])
-  classes       Class[]  @relation("ClassTeacher")
+  id          Int        @id @default(autoincrement())
+  uidFirebase String     @unique @map("uid_firebase")
+  fullName    String     @map("full_name")
+  email       String     @unique
+  roleId      Int?       @map("role_id")
+  addressId   Int        @map("address_id")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  status      UserStatus @default(ATIVO)
+  role        Role?      @relation("Roles", fields: [roleId], references: [id])
+  address     Address    @relation(fields: [addressId], references: [id])
+  classes     Class[]    @relation("ClassTeacher")
 
   @@map("user")
 }
@@ -28,114 +38,134 @@ model Role {
   name        String  @unique
   description String?
 
-  users User[]  @relation("Roles")
+  users User[] @relation("Roles")
 
   @@map("role")
 }
 
 model Student {
-  id                  Int               @id @default(autoincrement())
-  addressId           Int?              @map("address_id")
-  fullName            String            @map("full_name")
-  dateOfBirth         DateTime?         @map("date_of_birth") @db.Date
-  registrationNumber  String            @unique @map("registration_number")
-  enrollmentDate      DateTime          @default(now()) @map("enrollment_date") @db.Date
-  disenrollmentDate   DateTime?         @map("disenrollment_date") @db.Date
-  status              StudentStatus     @default(ATIVO)
-  levelId             Int?              @map("level_id")
-  socialName          String?           @map("social_name")
-  race                Race?
-  schoolName          String?           @map("school_name")
-  schoolShift         String?           @map("school_shift")
-  schoolYear          SchoolYear?       @map("school_year")
-  socialPrograms      SocialProgram?    @map("social_programs")
-  gender              Gender?
-  employmentStatus    EmploymentStatus? @map("employment_status")
-  gradeGap            Boolean?          @map("grade_gap") // defasagem escolar
+  id                 Int               @id @default(autoincrement())
+  addressId          Int?              @map("address_id")
+  fullName           String            @map("full_name")
+  dateOfBirth        DateTime?         @map("date_of_birth") @db.Date
+  registrationNumber String            @unique @map("registration_number")
+  enrollmentDate     DateTime          @default(now()) @map("enrollment_date") @db.Date
+  disenrollmentDate  DateTime?         @map("disenrollment_date") @db.Date
+  status             StudentStatus     @default(ATIVO)
+  levelId            Int?              @map("level_id")
+  socialName         String?           @map("social_name")
+  race               Race?
+  schoolName         String?           @map("school_name")
+  schoolShift        String?           @map("school_shift")
+  schoolYear         SchoolYear?       @map("school_year")
+  socialPrograms     SocialProgram?    @map("social_programs")
+  gender             Gender?
+  employmentStatus   EmploymentStatus? @map("employment_status")
+  gradeGap           Boolean?          @map("grade_gap") // defasagem escolar
 
-  address            Address?           @relation(fields: [addressId], references: [id], onDelete: Cascade)
-  level              Level?             @relation("LevelRelation",fields: [levelId], references: [id])
-  family             FamilyMember[]     @relation("StudentFamily")
-  frequencies        Frequency[]        @relation("StudentFrequency")
-  classes            Enrollment[]
-  answers            Answer[]           @relation("StudentAnswers")
-  docs               Doc[]              @relation("StudentDocs")
+  address     Address?       @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  level       Level?         @relation("LevelRelation", fields: [levelId], references: [id])
+  family      FamilyMember[] @relation("StudentFamily")
+  frequencies Frequency[]    @relation("StudentFrequency")
+  classes     Enrollment[]
+  answers     Answer[]       @relation("StudentAnswers")
+  docs        Doc[]          @relation("StudentDocs")
+
   @@map("student")
 }
 
 model Address {
-  id            Int             @id @default(autoincrement())
-  cep           String          @db.VarChar(9)
-  street        String
-  number        String?         @db.VarChar(10)
-  complement    String?
-  neighborhood  String
-  city          String
-  state         String          @db.VarChar(2)
+  id           Int     @id @default(autoincrement())
+  cep          String  @db.VarChar(9)
+  street       String
+  number       String? @db.VarChar(10)
+  complement   String?
+  neighborhood String
+  city         String
+  state        String  @db.VarChar(2)
 
   users         User[]
   students      Student[]
-  familyMembers FamilyMember[]  @relation("FamilyAddress")
+  familyMembers FamilyMember[] @relation("FamilyAddress")
 
   @@map("address")
 }
 
 model Class {
-  id          Int       @id @default(autoincrement())
+  id          Int             @id @default(autoincrement())
   name        String
-  activityId  Int       @map("activity_id")
-  levelId     Int       @map("level_id")
+  activityId  Int             @map("activity_id")
+  levelId     Int             @map("level_id")
   state       String
-  teacher     User[]    @relation("ClassTeacher")
-  activity    Activity  @relation(fields: [activityId], references: [id])
-  level       Level     @relation(fields: [levelId], references: [id])
+  teacher     User[]          @relation("ClassTeacher")
+  activity    Activity        @relation(fields: [activityId], references: [id])
+  level       Level           @relation(fields: [levelId], references: [id])
   frequencies Frequency[]
   students    Enrollment[]
+  isRecurrent Boolean         @default(true) @map("is_recurrent")
+  startDate   DateTime        @map("start_date") @db.Date
+  endDate     DateTime?       @map("end_date") @db.Date
+  startTime   DateTime        @map("start_time") @db.Time
+  endTime     DateTime        @map("end_time") @db.Time
+  schedules   ClassSchedule[]
 
   @@map("class")
 }
 
+model ClassSchedule {
+  id         Int       @id @default(autoincrement())
+  classId    Int       @map("class_id")
+  daysOfWeek DayOfWeek @map("day_of_week")
+
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([classId, daysOfWeek])
+  @@index([classId])
+  @@map("class_schedule")
+}
+
 model Frequency {
-  id        Int               @id @default(autoincrement())
-  studentId Int               @map("id_student")
-  classId   Int?              @map("id_class")
-  date      DateTime          @db.Date
-  status    FrequencyStatus   @default(PRESENTE)
+  id        Int             @id @default(autoincrement())
+  studentId Int             @map("id_student")
+  classId   Int?            @map("id_class")
+  date      DateTime        @db.Date
+  status    FrequencyStatus @default(PRESENTE)
   notes     NoteTypes?
 
-  student Student @relation("StudentFrequency",fields: [studentId], references: [id])
-  class   Class?   @relation(fields: [classId], references: [id])
+  student Student @relation("StudentFrequency", fields: [studentId], references: [id])
+  class   Class?  @relation(fields: [classId], references: [id])
 
   @@map("frequency")
 }
 
 model FamilyMember {
-  id                Int               @id @default(autoincrement())
-  addressId         Int?               @map("address_id")
-  fullName          String            @map("full_name")
-  relationship      String
-  phoneNumber       String            @map("phone_number")
-  nis               String?           
-  registrationNumber  String           @map("registration_number")
-  email             String?
-  socialName        String?           @map("social_name")
-  race              Race?
-  gender            Gender?
-  educationLevel    EducationLevel?   @map("education_level")
-  dateOfBirth       DateTime         @map("date_of_birth") @db.Date
-  socialPrograms    SocialProgram?    @map("social_programs")
-  employmentStatus  EmploymentStatus? @map("employment_status")
-  student           Student[]         @relation("StudentFamily")
-  address           Address?          @relation("FamilyAddress", fields: [addressId], references: [id], onDelete: Cascade)
+  id                 Int               @id @default(autoincrement())
+  addressId          Int?              @map("address_id")
+  fullName           String            @map("full_name")
+  relationship       String
+  phoneNumber        String            @map("phone_number")
+  nis                String?
+  registrationNumber String            @map("registration_number")
+  email              String?
+  socialName         String?           @map("social_name")
+  race               Race?
+  gender             Gender?
+  educationLevel     EducationLevel?   @map("education_level")
+  dateOfBirth        DateTime          @map("date_of_birth") @db.Date
+  socialPrograms     SocialProgram?    @map("social_programs")
+  employmentStatus   EmploymentStatus? @map("employment_status")
+  student            Student[]         @relation("StudentFamily")
+  address            Address?          @relation("FamilyAddress", fields: [addressId], references: [id], onDelete: Cascade)
+
   @@map("family_member")
 }
 
 model Level {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
   description String?
 
-  students Student[]    @relation("LevelRelation")
+  students Student[] @relation("LevelRelation")
   classes  Class[]
 
   @@map("level")
@@ -156,7 +186,7 @@ model Enrollment {
   studentId      Int       @map("id_student")
   classId        Int       @map("id_class")
   enrollmentDate DateTime  @default(now()) @map("enrollment_date")
-  endDate        DateTime? @map("end_date") 
+  endDate        DateTime? @map("end_date")
 
   student Student @relation(fields: [studentId], references: [id])
   class   Class   @relation(fields: [classId], references: [id])
@@ -164,6 +194,7 @@ model Enrollment {
   @@unique([studentId, classId])
   @@map("enrollment")
 }
+
 model Question {
   id         Int      @id @default(autoincrement())
   formId     Int
@@ -171,6 +202,7 @@ model Question {
   isRequired Boolean? @default(false) @map("is_required")
   form       Form     @relation(fields: [formId], references: [id])
   answers    Answer[] @relation("AnswersQuestions")
+
   @@map("question")
 }
 
@@ -179,18 +211,20 @@ model Answer {
   questionId Int    @map("id_question")
   studentId  Int
   content    String
-  
+
   question Question @relation("AnswersQuestions", fields: [questionId], references: [id])
-  student  Student  @relation("StudentAnswers",fields: [studentId], references: [id])
+  student  Student  @relation("StudentAnswers", fields: [studentId], references: [id])
 
   @@map("answer")
 }
+
 model Form {
-  id             Int      @id @default(autoincrement())
-  submissionDate DateTime @default(now()) @map("submission_date")
+  id             Int        @id @default(autoincrement())
+  submissionDate DateTime   @default(now()) @map("submission_date")
   type           FormType
   title          String
   questions      Question[]
+
   @@map("form")
 }
 
@@ -206,18 +240,22 @@ model Doc {
 
   @@map("doc")
 }
+
 enum FormType {
   PSICOLOGIA
   SOCIAL
 }
+
 enum UserStatus {
   ATIVO
   INATIVO
 }
+
 enum StudentStatus {
   ATIVO
   INATIVO
 }
+
 enum FrequencyStatus {
   PRESENTE
   AUSENTE
@@ -278,14 +316,14 @@ enum EducationLevel {
   POS_GRADUACAO
 }
 
-enum NoteTypes{
+enum NoteTypes {
   ATESTADO_MEDICO
   SEM_JUSTIFICATIVA
 }
 
 model ExampleEntity {
   id        String   @id
-  name      String   
+  name      String
   email     String   @unique
   birthDate DateTime
 }

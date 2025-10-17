@@ -10,20 +10,25 @@ export class ClassRepository implements IClassRepository {
 
   async create(classEntity: Class): Promise<Class> {
     const prismaClass = await this.prisma.class.create({
-      data: {
-        name: classEntity.getName(),
-        activityId: classEntity.getActivityId(),
-        levelId: classEntity.getLevelId(),
-        state: classEntity.getState(),
-      },
+      data: ClassMapper.toPrisma(classEntity),
     });
 
     return ClassMapper.toDomain(prismaClass);
   }
 
-  async findById(id: number): Promise<Class | null> {
-    const prismaClass = await this.prisma.class.findUnique({
-      where: { id },
+  async findById(
+    id: number,
+    activityId?: number,
+    levelId?: number,
+    state?: string
+  ): Promise<Class | null> {
+    const prismaClass = await this.prisma.class.findFirst({
+      where: {
+        id,
+        ...(activityId && { activityId: Number(activityId) }),
+        ...(levelId && { levelId: Number(levelId) }),
+        ...(state && { state }),
+      },
     });
 
     if (!prismaClass) {
@@ -31,6 +36,32 @@ export class ClassRepository implements IClassRepository {
     }
 
     return ClassMapper.toDomain(prismaClass);
+  }
+
+  async findAll(
+    activityId?: number,
+    levelId?: number,
+    state?: string
+  ): Promise<Class[] | []> {
+    const prismaClass = await this.prisma.class.findMany({
+      where: {
+        ...(activityId && { activityId: Number(activityId) }),
+        ...(levelId && { levelId: Number(levelId) }),
+        ...(state && { state }),
+      },
+    });
+    if (!prismaClass) {
+      return [];
+    }
+
+    return prismaClass.map(ClassMapper.toDomain);
+  }
+
+  async update(id: number, classEntity: Class) {
+    const prismaClass = await this.prisma.class.update({
+      where: { id },
+      data: ClassMapper.toPrisma(classEntity),
+    });
   }
 
   async delete(id: number): Promise<void> {

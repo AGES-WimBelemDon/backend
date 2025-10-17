@@ -5,6 +5,7 @@ import { ClassService } from "./application/class.service";
 import { ClassRepository } from "./infrastructure/class.repository";
 import { CLASS_REPOSITORY_TOKEN } from "./domain/class-repository.interface";
 import { PrismaModule } from "src/prisma/prisma.module";
+import { StudentModule } from "../student/student.module";
 
 @Module({
     imports: [PrismaModule],
