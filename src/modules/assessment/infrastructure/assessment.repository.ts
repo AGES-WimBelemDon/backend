@@ -28,13 +28,40 @@ export class AssessmentRepository {
     });
     return form?.questions?.map(QuestionMapper.toDomain) || [];
   }
-
-  async createAnswers(answers: Answer[]): Promise<void> {
-    await this.prisma.answer.createMany({
-      data: answers.map(AnswerMapper.toPersistence),
-    });
+  async createAnswers(answers: Answer[]): Promise<Answer[]> {
+    const createdAnswers = await this.prisma.$transaction(
+      answers.map(answer => 
+        this.prisma.answer.create({
+          data: AnswerMapper.toPersistence(answer)
+        })
+      )
+    );
+    return createdAnswers.map(AnswerMapper.toDomain);
   }
-
+  async findQuestionsByIds(questionsIds: number[]): Promise<Question[]>{
+    const resp = await this.prisma.question.findMany({
+      where: {
+        id : {
+          in : questionsIds
+        }
+      },
+      orderBy : {
+        id: "asc"
+      }
+    });
+    return resp.map(QuestionMapper.toDomain);
+  };
+  async findAnwswersByQuestionsIdsAndStudentId(questionsId: number[], studentId: number): Promise<Answer[]>{
+    const resp = await this.prisma.answer.findMany({
+      where: {
+        questionId : {
+          in: questionsId
+        },
+        studentId : studentId
+      }
+    });
+    return resp.map(AnswerMapper.toDomain)
+  }
   async findAnswersByStudentAndFormType(studentId: number, formType: FormType): Promise<Answer[]> {
     const rows = await this.prisma.answer.findMany({
       where: {

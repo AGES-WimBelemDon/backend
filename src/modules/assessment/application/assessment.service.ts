@@ -4,7 +4,7 @@ import { Injectable,
          BadRequestException
         } from "@nestjs/common";
 import { AssessmentRepository } from "../infrastructure/assessment.repository";
-import { CreateAssessmentDto } from "./create-assessment.dto";
+import { CreateAssessmentDto } from "./create-assessment.request.dto";
 import { UpdateAnswerDto } from "./update-answer.dto";
 import { Form} from "../domain/form.entity";
 import { FormType } from "src/common/enums/domain.enums";
@@ -25,17 +25,39 @@ export class AssessmentService {
   }
 
   async createAnswers(studentId: number, dto: CreateAssessmentDto): Promise<Answer[]> {
-    await this.assessmentRepository.createAnswers(
+    const requestedQuestionsIds = dto.answers.map(a => a.questionId).sort((a,b)=>a-b);
+    const submissionDate = this.formatDate(dto.submissionDate);
+    const questionDateCompositeKeys = dto.answers.map(item => item.questionId + "-" + submissionDate);
+    if(questionDateCompositeKeys.length !== dto.answers.length){
+      throw new BadRequestException("Duplicate answers detected. Each question can only have one answer per submission date");
+    }
+    const validQuestions = await this.assessmentRepository.findQuestionsByIds(requestedQuestionsIds);
+    const validQuestionsIds = validQuestions.map((item)=>item.id);
+    const invalidQuestionsIds = requestedQuestionsIds.filter(id => !validQuestionsIds.includes(id));
+    if (invalidQuestionsIds.length > 0) {
+      throw new BadRequestException(`Questions with IDs ${invalidQuestionsIds.join(', ')} not found`);
+    };
+    const listStudentAnswers = await this.assessmentRepository.findAnwswersByQuestionsIdsAndStudentId(validQuestionsIds,studentId);
+    const existingAnswerKeys = new Set(
+      listStudentAnswers.map(answer => `${answer.questionId}-${this.formatDate(answer.submissionDate)}`)
+    );
+    for (let index = 0; index < questionDateCompositeKeys.length; index++) {
+      if( existingAnswerKeys.has(questionDateCompositeKeys[index])){
+        throw new BadRequestException("Cannot create duplicate answers. Some answers already exist for this date and questions.");
+      }
+    }
+    return await this.assessmentRepository.createAnswers(
         dto.answers.map(a => new Answer(
           0,
           studentId,
-          a.id_question,
+          a.questionId,
           a.content,
-          dto.submission_date ? new Date(dto.submission_date) : new Date()
+          dto.submissionDate
         ))
       );
-    const typeEnum = FormType[dto.formType as keyof typeof FormType];
-    return await this.getAnswersByStudentAndFormType(studentId, typeEnum);
+  }
+  formatDate(date: Date | undefined | null): string {
+    return date ? date.toISOString().split("T")[0] : '';
   }
 
   async getAnswersByStudentAndFormType(studentId: number, formType: string | FormType): Promise<Answer[]> {
