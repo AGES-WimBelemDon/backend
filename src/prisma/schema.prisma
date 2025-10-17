@@ -176,7 +176,7 @@ model Question {
 
 model Answer {
   id             Int      @id @default(autoincrement())
-  submissionDate DateTime @default(now()) @map("submission_date")
+  submissionDate DateTime @default(now()) @map("submission_date") @db.Date
   questionId     Int      @map("question_id")
   studentId      Int      @map("student_id")
   content        String
@@ -189,7 +189,7 @@ model Answer {
 
 model Form {
   id             Int      @id @default(autoincrement())
-  submissionDate DateTime @default(now()) @map("submission_date")
+  submissionDate DateTime @default(now()) @map("submission_date") @db.Date
   type           FormType
   title          String
   questions      Question[]
