@@ -9,6 +9,7 @@ import { StudentModule } from './modules/student/student.module';
 import { FamilyMemberModule } from './modules/familyMember/familyMember.module';
 import { AddressModule } from './modules/address/address.module';
 import { LevelModule } from './modules/level/level.module';
+import { EnrollmentModule } from './modules/enrollment/enrollment.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { LevelModule } from './modules/level/level.module';
     StudentModule,
     FamilyMemberModule,
     AddressModule,
-    LevelModule
+    LevelModule,
+    EnrollmentModule
   ],
 })
 export class AppModule {}
