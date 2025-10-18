@@ -14,7 +14,7 @@ import { CreateAssessmentDto } from "../application/create-assessment.request.dt
 import { UpdateAnswerDto } from "../application/update-answer.dto";
 import { Answer } from "../domain/answer.entity";
 import { Question } from "../domain/question.entity";
-import { ApiBody, ApiOperation, ApiParam, ApiResponse } from "@nestjs/swagger";
+import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse } from "@nestjs/swagger";
 import { FormResponseDTO } from "../application/form.response.dto";
 import { FormType } from "src/common/enums/domain.enums";
 import { AnswerMapper, FormMapper, QuestionMapper } from "../infrastructure/assessment.mapper";
@@ -132,14 +132,14 @@ export class AssessmentController {
     const questions = await this.assessmentService.getQuestionsByFormType(formType);
     return questions.map(QuestionMapper.toResponse);
   }
-  @Post("student/:id/assessments")
+  @Post("student/:studentId/assessments")
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ 
     summary: "Submit student assessment answers",
     description: "Creates multiple answers for a student's assessment form with validation for duplicate questions and existing answers"
   })
   @ApiParam({ 
-    name: "id", 
+    name: "studentId", 
     description: "Student ID",
     type: Number,
     example: 1,
@@ -263,19 +263,93 @@ export class AssessmentController {
     }
   })
   async createAnswers(
-    @Param("id", ParseIntPipe) studentId: number,
+    @Param("studentId", ParseIntPipe) studentId: number,
     @Body() dto: CreateAssessmentDto
   ): Promise<AssessmentResponseDto[]> {
     const resp = await this.assessmentService.createAnswers(studentId, dto);
     return resp.map(AnswerMapper.toReponse);
   }
-
-  @Get("student/:id/assessments")
+  @ApiOperation({ 
+  summary: "Get student assessment answers by form type",
+  description: "Retrieves all answers submitted by a specific student for a particular form type"
+  })
+  @ApiParam({ 
+    name: "studentId", 
+    description: "ID of the student whose answers to retrieve",
+    type: Number,
+    example: 1,
+    required: true
+  })
+  @ApiQuery({ 
+    name: "formType", 
+    enum: FormType,
+    description: "The type of form to retrieve answers for",
+    example: "PSICOLOGIA",
+    required: true
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: "Answers successfully retrieved",
+    type: [AssessmentResponseDto],
+    schema: {
+      example: [
+        {
+          answerId: 42,
+          submissionDate: "2025-10-17",
+          questionId: 1,
+          studentId: 1,
+          content: "Yes, I have noticed improvement in my communication skills."
+        },
+        {
+          answerId: 43,
+          submissionDate: "2025-10-17",
+          questionId: 2,
+          studentId: 1,
+          content: "The individual counseling sessions were most helpful."
+        }
+      ]
+    }
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: "Invalid form type provided",
+    schema: {
+      example: {
+        statusCode: 400,
+        message: "formType must be a valid enum value",
+        error: "Bad Request"
+      }
+    }
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: "Student not found",
+    schema: {
+      example: {
+        statusCode: 404,
+        message: "The student with id 1 not found",
+        error: "Not Found"
+      }
+    }
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: "Internal server error",
+    schema: {
+      example: {
+        statusCode: 500,
+        message: "Internal server error",
+        error: "Failed to retrieve answers"
+      }
+    }
+  })
+  @Get("student/:studentId/assessments")
   async getAnswersByStudentAndFormType(
-    @Param("id", ParseIntPipe) studentId: number,
-    @Query("formType") formType: string
-  ): Promise<Answer[]> {
-    return await this.assessmentService.getAnswersByStudentAndFormType(studentId, formType);
+    @Param("studentId", ParseIntPipe) studentId: number,
+    @Query("formType", new ParseEnumPipe(FormType)) formType: FormType
+  ): Promise<AssessmentResponseDto[]> {
+    const resp = await this.assessmentService.getAnswersByStudentAndFormType(studentId, formType);
+    return resp.map(AnswerMapper.toReponse);
   }
 
   @Patch("student/:id/assessments/:answerId")

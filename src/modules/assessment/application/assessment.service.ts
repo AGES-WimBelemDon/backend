@@ -1,7 +1,8 @@
 import { Injectable,
          Inject,
          NotFoundException,
-         BadRequestException
+         BadRequestException,
+         forwardRef
         } from "@nestjs/common";
 import { AssessmentRepository } from "../infrastructure/assessment.repository";
 import { AnswerItemDto, CreateAssessmentDto } from "./create-assessment.request.dto";
@@ -10,12 +11,18 @@ import { Form} from "../domain/form.entity";
 import { FormType } from "src/common/enums/domain.enums";
 import { Answer } from "../domain/answer.entity";
 import { Question } from "../domain/question.entity";
+import { StudentService } from "src/modules/student/application/student.service";
 
 @Injectable()
 export class AssessmentService {
-  @Inject(AssessmentRepository)
-  private readonly assessmentRepository: AssessmentRepository;
+  constructor(
+    @Inject(AssessmentRepository)
+    private readonly assessmentRepository: AssessmentRepository,
 
+    @Inject(StudentService)
+    private readonly studentService: StudentService,
+    
+  ){}
   async getAllForms(): Promise<Form[]> {
     return await this.assessmentRepository.findAllForms();
   }
@@ -25,6 +32,10 @@ export class AssessmentService {
   }
 
   async createAnswers(studentId: number, dto: CreateAssessmentDto): Promise<Answer[]> {
+    const student = await this.studentService.findById(studentId);
+    if(!student){
+      throw new NotFoundException(`The student with id ${studentId} not found.`)
+    }
     const requestedQuestionIds = dto.answers.map(a => a.questionId);
     const formattedDate = this.formatDate(dto.submissionDate);
     this.checkForDuplicateQuestions(dto.answers, formattedDate);
@@ -90,16 +101,12 @@ export class AssessmentService {
     
     return this.assessmentRepository.createAnswers(answerEntities);
   }
-  async getAnswersByStudentAndFormType(studentId: number, formType: string | FormType): Promise<Answer[]> {
-    const typeEnum = typeof formType === "string" ? FormType[formType as keyof typeof FormType] : formType;
-    if (!typeEnum) {
-      throw new BadRequestException("Tipo de formulário inválido");
+  async getAnswersByStudentAndFormType(studentId: number, formType: FormType): Promise<Answer[]> {
+    const student = await this.studentService.findById(studentId);
+    if(!student){
+      throw new NotFoundException(`The student with id ${studentId} not found.`)
     }
-    const answers = await this.assessmentRepository.findAnswersByStudentAndFormType(studentId, typeEnum);
-    if (!answers || answers.length === 0) {
-      throw new NotFoundException("Nenhuma resposta encontrada para o aluno e tipo de formulário informado");
-    }
-    return answers;
+    return await this.assessmentRepository.findAnswersByStudentAndFormType(studentId, formType);
   }
 
   async updateAnswerContent(answerId: number, dto: UpdateAnswerDto): Promise<Answer | null> {
