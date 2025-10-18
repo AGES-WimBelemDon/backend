@@ -7,6 +7,7 @@ import {
   IsDateString,
   IsIn,
   IsNumber,
+  Matches,
 } from "class-validator";
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { Type } from "class-transformer";
@@ -48,11 +49,17 @@ export class UpdateClassDTO {
 
   @IsOptional()
   @IsString()
+  @Matches(/^\d{2}:\d{2}:\d{2}$/, {
+    message: "startTime deve estar no formato HH:mm:ss",
+  })
   @ApiPropertyOptional({ example: "09:00:00" })
   startTime?: string;
 
   @IsOptional()
   @IsString()
+  @Matches(/^\d{2}:\d{2}:\d{2}$/, {
+    message: "endTime deve estar no formato HH:mm:ss",
+  })
   @ApiPropertyOptional({ example: "10:00:00" })
   endTime?: string;
 

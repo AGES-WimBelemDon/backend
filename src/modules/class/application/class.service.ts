@@ -49,7 +49,11 @@ export class ClassService {
       throw new NotFoundException(`WARNING: Activity ID was not found!`);
     }
 
-    const classEntity = new Class(createClassDto);
+    const classEntity = new Class({
+      ...createClassDto,
+      startTime: new Date(`1970-01-01T${createClassDto.startTime}`),
+      endTime: new Date(`1970-01-01T${createClassDto.endTime}`),
+    });
 
     return await this.classRepository.create(classEntity);
   }
@@ -71,12 +75,13 @@ export class ClassService {
   }
 
   async update(id: number, updateClassDto: UpdateClassDTO){
-    var _class = await this.findById(id);
-    if(!_class){
-        return null;
+    var _class = await this.classRepository.findById(id);
+    if (!_class) {
+      throw new NotFoundException(`Class with ID ${id} not found`);
     }
-    const classEntity = ClassMapper.updateToDomain(_class, updateClassDto);
 
+    const classEntity = ClassMapper.updateToDomain(_class, updateClassDto);
+    
     var updatedClass = await this.classRepository.update(id,classEntity);
 
     return updatedClass

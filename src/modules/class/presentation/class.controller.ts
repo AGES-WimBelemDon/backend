@@ -18,6 +18,7 @@ import {
   ApiTags,
   ApiParam,
   ApiQuery,
+  ApiBody,
 } from "@nestjs/swagger";
 import { ClassService } from "../application/class.service";
 import { CreateClassDTO } from "../application/create-class.dto";
@@ -131,23 +132,45 @@ export class ClassController {
   @Patch(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
-    summary: "Update class (partial)",
+    summary: "Atualizar turma (parcialmente)",
     description:
-      "Partially updates class data and/or its associations (teachers, schedules).",
+      "Atualiza parcialmente os dados de uma turma existente, incluindo estado, horários, professores e horários de aula.",
+  })
+  @ApiParam({ name: "id", type: Number, example: 7 })
+  @ApiBody({
+    type: UpdateClassDTO,
+    examples: {
+      exemplo: {
+        summary: "Exemplo de atualização de turma",
+        value: {
+          name: "TENIS-I (Atualizada)",
+          activityId: 2,
+          levelId: 1,
+          state: "INATIVA",
+          isRecurrent: false,
+          startDate: "2025-02-01",
+          endDate: "",
+          startTime: "09:00:00",
+          endTime: "10:00:00",
+          teachersId: [2, 5],
+          schedulesIds: [1, 2],
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 204,
-    description: "Class successfully updated (no content returned)",
+    description: "Turma atualizada com sucesso (sem retorno de conteúdo)",
   })
   @ApiResponse({
     status: 400,
     description:
-      "Bad Request - invalid format (dates, times, state, or daysOfWeek)",
+      "Formato inválido (datas, horas, estado ou IDs incorretos)",
   })
   @ApiResponse({
     status: 404,
     description:
-      "Not Found - class doesn't exist or invalid foreign keys (activity/level/teacher)",
+      "Turma não encontrada ou referências inválidas (atividade/nível/professor)",
   })
   async updateClass(
     @Param("id", ParseIntPipe) id: number,
@@ -155,7 +178,7 @@ export class ClassController {
   ) {
     const updated = await this.classService.update(id, updateClassDto);
     if (!updated) {
-      throw new NotFoundException("Class not found or invalid references");
+      throw new NotFoundException("Turma não encontrada ou referências inválidas");
     }
   }
 

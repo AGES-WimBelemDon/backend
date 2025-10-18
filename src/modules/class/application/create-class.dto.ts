@@ -8,6 +8,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Matches,
 } from "class-validator";
 
 export class CreateClassDTO {
@@ -67,22 +68,26 @@ export class CreateClassDTO {
   endDate?: Date;
 
   @ApiProperty({
-    example: "2025-03-01T08:00:00.000Z",
-    description: "Horário de início das aulas",
+    example: "09:00:00",
+    description: "Horário de início das aulas (formato HH:mm:ss)",
   })
-  @IsDate()
-  @Type(() => Date)
+  @IsString()
+  @Matches(/^\d{2}:\d{2}:\d{2}$/, {
+    message: "startTime deve estar no formato HH:mm:ss",
+  })
   @IsNotEmpty()
-  startTime: Date;
+  startTime: string;
 
   @ApiProperty({
-    example: "2025-03-01T10:00:00.000Z",
-    description: "Horário de término das aulas",
+    example: "10:00:00",
+    description: "Horário de término das aulas (formato HH:mm:ss)",
   })
-  @IsDate()
-  @Type(() => Date)
+  @IsString()
+  @Matches(/^\d{2}:\d{2}:\d{2}$/, {
+    message: "endTime deve estar no formato HH:mm:ss",
+  })
   @IsNotEmpty()
-  endTime: Date;
+  endTime: string;
 
   @ApiProperty({
     example: [1, 2],

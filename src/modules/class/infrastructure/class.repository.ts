@@ -22,14 +22,13 @@ export class ClassRepository implements IClassRepository {
     levelId?: number,
     state?: string
   ): Promise<Class | null> {
-    const prismaClass = await this.prisma.class.findFirst({
-      where: {
-        id,
-        ...(activityId && { activityId: Number(activityId) }),
-        ...(levelId && { levelId: Number(levelId) }),
-        ...(state && { state }),
-      },
-    });
+    const where: any = { id };
+
+    if (activityId !== undefined) where.activityId = activityId;
+    if (levelId !== undefined) where.levelId = levelId;
+    if (state !== undefined) where.state = state;
+  
+    const prismaClass = await this.prisma.class.findFirst({ where });
 
     if (!prismaClass) {
       return null;

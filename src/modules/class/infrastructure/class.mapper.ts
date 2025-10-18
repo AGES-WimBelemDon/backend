@@ -2,6 +2,7 @@ import { Class as PrismaClass } from "@prisma/client";
 import { Class } from "../domain/class.entity";
 import { ClassResponseDTO } from "../application/class-response.dto";
 import { UpdateClassDTO } from "../application/update-class.dto";
+import { CreateClassDTO } from "../application/create-class.dto";
 
 export class ClassMapper {
   static toDomain(prismaClass: PrismaClass): Class {
@@ -66,19 +67,14 @@ export class ClassMapper {
       activityId: updateClassDto.activityId ?? classEntity.activityId,
       levelId: updateClassDto.levelId ?? classEntity.levelId,
       state: updateClassDto.state ?? classEntity.state,
-      teacherIds: updateClassDto.teachersId ?? classEntity.teacherIds,
+      teacherIds: updateClassDto.teachersId ?? classEntity.teacherIds,  
       isRecurrent: updateClassDto.isRecurrent ?? classEntity.isRecurrent,
-  
       startDate: safeDate(updateClassDto.startDate, classEntity.startDate, "startDate"),
-      endDate: updateClassDto.endDate
-        ? safeDate(updateClassDto.endDate, classEntity.endDate ?? new Date(), "endDate")
-        : classEntity.endDate,
-  
-      startTime: safeDate(updateClassDto.startTime, classEntity.startTime, "startTime"),
-      endTime: safeDate(updateClassDto.endTime, classEntity.endTime, "endTime"),
+      endDate: updateClassDto.endDate ? classEntity.endDate : undefined,
+      startTime: new Date(`1970-01-01T${updateClassDto.startTime}`) ?? classEntity.startTime,
+      endTime: new Date(`1970-01-01T${updateClassDto.endTime}`) ?? classEntity.endTime,
   
       schedulesIds: updateClassDto.schedulesIds ?? classEntity.schedulesIds,
     });
   }
-  
 }
