@@ -23,38 +23,36 @@ import {
   EnrollmentWarningDTO,
 } from "./dtos";
 import { Enrollment } from "../domain/enrollment.entity";
-import { PrismaService } from "src/prisma/prisma.service";
+import { StudentService } from "src/modules/student/application/student.service";
 
 @Injectable()
 export class EnrollmentService {
-  @Inject(ENROLLMENT_REPOSITORY_TOKEN)
-  private readonly enrollmentRepository: IEnrollmentRepository;
+  constructor(
+    @Inject(ENROLLMENT_REPOSITORY_TOKEN)
+    private readonly enrollmentRepository: IEnrollmentRepository,
 
-  @Inject(ENROLLMENT_QUERIES_TOKEN)
-  private readonly enrollmentQueryService: IEnrollmentQueries;
-
-  constructor(private readonly prisma: PrismaService) {}
+    @Inject(ENROLLMENT_QUERIES_TOKEN)
+    private readonly enrollmentQueryService: IEnrollmentQueries,
+    @Inject(StudentService)
+    private readonly studentService: StudentService,) {}
 
   async createEnrollments(
     data: CreateEnrollmentRequestDTO,
   ): Promise<CreateEnrollmentResponseDTO> {
     const { classId, studentIds } = data;
-
-    const classExists = await this.prisma.class.findUnique({
-      where: { id: classId },
-    });
-
+    // TODO: it's necessary to validate the class
+    //const classExists = await this.prisma.class.findUnique({
+    //  where: { id: classId },
+    //});
+    console.warn("WARNING: Class service validation not implemented yet");
+    const classExists = false; // TEMPORARY: Assuming class exists until validation is implemented
     if (!classExists) {
       throw new NotFoundException(`Class with ID ${classId} not found.`);
     }
 
-    const students = await this.prisma.student.findMany({
-      where: {
-        id: { in: studentIds },
-      },
-    });
+    const students = await this.studentService.findManyById(studentIds);
 
-    const foundStudentIds = students.map((s) => s.id);
+    const foundStudentIds = students.map((s) => s.getId());
     const missingStudentIds = studentIds.filter(
       (id) => !foundStudentIds.includes(id),
     );
@@ -93,14 +91,14 @@ export class EnrollmentService {
 
       const createdEnrollment =
         await this.enrollmentRepository.create(enrollment);
-      const student = students.find((s) => s.id === studentId);
+      const student = students.find((s) => s.getId() === studentId);
 
       created.push({
         id: createdEnrollment.getId()!,
         student: {
-          id: student!.id,
-          fullName: student!.fullName,
-          status: student!.status,
+          id: student!.getId()!,
+          fullName: student!.getFullName(),
+          status: student!.getStatus(),
         },
         enrollmentDate: createdEnrollment
           .getEnrollmentDate()
@@ -132,25 +130,7 @@ export class EnrollmentService {
       throw new NotFoundException(`Enrollment with ID ${id} not found.`);
     }
 
-    const enrollmentData = await this.prisma.enrollment.findUnique({
-      where: { id },
-      include: {
-        student: {
-          select: {
-            id: true,
-            fullName: true,
-            status: true,
-          },
-        },
-        class: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-    });
-
+    const enrollmentData = await this.enrollmentQueryService.findEnrollmentWithStudentAndClass(id);
     if (!enrollmentData) {
       throw new NotFoundException(`Enrollment with ID ${id} not found.`);
     }

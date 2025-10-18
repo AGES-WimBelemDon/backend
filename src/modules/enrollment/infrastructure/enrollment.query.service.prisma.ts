@@ -6,6 +6,7 @@ import {
 } from "../application/enrollment.service.query.interfaces";
 import { EnrollmentListItemDTO } from "../application/dtos";
 import { StudentStatus } from "@prisma/client";
+import { EnrollmentMapper } from "./enrollment.mapper";
 
 @Injectable()
 export class PrismaEnrollmentQueryService implements IEnrollmentQueries {
@@ -57,21 +58,30 @@ export class PrismaEnrollmentQueryService implements IEnrollmentQueries {
       },
     });
 
-    return enrollments.map((enrollment) => ({
-      id: enrollment.id,
-      student: {
-        id: enrollment.student.id,
-        fullName: enrollment.student.fullName,
-        status: enrollment.student.status,
+    return enrollments.map(EnrollmentMapper.toListItemDto);
+  }
+  async findEnrollmentWithStudentAndClass(id: number): Promise<EnrollmentListItemDTO | null>{
+    const enrollmentData = await this.prisma.enrollment.findUnique({
+      where: { id },
+      include: {
+        student: {
+          select: {
+            id: true,
+            fullName: true,
+            status: true,
+          },
+        },
+        class: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
-      class: {
-        id: enrollment.class.id,
-        name: enrollment.class.name,
-      },
-      enrollmentDate: enrollment.enrollmentDate.toISOString().split("T")[0],
-      endDate: enrollment.endDate
-        ? enrollment.endDate.toISOString().split("T")[0]
-        : null,
-    }));
+    });
+    if(!enrollmentData){
+      return null;
+    }
+    return EnrollmentMapper.toListItemDto(enrollmentData);
   }
 }

@@ -11,4 +11,5 @@ export interface EnrollmentQueryFilters {
 
 export interface IEnrollmentQueries {
   findEnrollments(filters: EnrollmentQueryFilters): Promise<EnrollmentListItemDTO[]>;
+  findEnrollmentWithStudentAndClass(id: number): Promise<EnrollmentListItemDTO | null>;
 }

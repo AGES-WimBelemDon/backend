@@ -5,10 +5,10 @@ import { PrismaEnrollmentRepository } from "./infrastructure/enrollment.reposito
 import { PrismaEnrollmentQueryService } from "./infrastructure/enrollment.query.service.prisma";
 import { ENROLLMENT_REPOSITORY_TOKEN } from "./domain/enrollment.repository";
 import { ENROLLMENT_QUERIES_TOKEN } from "./application/enrollment.service.query.interfaces";
-import { PrismaModule } from "src/prisma/prisma.module";
+import { StudentModule } from "../student/student.module";
 
 @Module({
-  imports: [PrismaModule],
+  imports: [StudentModule],
   controllers: [EnrollmentController],
   providers: [
     EnrollmentService,

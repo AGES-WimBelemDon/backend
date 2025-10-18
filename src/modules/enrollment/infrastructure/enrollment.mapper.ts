@@ -1,3 +1,4 @@
+import { EnrollmentListItemDTO } from "../application/dtos/enrollment-list.response.dto";
 import { Enrollment } from "../domain/enrollment.entity";
 import { Enrollment as PrismaEnrollment } from "@prisma/client";
 
@@ -18,6 +19,24 @@ export class EnrollmentMapper {
       classId: enrollment.getClassId(),
       enrollmentDate: enrollment.getEnrollmentDate(),
       endDate: enrollment.getEndDate(),
+    };
+  }
+  static toListItemDto(enrollment: any): EnrollmentListItemDTO {
+    return {
+      id: enrollment.id,
+      student: {
+        id: enrollment.student.id,
+        fullName: enrollment.student.fullName,
+        status: enrollment.student.status,
+      },
+      class: {
+        id: enrollment.class.id,
+        name: enrollment.class.name,
+      },
+      enrollmentDate: enrollment.enrollmentDate.toISOString().split("T")[0],
+      endDate: enrollment.endDate
+        ? enrollment.endDate.toISOString().split("T")[0]
+        : null,
     };
   }
 }
