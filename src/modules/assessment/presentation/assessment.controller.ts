@@ -14,7 +14,7 @@ import { CreateAssessmentDto } from "../application/create-assessment.request.dt
 import { UpdateAnswerDto } from "../application/update-answer.dto";
 import { Answer } from "../domain/answer.entity";
 import { Question } from "../domain/question.entity";
-import { ApiOperation, ApiParam, ApiResponse } from "@nestjs/swagger";
+import { ApiBody, ApiOperation, ApiParam, ApiResponse } from "@nestjs/swagger";
 import { FormResponseDTO } from "../application/form.response.dto";
 import { FormType } from "src/common/enums/domain.enums";
 import { AnswerMapper, FormMapper, QuestionMapper } from "../infrastructure/assessment.mapper";
@@ -132,12 +132,11 @@ export class AssessmentController {
     const questions = await this.assessmentService.getQuestionsByFormType(formType);
     return questions.map(QuestionMapper.toResponse);
   }
-
   @Post("student/:id/assessments")
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ 
     summary: "Submit student assessment answers",
-    description: "Creates multiple answers for a student's assessment form"
+    description: "Creates multiple answers for a student's assessment form with validation for duplicate questions and existing answers"
   })
   @ApiParam({ 
     name: "id", 
@@ -146,21 +145,44 @@ export class AssessmentController {
     example: 1,
     required: true
   })
+  @ApiBody({
+    description: "Assessment data with answers",
+    type: CreateAssessmentDto,
+    examples: {
+      validAssessment: {
+        summary: "Valid assessment submission",
+        value: {
+          submissionDate: "2025-10-17",
+          answers: [
+            {
+              questionId: 1,
+              content: "Yes, I have noticed improvement in my communication skills."
+            },
+            {
+              questionId: 2,
+              content: "The individual counseling sessions were most helpful."
+            }
+          ]
+        }
+      }
+    }
+  })
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: "Answers successfully submitted",
+    type: [AssessmentResponseDto],
     schema: {
       example: [
         {
-          id: 42,
-          submissionDate: "2023-10-16",
+          answerId: 42,
+          submissionDate: "2025-10-17",
           questionId: 1,
           studentId: 1,
           content: "Yes, I have noticed improvement in my communication skills."
         },
         {
-          id: 43,
-          submissionDate: "2023-10-16",
+          answerId: 43,
+          submissionDate: "2025-10-17",
           questionId: 2,
           studentId: 1,
           content: "The individual counseling sessions were most helpful."
@@ -171,10 +193,50 @@ export class AssessmentController {
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: "Invalid request data",
-    schema: {
-      example: {
-        statusCode: 400,
-        error: "Bad Request"
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            statusCode: { type: 'number', example: 400 },
+            message: { type: 'string' },
+            error: { type: 'string', example: 'Bad Request' }
+          }
+        },
+        examples: {
+          duplicateQuestions: {
+            summary: "Duplicate questions in request",
+            value: {
+              statusCode: 400,
+              message: "Duplicate answers detected. Each question can only have one answer per submission date",
+              error: "Bad Request"
+            }
+          },
+          nonExistentQuestions: {
+            summary: "Questions not found",
+            value: {
+              statusCode: 400,
+              message: "Questions with IDs 99, 100 not found",
+              error: "Bad Request"
+            }
+          },
+          existingAnswers: {
+            summary: "Answers already exist",
+            value: {
+              statusCode: 400,
+              message: "Cannot create duplicate answers. Some answers already exist for this date and questions.",
+              error: "Bad Request"
+            }
+          },
+          invalidDate: {
+            summary: "Invalid date format",
+            value: {
+              statusCode: 400,
+              message: "Submission date must be a valid date (YYYY-MM-DD)",
+              error: "Bad Request"
+            }
+          }
+        }
       }
     }
   })
