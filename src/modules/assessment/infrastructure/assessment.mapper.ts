@@ -7,6 +7,7 @@ import { Question } from '../domain/question.entity';
 import { Form } from '../domain/form.entity';
 import { FormResponseDTO } from '../application/form.response.dto';
 import { QuestionsResponseDTO } from '../application/questions.response.dto';
+import { AssessmentResponseDto } from '../application/create-assesment.response.dto';
 
 
 export class AnswerMapper {
@@ -16,20 +17,27 @@ export class AnswerMapper {
       prismaAnswer.studentId,
       prismaAnswer.questionId,
       prismaAnswer.content,
-      // se o client estiver gerado com o schema novo, esse campo existe
-      (prismaAnswer as any).submissionDate
+      prismaAnswer.submissionDate
     );
-  }
+  };
 
-  static toPersistence(answer: Answer): any /* Prisma.AnswerCreateManyInput */ {
-    // Não enviar 'id' para permitir autoincrement no banco
+  static toPersistence(answer: Answer): any {
     return {
       studentId: answer.studentId,
       questionId: answer.questionId,
-      content: answer.content
-      // Intencionalmente omitimos 'submissionDate' para manter compatibilidade
-      // com bancos que ainda não têm a coluna; o default do DB cobre o valor.
+      content: answer.content,
+      submissionDate: answer.submissionDate
     };
+  };
+
+  static toReponse(answer: Answer): AssessmentResponseDto{
+    return {
+      studentId : answer.studentId,
+      content   : answer.content,
+      answerId : answer.id,
+      questionId : answer.questionId,
+      submissionDate: answer.submissionDate.toISOString().split("T")[0]
+    }
   }
 }
 
@@ -45,10 +53,10 @@ export class QuestionMapper {
   }
   static toResponse(question: Question): QuestionsResponseDTO {
     return {
-      "formId" : question.formId,
-      "isRequired" : question.isRequired,
-      "questionId" : question.id,
-      "statement" : question.statement
+      formId : question.formId,
+      isRequired : question.isRequired,
+      questionId : question.id,
+      statement : question.statement
     }
   }
 }

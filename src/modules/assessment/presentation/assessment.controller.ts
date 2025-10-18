@@ -17,8 +17,9 @@ import { Question } from "../domain/question.entity";
 import { ApiOperation, ApiParam, ApiResponse } from "@nestjs/swagger";
 import { FormResponseDTO } from "../application/form.response.dto";
 import { FormType } from "src/common/enums/domain.enums";
-import { FormMapper, QuestionMapper } from "../infrastructure/assessment.mapper";
+import { AnswerMapper, FormMapper, QuestionMapper } from "../infrastructure/assessment.mapper";
 import { QuestionsResponseDTO } from "../application/questions.response.dto";
+import { AssessmentResponseDto } from "../application/create-assesment.response.dto";
 
 
 @Controller("assessment")
@@ -202,8 +203,9 @@ export class AssessmentController {
   async createAnswers(
     @Param("id", ParseIntPipe) studentId: number,
     @Body() dto: CreateAssessmentDto
-  ): Promise<Answer[]> {
-    return await this.assessmentService.createAnswers(studentId, dto);
+  ): Promise<AssessmentResponseDto[]> {
+    const resp = await this.assessmentService.createAnswers(studentId, dto);
+    return resp.map(AnswerMapper.toReponse);
   }
 
   @Get("student/:id/assessments")

@@ -4,6 +4,6 @@ export class Answer {
     public readonly studentId: number,
     public readonly questionId: number,
     public readonly content: string,
-    public readonly submissionDate?: Date
+    public readonly submissionDate: Date
   ) {}
 }
