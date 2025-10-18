@@ -11,16 +11,16 @@ import { Controller,
   ParseEnumPipe} from "@nestjs/common";
 import { AssessmentService } from "../application/assessment.service";
 import { CreateAssessmentDto } from "../application/create-assessment.request.dto";
-import { UpdateAnswerDto } from "../application/update-answer.dto";
+import { UpdateAnswerBatchDto, UpdateAnswerDto } from "../application/update-answer.dto";
 import { Answer } from "../domain/answer.entity";
-import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse } from "@nestjs/swagger";
+import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FormResponseDTO } from "../application/form.response.dto";
 import { FormType } from "src/common/enums/domain.enums";
 import { AnswerMapper, FormMapper, QuestionMapper } from "../infrastructure/assessment.mapper";
 import { QuestionsResponseDTO } from "../application/questions.response.dto";
 import { AssessmentResponseDto } from "../application/create-assesment.response.dto";
 
-
+@ApiTags("assessment")
 @Controller("assessment")
 export class AssessmentController {
   constructor(private readonly assessmentService: AssessmentService) {}
@@ -345,14 +345,69 @@ export class AssessmentController {
     const resp = await this.assessmentService.getAnswersByStudentAndFormType(studentId, formType);
     return resp.map(AnswerMapper.toReponse);
   }
-
-  @Patch("student/:id/assessments/:answerId")
-  async updateAnswerContent(
-    @Param("id", ParseIntPipe) studentId: number,
-    @Param("answerId", ParseIntPipe) answerId: number,
-    @Body() dto: UpdateAnswerDto,
-    @Query("submission_date") submissionDate?: string
-  ): Promise<Answer | null> {
-    return await this.assessmentService.updateAnswerContent(answerId, dto);
+  @Patch("/")
+  @ApiOperation({ 
+    summary: "Bulk update or delete answers",
+    description: "Updates multiple answers at once. If content is set to null for an answer, that answer will be removed."
+  })
+  @ApiBody({
+    description: "Batch of answer updates",
+    type: UpdateAnswerBatchDto
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: "Answers successfully updated",
+    type: [AssessmentResponseDto]
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: "Invalid request or answers not found",
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            statusCode: { type: 'number', example: 400 },
+            message: { type: 'string' },
+            error: { type: 'string', example: 'Bad Request' }
+          }
+        },
+        examples: {
+          invalidAnswerIds: {
+            summary: "Some answer IDs don't exist",
+            value: {
+              statusCode: 400,
+              message: "Answers with IDs 99, 100 not found",
+              error: "Bad Request"
+            }
+          },
+          validationError: {
+            summary: "Validation error",
+            value: {
+              statusCode: 400,
+              message: ["answerId must be an integer",
+                "submissionDate must be a valid date (YYYY-MM-DD)",
+              "updates.0.content must be a string"],
+              error: "Bad Request"
+            }
+          }
+        }
+      }
+    }
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: "Internal server error",
+    schema: {
+      example: {
+        statusCode: 500,
+        message: "Internal server error",
+        error: "Failed to update answers"
+      }
+    }
+  })
+  async bulkUpdateAnswer(@Body() dto: UpdateAnswerBatchDto): Promise<AssessmentResponseDto[]> {
+    const resp = await this.assessmentService.bulkUpdateAnswer(dto);
+    return resp.map(AnswerMapper.toReponse);
   }
 }

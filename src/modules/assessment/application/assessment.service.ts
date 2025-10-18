@@ -108,17 +108,10 @@ export class AssessmentService {
     }
     return await this.assessmentRepository.findAnswersByStudentAndFormType(studentId, formType);
   }
-
-  async updateAnswerContent(answerId: number, dto: UpdateAnswerDto): Promise<Answer | null> {
-    const updated = await this.assessmentRepository.updateAnswerContent(answerId, dto.content);
-    if (!updated) {
-      throw new NotFoundException(``);
-    }
-    return updated;
-  }
-  async updateAnswerInBatch(dto: UpdateAnswerBatchDto){
+  async bulkUpdateAnswer(dto: UpdateAnswerBatchDto): Promise<Answer[]>{
     const updates = dto.updates;
     const answersIds = updates.map(item=>item.answerId);
+    var updatedValues: Answer[] = [];
     const existingAnswers = await this.assessmentRepository.findAnswersByIds(answersIds);
     await this.validateAnswerExist(existingAnswers,answersIds);
     const answersToRemove = updates
@@ -143,8 +136,10 @@ export class AssessmentService {
       );
     });
     
-    return await this.assessmentRepository.updateAnswers(mergedUpdates);
+    const _updated = await this.assessmentRepository.updateAnswers(mergedUpdates);
+    updatedValues = _updated;
     }
+    return updatedValues;
   };
   private async validateAnswerExist(validAnswers: Answer[], answersIds: number[]): Promise<void> {
     const validIds = validAnswers.map(q => q.id);
