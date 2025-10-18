@@ -1,13 +1,21 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { IUserRepository } from "../application/user.service.query.interfaces";
-import { UserResponseDTO } from "../application/user.dtos";
+import {
+  UserDetailedResponseDTO,
+  UserResponseDTO,
+} from "../application/user.dtos";
+import { UserStatus } from "@prisma/client";
 
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createUser(uid: string, email: string, name: string): Promise<UserResponseDTO> {
+  async createUser(
+    uid: string,
+    email: string,
+    name: string,
+  ): Promise<UserResponseDTO> {
     const user = await this.prisma.user.create({
       data: {
         fullName: name,
@@ -21,30 +29,73 @@ export class PrismaUserRepository implements IUserRepository {
             street: "Av. Heitor Viêira",
             neighborhood: "Bemém Novo",
             number: "68",
-          }
-        }
+          },
+        },
       },
     });
-    return { id: user.id, email: user.email };
+    return {
+      id: user.id,
+      fullName: user.fullName,
+      status: user.status,
+    };
+  }
+
+  async findAll(): Promise<UserResponseDTO[]> {
+    const users = await this.prisma.user.findMany();
+    return users.map((user) => ({
+      id: user.id,
+      fullName: user.fullName,
+      status: user.status,
+    }));
   }
 
   async findByUid(uid: string): Promise<UserResponseDTO | null> {
     const user = await this.prisma.user.findUnique({
-      where: { uidFirebase: uid }
+      where: { uidFirebase: uid },
     });
     if (!user) {
       return null;
     }
-    return { id: user.id, email: user.email };
+    return {
+      id: user.id,
+      fullName: user.fullName,
+      status: user.status,
+    };
+  }
+
+  async findById(id: number): Promise<UserDetailedResponseDTO | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+    if (!user) {
+      return null;
+    }
+    return {
+      id: user.id,
+      fullName: user.fullName,
+      status: user.status,
+      email: user.email,
+    };
   }
 
   async findByEmail(email: string): Promise<UserResponseDTO | null> {
     const user = await this.prisma.user.findUnique({
-      where: { email }
+      where: { email },
     });
     if (!user) {
       return null;
     }
-    return { id: user.id, email: user.email };
+    return {
+      id: user.id,
+      fullName: user.fullName,
+      status: user.status,
+    };
+  }
+
+  async disableUser(id: number): Promise<void> {
+    await this.prisma.user.update({
+      where: { id },
+      data: { status: UserStatus.INATIVO },
+    });
   }
 }
