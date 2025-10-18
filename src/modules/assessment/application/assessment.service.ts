@@ -6,7 +6,7 @@ import { Injectable,
         } from "@nestjs/common";
 import { AssessmentRepository } from "../infrastructure/assessment.repository";
 import { AnswerItemDto, CreateAssessmentDto } from "./create-assessment.request.dto";
-import { UpdateAnswerDto } from "./update-answer.dto";
+import { UpdateAnswerBatchDto, UpdateAnswerDto } from "./update-answer.dto";
 import { Form} from "../domain/form.entity";
 import { FormType } from "src/common/enums/domain.enums";
 import { Answer } from "../domain/answer.entity";
@@ -71,7 +71,7 @@ export class AssessmentService {
     formattedDate: string,
     newAnswers: AnswerItemDto[]
   ): Promise<void> {
-    const existingAnswers = await this.assessmentRepository.findAnwswersByQuestionsIdsAndStudentId(
+    const existingAnswers = await this.assessmentRepository.findAnswersByQuestionsIdsAndStudentId(
       questionIds, 
       studentId
     );
@@ -115,6 +115,44 @@ export class AssessmentService {
       throw new NotFoundException(``);
     }
     return updated;
+  }
+  async updateAnswerInBatch(dto: UpdateAnswerBatchDto){
+    const updates = dto.updates;
+    const answersIds = updates.map(item=>item.answerId);
+    const existingAnswers = await this.assessmentRepository.findAnswersByIds(answersIds);
+    await this.validateAnswerExist(existingAnswers,answersIds);
+    const answersToRemove = updates
+    .filter(update => update.content === null)
+    .map(update => update.answerId);
+    const answersToUpdate = updates.filter(update => update.content !== null);
+    if (answersToRemove.length > 0) {
+      await this.assessmentRepository.removeAnswersByIds(answersToRemove);
+    };
+    if (answersToUpdate.length > 0){
+      const existingAnswersMap = new Map(
+        existingAnswers.map(answer => [answer.id, answer])
+    );
+    const mergedUpdates = answersToUpdate.map(update => {
+      const existingAnswer = existingAnswersMap.get(update.answerId)!;
+      return new Answer(
+        update.answerId,
+        existingAnswer.studentId,
+        existingAnswer.questionId,
+        update.content !== undefined ? update.content : existingAnswer.content,
+        update.submissionDate || existingAnswer.submissionDate,
+      );
+    });
+    
+    return await this.assessmentRepository.updateAnswers(mergedUpdates);
+    }
+  };
+  private async validateAnswerExist(validAnswers: Answer[], answersIds: number[]): Promise<void> {
+    const validIds = validAnswers.map(q => q.id);
+    const invalidIds = answersIds.filter(id => !validIds.includes(id));
+    if (invalidIds.length > 0) {
+      throw new BadRequestException(`Answers with IDs ${invalidIds.join(', ')} not found`);
+    };
+    
   }
 }
 

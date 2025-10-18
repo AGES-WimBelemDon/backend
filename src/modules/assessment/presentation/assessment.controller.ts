@@ -13,7 +13,6 @@ import { AssessmentService } from "../application/assessment.service";
 import { CreateAssessmentDto } from "../application/create-assessment.request.dto";
 import { UpdateAnswerDto } from "../application/update-answer.dto";
 import { Answer } from "../domain/answer.entity";
-import { Question } from "../domain/question.entity";
 import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse } from "@nestjs/swagger";
 import { FormResponseDTO } from "../application/form.response.dto";
 import { FormType } from "src/common/enums/domain.enums";
@@ -28,36 +27,31 @@ export class AssessmentController {
 
   @Get("forms")
   @ApiOperation({ 
-    summary: "Get all assessment forms",
-    description: "Retrieves all available assessment forms in the system without their questions"
+    summary: 'Get all assessment forms',
+    description: 'Retrieves all available assessment forms in the system'
   })
   @ApiResponse({ 
     status: 200, 
-    description: "Forms successfully retrieved",
+    description: 'Forms successfully retrieved',
     type: [FormResponseDTO],
     schema: {
       example: [
         {
           id: 1,
-          title: "Initial Psichology form",
-          type: FormType.PSICOLOGIA
-        },
-        {
-          id: 2,
-          title: "Initial social form",
-          type: FormType.SOCIAL
+          title: 'Initial Assessment',
+          type: 'PSICOLOGIA'
         }
       ]
     }
   })
   @ApiResponse({
     status: 500,
-    description: "Internal server error",
+    description: 'Internal server error',
     schema: {
       example: {
         statusCode: 500,
-        message: "Internal server error",
-        error: "Error retrieving forms from database"
+        message: 'Internal server error',
+        error: 'Failed to retrieve forms'
       }
     }
   })
@@ -109,7 +103,7 @@ export class AssessmentController {
     description: "Invalid form type provided",
     schema: {
       example: {
-        statusCode: 400,
+        statusCode: 400,"content": "The individual counseling sessions were most helpful.",
         message: "formType must be a valid enum value",
         error: "Bad Request"
       }
