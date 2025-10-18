@@ -189,4 +189,7 @@ export class StudentService {
         await this.studentRepository.update(student);
         await this.addressService.delete(addressId);
     }
+    async findManyById(studentsIds: number[]): Promise<Student[]>{
+        return await this.studentRepository.findManyById(studentsIds);
+    }
 }
