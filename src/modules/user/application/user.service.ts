@@ -2,7 +2,6 @@ import {
   Inject,
   Injectable,
   BadRequestException,
-  UnauthorizedException,
 } from "@nestjs/common";
 import {
   USER_REPOSITORY_TOKEN,
@@ -16,6 +15,7 @@ import {
 } from "./user.dtos";
 import { FirebaseService } from "src/modules/firebase/application/firebase.service";
 import { UserStatus } from "@prisma/client";
+import { AuthException, AuthErrorCode } from "../domain/exceptions/auth.exception";
 
 @Injectable()
 export class UserService {
@@ -31,9 +31,11 @@ export class UserService {
       throw new BadRequestException("Email already registered");
     }
 
-    let firebaseUser;
+    let firebaseUser = await this.firebaseService.getFirebaseUserByEmail(user.email);
     try {
-      firebaseUser = await this.firebaseService.createFirebaseUser(user);
+      if (!firebaseUser) {
+        firebaseUser = await this.firebaseService.createFirebaseUser(user);
+      }
       const dbUser = await this.userRepository.createUser(
         firebaseUser.uid,
         user.email,
@@ -53,16 +55,25 @@ export class UserService {
   async login({ token }: LoginUserDTO): Promise<UserResponseDTO> {
     const decoded = await this.firebaseService.verifyIdToken(token);
     if (!decoded?.uid) {
-      throw new UnauthorizedException("Invalid Firebase token");
+      throw new AuthException(
+        AuthErrorCode.INVALID_TOKEN,
+        "Invalid Firebase token"
+      );
     }
 
     const user = await this.userRepository.findByUid(decoded.uid);
     if (!user) {
-      throw new UnauthorizedException("User not registered in system");
+      throw new AuthException(
+        AuthErrorCode.USER_NOT_REGISTERED,
+        "User not registered in system"
+      );
     }
 
     if (!(user.status === UserStatus.ATIVO)) {
-      throw new UnauthorizedException("User account is not active");
+      throw new AuthException(
+        AuthErrorCode.USER_INACTIVE,
+        "User account is not active"
+      );
     }
     
     return user;

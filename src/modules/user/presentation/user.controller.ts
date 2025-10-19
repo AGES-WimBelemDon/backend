@@ -18,6 +18,7 @@ import {
   UserDetailedResponseDTO,
 } from "../application/user.dtos";
 import { FirebaseAuthGuard } from "src/modules/auth/guards/firebase-auth.guard";
+import { AuthErrorCode } from "../domain/exceptions/auth.exception";
 
 @Controller("user")
 @ApiTags("user")
@@ -45,7 +46,22 @@ export class UserController {
     description: "User logged in",
     type: UserResponseDTO,
   })
-  @ApiResponse({ status: 401, description: "Invalid token" })
+  @ApiResponse({ 
+    status: 401, 
+    description: "Authentication failed",
+    schema: {
+      properties: {
+        statusCode: { type: 'number', example: 401 },
+        message: { type: 'string', example: 'Invalid Firebase token' },
+        code: { 
+          type: 'string', 
+          enum: Object.values(AuthErrorCode),
+          example: AuthErrorCode.INVALID_TOKEN
+        },
+        timestamp: { type: 'string', format: 'date-time' }
+      }
+    }
+  })
   async login(@Body() dto: LoginUserDTO): Promise<UserResponseDTO> {
     return this.userService.login(dto);
   }

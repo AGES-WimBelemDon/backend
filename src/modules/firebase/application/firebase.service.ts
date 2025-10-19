@@ -24,6 +24,15 @@ export class FirebaseService {
     }
   }
 
+  async getFirebaseUserByEmail(email: string): Promise<admin.auth.UserRecord> {
+    try {
+      const userRecord = await this.firebaseAdmin.auth().getUserByEmail(email);
+      return userRecord;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
   async createExampleEntityOnFirebase(
     userData: CreateExampleEntityDTO,
   ): Promise<{
