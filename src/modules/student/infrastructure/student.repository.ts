@@ -3,7 +3,6 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { IStudentRepository } from "../domain/student-repository.interface";
 import { Student } from "../domain/student.entity";
 import { StudentMapper } from "./student.mapper";
-import { disconnect } from "process";
 import { ListStudentsQueryDto } from "../application/list-students.query.dto";
 
 @Injectable()

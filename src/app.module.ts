@@ -9,6 +9,7 @@ import { StudentModule } from './modules/student/student.module';
 import { FamilyMemberModule } from './modules/familyMember/familyMember.module';
 import { AddressModule } from './modules/address/address.module';
 import { LevelModule } from './modules/level/level.module';
+import { EnrollmentModule } from './modules/enrollment/enrollment.module';
 import { AssessmentModule } from './modules/assessment/assessment.module';
 
 @Module({
@@ -27,6 +28,7 @@ import { AssessmentModule } from './modules/assessment/assessment.module';
     FamilyMemberModule,
     AddressModule,
     LevelModule,
+    EnrollmentModule
     AssessmentModule
   ],
 })
