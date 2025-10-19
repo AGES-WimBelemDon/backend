@@ -28,7 +28,7 @@ import { AssessmentModule } from './modules/assessment/assessment.module';
     FamilyMemberModule,
     AddressModule,
     LevelModule,
-    EnrollmentModule
+    EnrollmentModule,
     AssessmentModule
   ],
 })
