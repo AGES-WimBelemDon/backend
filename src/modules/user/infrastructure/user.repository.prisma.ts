@@ -117,4 +117,11 @@ export class PrismaUserRepository implements IUserRepository {
       data: { status: UserStatus.INATIVO },
     });
   }
+
+  async enableUser(id: number): Promise<void> {
+    await this.prisma.user.update({
+      where: { id },
+      data: { status: UserStatus.ATIVO },
+    });
+  }
 }

@@ -16,6 +16,7 @@ import {
 import { FirebaseService } from "src/modules/firebase/application/firebase.service";
 import { UserStatus } from "@prisma/client";
 import { AuthException, AuthErrorCode } from "../domain/exceptions/auth.exception";
+import { auth } from "firebase-admin";
 
 @Injectable()
 export class UserService {
@@ -31,8 +32,9 @@ export class UserService {
       throw new BadRequestException("Email already registered");
     }
 
-    let firebaseUser = await this.firebaseService.getFirebaseUserByEmail(user.email);
+    let firebaseUser: auth.UserRecord | null = null;
     try {
+      firebaseUser = await this.firebaseService.getFirebaseUserByEmail(user.email);
       if (!firebaseUser) {
         firebaseUser = await this.firebaseService.createFirebaseUser(user);
       }
@@ -89,5 +91,9 @@ export class UserService {
 
   async disableUser(id: number): Promise<void> {
     return await this.userRepository.disableUser(id);
+  }
+
+  async enableUser(id: number): Promise<void> {
+    return await this.userRepository.enableUser(id);
   }
 }

@@ -13,4 +13,5 @@ export interface IUserRepository {
   findByUid(uid: string): Promise<UserResponseDTO | null>;
   findByEmail(email: string): Promise<UserResponseDTO | null>;
   disableUser(id: number): Promise<void>;
+  enableUser(id: number): Promise<void>;
 }

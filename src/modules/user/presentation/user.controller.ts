@@ -101,4 +101,12 @@ export class UserController {
   async disableUser(@Param("id", ParseIntPipe) id: number): Promise<void> {
     return this.userService.disableUser(id);
   }
+
+  @Patch("enable/:id")
+  @UseGuards(FirebaseAuthGuard)
+  @ApiOperation({ summary: "Enable a user" })
+  @ApiResponse({ status: 204, description: "User enabled" })
+  async enableUser(@Param("id", ParseIntPipe) id: number): Promise<void> {
+    return this.userService.enableUser(id);
+  }
 }
