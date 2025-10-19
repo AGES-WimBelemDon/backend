@@ -10,6 +10,7 @@ import { FamilyMemberModule } from './modules/familyMember/familyMember.module';
 import { AddressModule } from './modules/address/address.module';
 import { LevelModule } from './modules/level/level.module';
 import { EnrollmentModule } from './modules/enrollment/enrollment.module';
+import { AssessmentModule } from './modules/assessment/assessment.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { EnrollmentModule } from './modules/enrollment/enrollment.module';
     AddressModule,
     LevelModule,
     EnrollmentModule
+    AssessmentModule
   ],
 })
 export class AppModule {}
