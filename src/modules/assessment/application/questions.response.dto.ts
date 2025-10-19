@@ -5,7 +5,7 @@ export class QuestionsResponseDTO {
     description: "Unique identifier of the question",
     example: 1,
     type: Number,
-    required: true
+    required: true,
   })
   questionId: number;
 
@@ -13,7 +13,7 @@ export class QuestionsResponseDTO {
     description: "ID of the form this question belongs to",
     example: 1,
     type: Number,
-    required: true
+    required: true,
   })
   formId: number;
 
@@ -21,7 +21,7 @@ export class QuestionsResponseDTO {
     description: "The question text shown to users",
     example: "How would you rate your overall experience?",
     type: String,
-    required: true
+    required: true,
   })
   statement: string;
 
@@ -29,7 +29,7 @@ export class QuestionsResponseDTO {
     description: "Indicates if an answer to this question is mandatory",
     example: true,
     type: Boolean,
-    default: false
+    default: false,
   })
   isRequired: boolean;
 }

@@ -37,26 +37,26 @@ export class CreateAssessmentDto {
     description: "Date when the assessment was submitted",
     example: "2025-10-17",
     type: Date,
-    required: true
+    required: true,
   })
   @Transform(transformDateStringToDate, { toClassOnly: true })
   @IsDate({ message: "Submission date must be a valid date (YYYY-MM-DD)" })
   submissionDate: Date;
-  
+
   @ApiProperty({
     description: "Array of answers submitted by the student",
     type: [AnswerItemDto],
     example: [
       {
         questionId: 1,
-        content: "Yes, I have noticed improvement in my communication skills."
+        content: "Yes, I have noticed improvement in my communication skills.",
       },
       {
         questionId: 2,
-        content: "The individual counseling sessions were most helpful."
-      }
+        content: "The individual counseling sessions were most helpful.",
+      },
     ],
-    required: true
+    required: true,
   })
   @IsArray()
   @ArrayNotEmpty()

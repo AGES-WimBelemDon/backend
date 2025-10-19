@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from 'src/prisma/prisma.service';
-import { FormType } from 'src/common/enums/domain.enums';
-import { Form } from '../domain/form.entity';
+import { PrismaService } from "src/prisma/prisma.service";
+import { FormType } from "src/common/enums/domain.enums";
+import { Form } from "../domain/form.entity";
 import { AnswerMapper, QuestionMapper, FormMapper } from "./assessment.mapper";
 import { Answer } from "../domain/answer.entity";
 import { Question } from "../domain/question.entity";
@@ -12,7 +12,7 @@ export class AssessmentRepository {
 
   async findAllForms(): Promise<Form[]> {
     const forms = await this.prisma.form.findMany();
-    return forms?.map(FormMapper.toDomain) || [];
+    return forms?.map((item) => FormMapper.toDomain(item)) || [];
   }
 
   async findQuestionsByFormType(formType: FormType): Promise<Question[]> {
@@ -21,81 +21,90 @@ export class AssessmentRepository {
       include: {
         questions: {
           include: {
-            answers: false
-          }
-        }
-      }
+            answers: false,
+          },
+        },
+      },
     });
-    return form?.questions?.map(QuestionMapper.toDomain) || [];
+    return (
+      form?.questions?.map((question) => QuestionMapper.toDomain(question)) ||
+      []
+    );
   }
   async createAnswers(answers: Answer[]): Promise<Answer[]> {
     const createdAnswers = await this.prisma.$transaction(
-      answers.map(answer => 
+      answers.map((answer) =>
         this.prisma.answer.create({
-          data: AnswerMapper.toPersistence(answer)
-        })
-      )
+          data: AnswerMapper.toPersistence(answer),
+        }),
+      ),
     );
-    return createdAnswers.map(AnswerMapper.toDomain);
+    return createdAnswers.map((answer) => AnswerMapper.toDomain(answer));
   }
-  async findQuestionsByIds(questionsIds: number[]): Promise<Question[]>{
+  async findQuestionsByIds(questionsIds: number[]): Promise<Question[]> {
     const resp = await this.prisma.question.findMany({
       where: {
-        id : {
-          in : questionsIds
-        }
+        id: {
+          in: questionsIds,
+        },
       },
-      orderBy : {
-        id: "asc"
-      }
+      orderBy: {
+        id: "asc",
+      },
     });
-    return resp.map(QuestionMapper.toDomain);
-  };
-  async findAnswersByQuestionsIdsAndStudentId(questionsId: number[], studentId: number): Promise<Answer[]>{
+    return resp.map((question) => QuestionMapper.toDomain(question));
+  }
+  async findAnswersByQuestionsIdsAndStudentId(
+    questionsId: number[],
+    studentId: number,
+  ): Promise<Answer[]> {
     const resp = await this.prisma.answer.findMany({
       where: {
-        questionId : {
-          in: questionsId
+        questionId: {
+          in: questionsId,
         },
-        studentId : studentId
-      }
+        studentId: studentId,
+      },
     });
-    return resp.map(AnswerMapper.toDomain)
+    return resp.map((answer) => AnswerMapper.toDomain(answer));
   }
-  async findAnswersByIds(answersId: number[]){
+  async findAnswersByIds(answersId: number[]) {
     const resp = await this.prisma.answer.findMany({
-      where : {
-        id : {
-          in: answersId
-        }
-      }
+      where: {
+        id: {
+          in: answersId,
+        },
+      },
     });
-    return resp.map(AnswerMapper.toDomain);
+    return resp.map((answer) => AnswerMapper.toDomain(answer));
   }
-  async removeAnswersByIds(answersIds: number[]):Promise<void>{
+  async removeAnswersByIds(answersIds: number[]): Promise<void> {
     await this.prisma.answer.deleteMany({
       where: {
-        id : {
-          in: answersIds
-        }
-      }
-    })
+        id: {
+          in: answersIds,
+        },
+      },
+    });
   }
   async updateAnswers(answers: Answer[]): Promise<Answer[]> {
     const updatedAnswers = await this.prisma.$transaction(
-      answers.map(answer => 
+      answers.map((answer) =>
         this.prisma.answer.update({
           where: { id: answer.id },
           data: {
             content: answer.content,
-            submissionDate: answer.submissionDate
-          }
-        })
-      )
+            submissionDate: answer.submissionDate,
+          },
+        }),
+      ),
     );
-    return updatedAnswers.map(AnswerMapper.toDomain);
+    return updatedAnswers.map((answer) => AnswerMapper.toDomain(answer));
   }
-  async findAnswersByStudentAndFormType(studentId: number, formType: FormType): Promise<Answer[]> {
+  async findAnswersByStudentAndFormType(
+    studentId: number,
+    formType: FormType,
+  ): Promise<Answer[]> {
     const rows = await this.prisma.answer.findMany({
       where: {
         studentId,
@@ -103,10 +112,13 @@ export class AssessmentRepository {
       },
       include: { question: true },
     });
-    return rows.map(AnswerMapper.toDomain);
+    return rows.map((item) => AnswerMapper.toDomain(item));
   }
 
-  async updateAnswerContent(answerId: number, content: string): Promise<Answer | null> {
+  async updateAnswerContent(
+    answerId: number,
+    content: string,
+  ): Promise<Answer | null> {
     const r = await this.prisma.answer.update({
       where: { id: answerId },
       data: { content },
@@ -114,4 +126,3 @@ export class AssessmentRepository {
     return r ? AnswerMapper.toDomain(r) : null;
   }
 }
-

@@ -6,6 +6,6 @@ export class Question {
     public readonly formId: number,
     public readonly statement: string,
     public readonly isRequired: boolean,
-    public readonly answers: Answer[] = []
+    public readonly answers: Answer[] = [],
   ) {}
 }

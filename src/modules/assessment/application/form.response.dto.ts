@@ -5,14 +5,14 @@ export class FormResponseDTO {
   @ApiProperty({
     description: "Unique identifier of the form",
     example: 1,
-    type: Number
+    type: Number,
   })
   id: number;
 
   @ApiProperty({
     description: "Title of the form",
     example: "Initial Assessment",
-    type: String
+    type: String,
   })
   title: string;
 

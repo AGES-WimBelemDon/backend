@@ -1,13 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { ArrayNotEmpty, IsArray, IsDate, IsInt, IsOptional, IsString, MinLength, ValidateNested } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsDate, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { transformDateStringToDate } from 'src/common/transformers/string.to.date.transformer';
-
-export class UpdateAnswerDto {
-  @IsString()
-  @MinLength(1)
-  content: string;
-}
 
 export class UpdateAnswerItemDto {
   @ApiProperty({
