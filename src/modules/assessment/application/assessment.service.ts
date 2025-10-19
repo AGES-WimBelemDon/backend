@@ -15,12 +15,13 @@ import { FormType } from "src/common/enums/domain.enums";
 import { Answer } from "../domain/answer.entity";
 import { Question } from "../domain/question.entity";
 import { StudentService } from "src/modules/student/application/student.service";
+import { ASSESSMENT_REPOSITORY_TOKEN, IAssessmentRepository } from "../domain/assessment-repository.interface";
 
 @Injectable()
 export class AssessmentService {
   constructor(
-    @Inject(AssessmentRepository)
-    private readonly assessmentRepository: AssessmentRepository,
+    @Inject(ASSESSMENT_REPOSITORY_TOKEN)
+    private readonly assessmentRepository: IAssessmentRepository,
 
     @Inject(StudentService)
     private readonly studentService: StudentService,

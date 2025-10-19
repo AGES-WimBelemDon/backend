@@ -5,6 +5,7 @@ import { AssessmentRepository } from './infrastructure/assessment.repository';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AnswerMapper, QuestionMapper, FormMapper } from './infrastructure/assessment.mapper';
 import { StudentModule } from '../student/student.module';
+import { ASSESSMENT_REPOSITORY_TOKEN } from './domain/assessment-repository.interface';
 
 @Module({
   imports:[
@@ -12,7 +13,10 @@ import { StudentModule } from '../student/student.module';
   ],
   controllers: [AssessmentController],
   providers: [AssessmentService,
-    AssessmentRepository,
+    {
+        provide: ASSESSMENT_REPOSITORY_TOKEN,
+        useClass: AssessmentRepository,
+    },
     PrismaService,
     AnswerMapper,
     QuestionMapper,

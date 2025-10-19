@@ -5,9 +5,10 @@ import { Form } from "../domain/form.entity";
 import { AnswerMapper, QuestionMapper, FormMapper } from "./assessment.mapper";
 import { Answer } from "../domain/answer.entity";
 import { Question } from "../domain/question.entity";
+import { IAssessmentRepository } from "../domain/assessment-repository.interface";
 
 @Injectable()
-export class AssessmentRepository {
+export class AssessmentRepository implements IAssessmentRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAllForms(): Promise<Form[]> {
