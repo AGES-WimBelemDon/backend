@@ -3,7 +3,7 @@ import { StudentEnrollmentDTO, ClassEnrollmentDTO } from "./common.dto";
 
 export class EnrollmentListItemDTO {
   @ApiProperty({ description: "ID da matrícula", example: 1 })
-  id: number;
+  enrollmentId: number;
 
   @ApiProperty({ description: "Dados do aluno", type: StudentEnrollmentDTO })
   student: StudentEnrollmentDTO;

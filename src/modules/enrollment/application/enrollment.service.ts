@@ -45,7 +45,7 @@ export class EnrollmentService {
     //  where: { id: classId },
     //});
     console.warn("WARNING: Class service validation not implemented yet");
-    const classExists = false; // TEMPORARY: Assuming class exists until validation is implemented
+    const classExists = true; // TEMPORARY: Assuming class exists until validation is implemented
     if (!classExists) {
       throw new NotFoundException(`Class with ID ${classId} not found.`);
     }
@@ -145,7 +145,7 @@ export class EnrollmentService {
     if (enrollment.isActive()) {
       warnings.push({
         code: "ALREADY_ACTIVE",
-        message: "Matrícula já estava ativa.",
+        message: "The enrollment was already active.",
       });
 
       return {

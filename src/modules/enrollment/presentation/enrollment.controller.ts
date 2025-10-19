@@ -26,6 +26,7 @@ import {
   EnrollmentListItemDTO,
   ReactivateEnrollmentResponseDTO,
 } from "../application/dtos";
+import { EnrollmentQueryFilterDto } from "../application/dtos/enrollment-query.dto";
 
 @Controller("enrollments")
 @ApiTags("enrollment-resource")
@@ -34,9 +35,9 @@ export class EnrollmentController {
 
   @Post()
   @ApiOperation({
-    summary: "Criar matrículas",
+    summary: "Create enrollments",
     description:
-      "Cria uma ou várias matrículas em uma única requisição. Ignora alunos que já possuem matrícula ativa na turma.",
+      "Creates one or more enrollments in a single request. Ignores students who already have an active enrollment in the class.",
   })
   @ApiBody({
     type: CreateEnrollmentRequestDTO,
@@ -46,18 +47,18 @@ export class EnrollmentController {
           classId: 45,
           studentIds: [1, 2, 3],
         },
-        summary: "Criar múltiplas matrículas",
+        summary: "Create multiple enrollments",
       },
     },
   })
   @ApiResponse({
     status: 200,
-    description: "Matrículas criadas com sucesso",
+    description: "Enrollments created successfully",
     type: CreateEnrollmentResponseDTO,
   })
   @ApiResponse({
     status: 404,
-    description: "Turma ou aluno não encontrado",
+    description: "Class or student not found",
   })
   async createEnrollments(
     @Body() data: CreateEnrollmentRequestDTO,
@@ -67,87 +68,77 @@ export class EnrollmentController {
 
   @Get()
   @ApiOperation({
-    summary: "Listar matrículas com filtros",
+    summary: "List enrollments with filters",
     description:
-      "Lista matrículas podendo filtrar por turma, aluno, status da matrícula e status do aluno.",
+      "Lists enrollments with filtering options by class, student, enrollment status, and student status.",
   })
   @ApiQuery({
     name: "classId",
     required: false,
     type: Number,
-    description: "Filtrar por ID da turma",
+    description: "Filter by class ID",
     example: 45,
   })
   @ApiQuery({
     name: "studentId",
     required: false,
     type: Number,
-    description: "Filtrar por ID do aluno",
+    description: "Filter by student ID",
     example: 101,
   })
   @ApiQuery({
     name: "endDateNull",
     required: false,
     type: Boolean,
-    description: "true = apenas matrículas ativas, false = todas (default: true)",
+    description: "true = only active enrollments, false = all enrollments (default: true)",
     example: true,
   })
   @ApiQuery({
     name: "studentStatus",
     required: false,
     enum: ["ATIVO", "INATIVO", "ALL"],
-    description: "Filtrar por status do aluno (default: ALL)",
+    description: "Filter by student status (default: ALL)",
     example: "ATIVO",
   })
   @ApiResponse({
     status: 200,
-    description: "Lista de matrículas",
+    description: "List of enrollments",
     type: [EnrollmentListItemDTO],
   })
   async findEnrollments(
-    @Query("classId") classId?: string,
-    @Query("studentId") studentId?: string,
-    @Query("endDateNull") endDateNull?: string,
-    @Query("studentStatus") studentStatus?: "ATIVO" | "INATIVO" | "ALL",
+    @Query() filterDto: EnrollmentQueryFilterDto
   ): Promise<EnrollmentListItemDTO[]> {
-    const filters = {
-      classId: classId ? parseInt(classId) : undefined,
-      studentId: studentId ? parseInt(studentId) : undefined,
-      endDateNull: endDateNull !== undefined ? endDateNull === "true" : true,
-      studentStatus: studentStatus || "ALL",
-    };
-
-    return await this.enrollmentService.findEnrollments(filters);
+    return await this.enrollmentService.findEnrollments(filterDto);
   }
 
   @Patch(":id")
   @ApiOperation({
-    summary: "Reativar matrícula",
+    summary: "Reactivate enrollment",
     description:
-      "Remove o endDate de uma matrícula encerrada para que o aluno volte a participar da turma. Aluno deve estar com status ATIVO.",
+      "Removes the endDate from a terminated enrollment so the student can rejoin the class. Student must have ACTIVE status.",
   })
   @ApiParam({
     name: "id",
     type: Number,
-    description: "ID da matrícula",
+    description: "Enrollment ID",
     example: 3,
   })
   @ApiResponse({
     status: 200,
-    description: "Matrícula reativada com sucesso",
+    description: "Enrollment successfully reactivated",
     type: ReactivateEnrollmentResponseDTO,
   })
   @ApiResponse({
     status: 404,
-    description: "Matrícula não encontrada",
+    description: "Enrollment not found",
   })
   @ApiResponse({
     status: 400,
-    description: "Aluno não está ativo ou matrícula já está ativa",
+    description: "Student is not active or enrollment is already active",
   })
   @ApiResponse({
     status: 409,
-    description: "Aluno já possui matrícula ativa na turma",
+    description: "Student already has an active enrollment in the class",
   })
   async reactivateEnrollment(
     @Param("id", ParseIntPipe) id: number,
@@ -158,27 +149,27 @@ export class EnrollmentController {
   @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
-    summary: "Soft delete de matrícula",
+    summary: "Soft delete enrollment",
     description:
-      "Define endDate = now() para a matrícula (não remove fisicamente do banco).",
+      "Sets endDate to current date for the enrollment (does not physically remove it from the database).",
   })
   @ApiParam({
     name: "id",
     type: Number,
-    description: "ID da matrícula",
+    description: "Enrollment ID",
     example: 3,
   })
   @ApiResponse({
     status: 204,
-    description: "Matrícula encerrada com sucesso",
+    description: "Enrollment successfully terminated",
   })
   @ApiResponse({
     status: 404,
-    description: "Matrícula não encontrada",
+    description: "Enrollment not found",
   })
   @ApiResponse({
     status: 400,
-    description: "Matrícula já está inativa",
+    description: "Enrollment is already inactive",
   })
   async softDeleteEnrollment(
     @Param("id", ParseIntPipe) id: number,

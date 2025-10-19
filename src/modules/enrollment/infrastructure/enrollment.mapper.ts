@@ -23,7 +23,7 @@ export class EnrollmentMapper {
   }
   static toListItemDto(enrollment: any): EnrollmentListItemDTO {
     return {
-      id: enrollment.id,
+      enrollmentId: enrollment.id,
       student: {
         id: enrollment.student.id,
         fullName: enrollment.student.fullName,
