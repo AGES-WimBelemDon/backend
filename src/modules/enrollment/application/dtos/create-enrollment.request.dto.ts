@@ -3,14 +3,14 @@ import { IsInt, IsArray, ArrayNotEmpty } from "class-validator";
 
 export class CreateEnrollmentRequestDTO {
   @ApiProperty({
-    description: "ID da turma",
+    description: "Class ID",
     example: 45,
   })
   @IsInt()
   classId: number;
 
   @ApiProperty({
-    description: "Lista de IDs dos alunos a serem matriculados",
+    description: "List of student IDs to be enrolled",
     example: [1, 2, 3],
     type: [Number],
   })

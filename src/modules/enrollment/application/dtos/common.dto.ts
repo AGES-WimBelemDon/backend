@@ -1,37 +1,37 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class StudentEnrollmentDTO {
-  @ApiProperty({ description: "ID do aluno", example: 101 })
+  @ApiProperty({ description: "Student ID", example: 101 })
   id: number;
 
-  @ApiProperty({ description: "Nome completo do aluno", example: "Maria Souza" })
+  @ApiProperty({ description: "Student's full name", example: "Maria Souza" })
   fullName: string;
 
-  @ApiProperty({ description: "Status do aluno", example: "ATIVO" })
+  @ApiProperty({ description: "Student status", example: "ATIVO" })
   status: string;
 }
 
 export class ClassEnrollmentDTO {
-  @ApiProperty({ description: "ID da turma", example: 45 })
+  @ApiProperty({ description: "Class ID", example: 45 })
   id: number;
 
-  @ApiProperty({ description: "Nome da turma", example: "TENIS-I" })
+  @ApiProperty({ description: "Class name", example: "TENIS-I" })
   name: string;
 }
 
 export class EnrollmentWarningDTO {
-  @ApiProperty({ description: "ID do aluno", example: 102 })
+  @ApiProperty({ description: "Student ID", example: 102 })
   studentId?: number;
 
   @ApiProperty({
-    description: "Código do aviso",
+    description: "Warning code",
     example: "ALREADY_ACTIVE",
   })
   code: string;
 
   @ApiProperty({
-    description: "Mensagem do aviso",
-    example: "Student 102 já possui matrícula ativa na turma 45.",
+    description: "Warning message",
+    example: "Student 102 already has an active enrollment in class 45.",
   })
   message: string;
 }

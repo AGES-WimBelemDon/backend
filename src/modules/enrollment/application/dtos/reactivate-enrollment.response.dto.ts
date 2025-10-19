@@ -2,30 +2,30 @@ import { ApiProperty } from "@nestjs/swagger";
 import { StudentEnrollmentDTO, ClassEnrollmentDTO, EnrollmentWarningDTO } from "./common.dto";
 
 export class ReactivateEnrollmentResponseDTO {
-  @ApiProperty({ description: "ID da matrícula", example: 3 })
+  @ApiProperty({ description: "Enrollment ID", example: 3 })
   id: number;
 
-  @ApiProperty({ description: "Dados do aluno", type: StudentEnrollmentDTO })
+  @ApiProperty({ description: "Student data", type: StudentEnrollmentDTO })
   student: StudentEnrollmentDTO;
 
-  @ApiProperty({ description: "Dados da turma", type: ClassEnrollmentDTO })
+  @ApiProperty({ description: "Class data", type: ClassEnrollmentDTO })
   class: ClassEnrollmentDTO;
 
   @ApiProperty({
-    description: "Data de matrícula",
+    description: "Enrollment date",
     example: "2025-08-01",
   })
   enrollmentDate: string;
 
   @ApiProperty({
-    description: "Data de encerramento da matrícula",
+    description: "Enrollment end date",
     example: null,
     nullable: true,
   })
   endDate: string | null;
 
   @ApiProperty({
-    description: "Lista de avisos",
+    description: "List of warnings",
     type: [EnrollmentWarningDTO],
   })
   warnings: EnrollmentWarningDTO[];
