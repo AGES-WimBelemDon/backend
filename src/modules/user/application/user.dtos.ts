@@ -2,6 +2,17 @@ import { ApiProperty } from "@nestjs/swagger";
 import { UserStatus } from "@prisma/client";
 import { IsEmail, IsString } from "class-validator";
 
+export class RoleDTO {
+  @ApiProperty({ example: 1, description: "Role ID" })
+  id: number;
+
+  @ApiProperty({ example: "Admin", description: "Role name" })
+  name: string;
+
+  @ApiProperty({ example: "Administrator role", description: "Role description", nullable: true })
+  description: string | null;
+}
+
 export class RegisterUserDTO {
   @ApiProperty({
     example: "user@example.com",
@@ -34,11 +45,16 @@ export class UserResponseDTO {
   @ApiProperty({ example: "John Doe", description: "User full name" })
   fullName: string;
 
-  @ApiProperty({ example: "ATIVO", description: "User account status" })
+  @ApiProperty({ example: "user@example.com", description: "User email" })
+  email: string;
+
+  @ApiProperty({ example: "ATIVO", description: "User account status", enum: UserStatus })
   status: UserStatus;
+
+  @ApiProperty({ type: RoleDTO, nullable: true, description: "User role" })
+  role: RoleDTO | null;
 }
 
 export class UserDetailedResponseDTO extends UserResponseDTO {
-  @ApiProperty({ example: "user@example.com", description: "User email" })
-  email: string;
+  // Can add additional fields here if needed in the future
 }

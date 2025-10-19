@@ -32,26 +32,38 @@ export class PrismaUserRepository implements IUserRepository {
           },
         },
       },
+      include: {
+        role: true,
+      },
     });
     return {
       id: user.id,
       fullName: user.fullName,
+      email: user.email,
       status: user.status,
+      role: user.role,
     };
   }
 
   async findAll(): Promise<UserResponseDTO[]> {
-    const users = await this.prisma.user.findMany();
+      const users = await this.prisma.user.findMany({
+        include: {
+          role: true,
+        },
+      });
     return users.map((user) => ({
       id: user.id,
       fullName: user.fullName,
+      email: user.email,
       status: user.status,
+      role: user.role,
     }));
   }
 
   async findByUid(uid: string): Promise<UserResponseDTO | null> {
     const user = await this.prisma.user.findUnique({
       where: { uidFirebase: uid },
+      include: { role: true },
     });
     if (!user) {
       return null;
@@ -59,13 +71,16 @@ export class PrismaUserRepository implements IUserRepository {
     return {
       id: user.id,
       fullName: user.fullName,
+      email: user.email,
       status: user.status,
+      role: user.role,
     };
   }
 
   async findById(id: number): Promise<UserDetailedResponseDTO | null> {
     const user = await this.prisma.user.findUnique({
       where: { id },
+      include: { role: true },
     });
     if (!user) {
       return null;
@@ -73,14 +88,16 @@ export class PrismaUserRepository implements IUserRepository {
     return {
       id: user.id,
       fullName: user.fullName,
-      status: user.status,
       email: user.email,
+      status: user.status,
+      role: user.role,
     };
   }
 
   async findByEmail(email: string): Promise<UserResponseDTO | null> {
     const user = await this.prisma.user.findUnique({
       where: { email },
+      include: { role: true },
     });
     if (!user) {
       return null;
@@ -88,7 +105,9 @@ export class PrismaUserRepository implements IUserRepository {
     return {
       id: user.id,
       fullName: user.fullName,
+      email: user.email,
       status: user.status,
+      role: user.role,
     };
   }
 
