@@ -23,7 +23,7 @@ services:
       interval: 5s
       retries: 5
     volumes:
-      - wbd_ database:/var/lib/postgresql/data
+      - wbd_database:/var/lib/postgresql/data
     networks:
       - app-network
 
