@@ -4,14 +4,14 @@ services:
   api-wbd:
     image: 179388324778.dkr.ecr.us-east-2.amazonaws.com/wbd-mais-ages:latest
     restart: unless-stopped
-    ports:
-      - "80:3000"
     env_file:
       - .env.production
     depends_on:
       db-wbd:
         condition: service_healthy
     command: sh -c "yarn prisma:migrate:prod && node dist/main.js"
+    networks:
+      - app-network
 
   db-wbd:
     image: postgres:16-alpine
@@ -23,7 +23,54 @@ services:
       interval: 5s
       retries: 5
     volumes:
-      - wbd_database:/var/lib/postgresql/data
+      - wbd_ database:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  webserver:
+    image: nginx:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx-conf:/etc/nginx/conf.d
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+      - dhparam:/etc/ssl/certs
+    depends_on:
+      - api-wbd
+    networks:
+      - app-network
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    depends_on:
+      - webserver
+    command: certonly --webroot --webroot-path=/var/www/html --email ${EMAIL} --agree-tos --no-eff-email --staging -d ${DOMAIN}
 
 volumes:
   wbd_database:
+  certbot-etc:
+  certbot-var:
+  web-root:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/ec2-user/app/web-root/
+      o: bind
+  dhparam:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/ec2-user/app/dhparam/
+      o: bind
+
+networks:
+  app-network:
+    driver: bridge

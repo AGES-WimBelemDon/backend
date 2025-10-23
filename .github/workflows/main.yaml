@@ -3,7 +3,7 @@ name: Deploy to AWS EC2
 on:
   push:
     branches:
-      - develop
+      - cicd/lets-encrypt
   workflow_dispatch:
 jobs:
   deploy:
@@ -53,8 +53,17 @@ jobs:
             echo "FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}" >> .env.production
             echo "FIREBASE_CLIENT_EMAIL=${{ secrets.FIREBASE_CLIENT_EMAIL }}" >> .env.production
             echo "FIREBASE_PRIVATE_KEY=${{ secrets.FIREBASE_PRIVATE_KEY }}" >> .env.production
+            echo "DOMAIN=${{ secrets.DOMAIN }}" >> .env.production
+            echo "EMAIL=${{ secrets.EMAIL }}" >> .env.production
+            mkdir -p nginx-conf web-root dhparam
+            if [ ! -f dhparam/dhparam-2048.pem ]; then
+              openssl dhparam -out dhparam/dhparam-2048.pem 2048
+            fi
+            cat <<'EOF' > nginx-conf/nginx.conf
+            ${{ secrets.NGINX_CONF_CONTENT }}
+            EOF
             cat <<'EOF' > docker-compose.prod.yml
-            ${{ secrets.DOCKER_COMPOSE_PROD_CONTENT }}
+            ${{ secrets.DOCKER_COMPOSE_PROD_CONTENT_HTTPS }}
             EOF
 
             aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
@@ -62,4 +71,3 @@ jobs:
             sed -i '/dkr.ecr/s|image:.*|image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}|' docker-compose.prod.yml
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
             docker image prune -af
-    
