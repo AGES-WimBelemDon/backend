@@ -65,9 +65,6 @@ jobs:
             cat <<'EOF' > docker-compose.prod.yml
             ${{ secrets.DOCKER_COMPOSE_PROD_CONTENT_HTTPS }}
             EOF
-            set -a
-            source .env.production
-            set +a
             sed -i "s|\${DOMAIN}|${{ secrets.DOMAIN }}|g" nginx-conf/nginx.conf
             aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
             docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
