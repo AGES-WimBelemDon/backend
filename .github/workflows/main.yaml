@@ -52,7 +52,7 @@ jobs:
             echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env.production
             echo "FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}" >> .env.production
             echo "FIREBASE_CLIENT_EMAIL=${{ secrets.FIREBASE_CLIENT_EMAIL }}" >> .env.production
-            printf "FIREBASE_PRIVATE_KEY=%q" "${{ secrets.FIREBASE_PRIVATE_KEY }}" >> .env.production
+            echo "FIREBASE_PRIVATE_KEY=${{ secrets.FIREBASE_PRIVATE_KEY }}" >> .env.production
             echo "DOMAIN=${{ secrets.DOMAIN }}" >> .env.production
             echo "EMAIL=${{ secrets.EMAIL }}" >> .env.production
             mkdir -p nginx-conf web-root dhparam
@@ -68,7 +68,7 @@ jobs:
             set -a
             source .env.production
             set +a
-            sed -i "s|\${DOMAIN}|${DOMAIN}|g" nginx-conf/nginx.conf
+            sed -i "s|\${DOMAIN}|${{ secrets.DOMAIN }}|g" nginx-conf/nginx.conf
             aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
             docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
             sed -i '/dkr.ecr/s|image:.*|image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}|' docker-compose.prod.yml
