@@ -65,9 +65,12 @@ jobs:
             cat <<'EOF' > docker-compose.prod.yml
             ${{ secrets.DOCKER_COMPOSE_PROD_CONTENT_HTTPS }}
             EOF
-
+            set -a
+            source .env.production
+            set +a
+            sed -i "s|\${DOMAIN}|${DOMAIN}|g" nginx-conf/nginx.conf
             aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
             docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
             sed -i '/dkr.ecr/s|image:.*|image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}|' docker-compose.prod.yml
-            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+            docker compose --env-file .env.production -f docker-compose.prod.yml up -d --remove-orphans
             docker image prune -af
