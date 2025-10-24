@@ -14,12 +14,17 @@ import { StudentService } from "src/modules/student/application/student.service"
 import { ClassResponseDTO } from "./class-response.dto";
 import { UpdateClassDTO } from "./update-class.dto";
 import { ClassMapper } from "../infrastructure/class.mapper";
+import { CLASS_SCHEDULE_REPOSITORY_TOKEN, IClassScheduleRepository } from "../domain/class-schedule-repository.interface";
+import { ClassSchedule } from "../domain/class-schedule";
+import { DayOfWeek } from "@prisma/client";
 
 @Injectable()
 export class ClassService {
   constructor(
     @Inject(CLASS_REPOSITORY_TOKEN)
     private readonly classRepository: IClassRepository,
+    @Inject(CLASS_SCHEDULE_REPOSITORY_TOKEN)
+    private readonly scheduleRepository: IClassScheduleRepository
   ) {}
 
   async createClass(createClassDto: CreateClassDTO): Promise<Class>  {
@@ -42,6 +47,7 @@ export class ClassService {
     }
 
     if (!createClassDto.levelId) {
+      //IMPLEMENTAR A VERIFICAçÂO COM O SERViÇO JÁ IMPLEMENTADO
       throw new NotFoundException(`WARNING: Level ID was not found!`);
     }
 
@@ -53,11 +59,25 @@ export class ClassService {
       ...createClassDto,
       startTime: new Date(`1970-01-01T${createClassDto.startTime}`),
       endTime: new Date(`1970-01-01T${createClassDto.endTime}`),
+      schedules: [],
     });
 
-    return await this.classRepository.create(classEntity);
-  }
+// const daysEnum: DayOfWeek[] = createClassDto.dayOfWeek
+//     .map(day => DayOfWeek[day as keyof typeof DayOfWeek])
+//     .filter(Boolean) as DayOfWeek[];
 
+  // Cria a entidade de domíni
+
+  // Usa os enums convertidos, não as strings originais
+  const createdClass = await this.classRepository.create(
+    classEntity,
+    DayOfWeek["SEGUNDA"],
+    createClassDto.teacherIds || []
+  );
+
+  // Retorna a entidade de domínio criada
+  return createdClass;
+}
   async findAll(activityId?: number, levelId?: number, state?: string): Promise<Class[]> {
     var _classes = await this.classRepository.findAll(activityId, levelId, state);
     if (!_classes) {
@@ -80,7 +100,11 @@ export class ClassService {
       throw new NotFoundException(`Class with ID ${id} not found`);
     }
 
+    var allSchedules: ClassSchedule[] = await this.scheduleRepository.findAll();
+
+    const commonSchedules = allSchedules.filter(s => updateClassDto.schedulesIds.includes(s.id))
     const classEntity = ClassMapper.updateToDomain(_class, updateClassDto);
+    classEntity.setSchedules(commonSchedules)
     
     var updatedClass = await this.classRepository.update(id,classEntity);
 

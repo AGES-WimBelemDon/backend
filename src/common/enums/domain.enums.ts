@@ -9,7 +9,8 @@ import {
   EmploymentStatus,
   SchoolYear,
   EducationLevel,
-  NoteTypes
+  NoteTypes,
+  DayOfWeek
 } from '@prisma/client';
 
 export {
@@ -23,5 +24,6 @@ export {
   EmploymentStatus,
   SchoolYear,
   EducationLevel,
-  NoteTypes
+  NoteTypes,
+  DayOfWeek
 };

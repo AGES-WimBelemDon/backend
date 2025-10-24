@@ -1,4 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { ClassSchedule } from "../domain/class-schedule";
+import { Teacher } from "../domain/teacher";
 
 export class ClassResponseDTO {
   @ApiProperty({ example: 1, description: "ID único da turma" })
@@ -18,9 +20,6 @@ export class ClassResponseDTO {
 
   @ApiProperty({ example: [1, 2, 3], description: "Lista de IDs de alunos" })
   studentsIds: number[];
-
-  @ApiProperty({ example: [1], description: "Lista de IDs de professores" })
-  teacherIds: number[];
 
   @ApiProperty({ example: true, description: "Define se a turma é recorrente" })
   isRecurrent: boolean;
@@ -51,8 +50,22 @@ export class ClassResponseDTO {
   endTime: Date;
 
   @ApiProperty({
-    example: [1, 2],
-    description: "IDs dos horários associados à turma",
+    example: [
+      { id: 10, classId: 1, dayOfWeek: "SEGUNDA" },
+      { id: 11, classId: 1, dayOfWeek: "QUARTA" },
+    ],
+    description: "Horários associados à turma",
   })
-  schedulesIds: number[];
+  schedules: ClassSchedule[];
+
+  @ApiProperty({
+    example: [
+      [
+        { id: 1, fullName: "João da Silva" },
+        { id: 2, fullName: "José Santos" },
+      ],
+    ],
+    description: "Lista de professores",
+  })
+  teachers: Teacher[];
 }

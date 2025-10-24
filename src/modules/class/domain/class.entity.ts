@@ -1,16 +1,19 @@
+import { ClassSchedule } from "./class-schedule";
+import { Teacher } from "./teacher";
+
 interface ClassProps {
   name: string;
   activityId: number;
   levelId: number;
   state: string;
-  teacherIds?: number[];
+  teachers?: Teacher[];
   id?: number;
   isRecurrent: boolean;
   startDate: Date;
   endDate?: Date;
   startTime: Date;
   endTime: Date;
-  schedulesIds: number[];
+  schedules: ClassSchedule[];
 }
 
 export class Class {
@@ -19,13 +22,13 @@ export class Class {
   activityId: number;
   levelId: number;
   state: string;
-  teacherIds: number[];
+  teachers: Teacher[];
   isRecurrent: boolean;
   startDate: Date;
   endDate?: Date;
   startTime: Date;
   endTime: Date;
-  schedulesIds: number[];
+  schedules: ClassSchedule[];
 
   constructor(props: ClassProps) {
     this.id = props.id;
@@ -33,13 +36,13 @@ export class Class {
     this.activityId = props.activityId;
     this.levelId = props.levelId;
     this.state = props.state;
-    this.teacherIds = props.teacherIds || [];
+    this.teachers = props.teachers || [];
     this.isRecurrent = props.isRecurrent;
     this.startDate = props.startDate;
     this.endDate = props.endDate;
     this.startTime = props.startTime;
     this.endTime = props.endTime;
-    this.schedulesIds = props.schedulesIds;
+    this.schedules = props.schedules;
   }
 
   getId(): number | undefined {
@@ -63,8 +66,8 @@ export class Class {
   }
 
 
-  getTeacherIds(): number[] {
-    return this.teacherIds;
+  getTeachers(): Teacher[] {
+    return this.teachers;
   }
 
   getIsRecurrent(): boolean {
@@ -87,8 +90,8 @@ export class Class {
     return this.endTime;
   }
 
-  getSchedulesIds(): number[] {
-    return this.schedulesIds;
+  getSchedules(): ClassSchedule[] {
+    return this.schedules;
   }
 
   setName(name: string): void {
@@ -107,8 +110,8 @@ export class Class {
     this.state = state;
   }
 
-  setTeacherIds(teacherIds: number[]): void {
-    this.teacherIds = teacherIds;
+  setTeachers(teachers: Teacher[]): void {
+    this.teachers = teachers;
   }
 
   setIsRecurrent(isRecurrent: boolean): void {
@@ -131,7 +134,7 @@ export class Class {
     this.endTime = endTime;
   }
 
-  setSchedulesIds(schedulesIds: number[]): void {
-    this.schedulesIds = schedulesIds;
+  setSchedules(schedules: ClassSchedule[]): void {
+    this.schedules = schedules;
   }
 }

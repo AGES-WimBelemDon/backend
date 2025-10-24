@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { DayOfWeek } from "@prisma/client";
 import { Type } from "class-transformer";
 import {
   IsArray,
@@ -90,12 +91,9 @@ export class CreateClassDTO {
   endTime: string;
 
   @ApiProperty({
-    example: [1, 2],
-    description: "IDs dos horários associados à turma",
+    example: ["SEGUNDA", "QUARTA", "SEXTA"]
   })
   @IsArray()
-  @IsNumber({}, { each: true })
-  @Type(() => Number)
   @IsNotEmpty()
-  schedulesIds: number[];
+  dayOfWeek: DayOfWeek
 }

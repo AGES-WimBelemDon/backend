@@ -1,24 +1,24 @@
-import { Class as PrismaClass } from "@prisma/client";
+import { ClassSchedule, Class as PrismaClass } from "@prisma/client";
 import { Class } from "../domain/class.entity";
 import { ClassResponseDTO } from "../application/class-response.dto";
 import { UpdateClassDTO } from "../application/update-class.dto";
 import { CreateClassDTO } from "../application/create-class.dto";
 
 export class ClassMapper {
-  static toDomain(prismaClass: PrismaClass): Class {
+  static toDomain(prismaClass: PrismaClass, schedules?: ClassSchedule[]): Class {
     return new Class({
       id: prismaClass.id,
       name: prismaClass.name,
       activityId: prismaClass.activityId,
       levelId: prismaClass.levelId,
       state: prismaClass.state,
-      teacherIds: [],
+      teachers: [],
       isRecurrent: prismaClass.isRecurrent,
       startDate: prismaClass.startDate,
       endDate: prismaClass.endDate ?? undefined,
       startTime: prismaClass.startTime,
       endTime: prismaClass.endTime,
-      schedulesIds: [],
+      schedules: schedules ?? []
     });
   }
 
@@ -43,8 +43,8 @@ export class ClassMapper {
     responseDto.activityId = classEntity.getActivityId();
     responseDto.levelId = classEntity.getLevelId();
     responseDto.state = classEntity.getState();
-    responseDto.teacherIds = classEntity.getTeacherIds();
-    responseDto.schedulesIds = classEntity.getSchedulesIds();
+    responseDto.teachers = classEntity.getTeachers();
+    responseDto.schedules = classEntity.getSchedules();
 
     return responseDto;
   }
@@ -67,14 +67,14 @@ export class ClassMapper {
       activityId: updateClassDto.activityId ?? classEntity.activityId,
       levelId: updateClassDto.levelId ?? classEntity.levelId,
       state: updateClassDto.state ?? classEntity.state,
-      teacherIds: updateClassDto.teachersId ?? classEntity.teacherIds,  
+      teachers: classEntity.teachers,  
       isRecurrent: updateClassDto.isRecurrent ?? classEntity.isRecurrent,
       startDate: safeDate(updateClassDto.startDate, classEntity.startDate, "startDate"),
       endDate: updateClassDto.endDate ? classEntity.endDate : undefined,
       startTime: new Date(`1970-01-01T${updateClassDto.startTime}`) ?? classEntity.startTime,
       endTime: new Date(`1970-01-01T${updateClassDto.endTime}`) ?? classEntity.endTime,
   
-      schedulesIds: updateClassDto.schedulesIds ?? classEntity.schedulesIds,
+      schedules: classEntity.schedules,
     });
   }
 }
