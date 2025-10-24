@@ -1,11 +1,66 @@
-## Documentando o que foi feito para efetuar o deploy
-Para que fosse possível se realizar a primeira comunicação com o Let's Encrypt utilizando foram cridas os seguintes secrets no Github:
-- DOCKER_COMPOSE_PROD_CONTENT_HTTPS
-- DOMAIN
-- EMAIL
-- NGINX_CONF_CONTENT
-Para o primeiro deploy a variável DOCKER_COMPOSE_PROD_CONTENT_HTTPS foi setada como:
-```
+# CI/CD and HTTPS Deployment Documentation
+
+## Overview
+
+This document explains how the CI/CD pipeline for the **Node.js backend API** was implemented, including the automated deployment process, container orchestration, and HTTPS configuration using **Let's Encrypt (Certbot)**.
+
+The system is hosted on **AWS EC2** and uses **GitHub Actions** for CI/CD. It is designed to automatically build and deploy the backend whenever new commits are pushed to the main branch.
+
+---
+
+## CI/CD Pipeline Overview
+
+### 1. Continuous Integration (CI)
+
+When a new commit is pushed to the main branch:
+
+* GitHub Actions runs a **build and test workflow**.
+* The workflow installs dependencies, runs the test suite, and builds the application.
+* If successful, a **Docker image** is built and pushed to **AWS Elastic Container Registry (ECR)**.
+
+### 2. Continuous Deployment (CD)
+
+After a successful image push:
+
+* GitHub Actions connects to the **EC2 instance** via SSH.
+* It updates environment variables and configuration files using **GitHub Secrets**.
+* The EC2 instance pulls the latest Docker image from ECR and recreates containers using the latest version.
+* HTTPS certificates are automatically managed by **Let's Encrypt** through the **Certbot** container.
+
+### 3. Secrets and Environment Variables
+
+The following secrets are required in GitHub:
+
+* `AWS_ACCESS_KEY_ID`
+* `AWS_SECRET_ACCESS_KEY`
+* `AWS_ECR_REPOSITORY`
+* `EC2_SSH_KEY`
+* `EC2_HOST`
+* `DOCKER_COMPOSE_PROD_CONTENT_HTTPS`
+* `DOMAIN`
+* `EMAIL`
+* `NGINX_CONF_CONTENT`
+
+These are injected into the EC2 instance during deployment to dynamically generate Docker Compose and Nginx configuration files.
+
+---
+
+## HTTPS Configuration and Deployment Steps
+
+### 1. Domain Setup
+
+Before deployment, ensure the API is linked to a specific domain. This is essential since the **frontend** and **backend** run on separate servers and domains.
+
+### 2. Initial Let's Encrypt Certificate Request
+
+To enable HTTPS for the first time, the following services were configured in Docker Compose:
+
+* **Nginx**: Acts as a reverse proxy for routing requests to the API.
+* **Certbot**: Handles HTTPS certificate generation and renewal.
+
+#### Example `DOCKER_COMPOSE_PROD_CONTENT_HTTPS` (Initial Version)
+
+```yaml
 version: '3.8'
 
 services:
@@ -84,8 +139,9 @@ networks:
     driver: bridge
 ```
 
-A variável NGINX_CONF_CONTENT foi setada como:
-```
+#### Example `NGINX_CONF_CONTENT`
+
+```nginx
 server {
     listen 80;
     server_name ${DOMAIN};
@@ -104,22 +160,33 @@ server {
     }
 }
 ```
-As demais variáveis são sequências simples e auto-explicáveis.
-Após isso, foi dado o _build_ e _deploy_ da aplicação na AWS. 
-Como não havia sido gerado um certificado para o protocolo https, sendo a primeira transação com o serviço Let's Encrypt diferente das demais, foi necessário se entrar "manualmente" na instância da AWS EC2 e se fazer o seguinte:
-- 1. Editar o arquivo docker-compose.prod.yml
 
-Substituindo --staging por --force-renewal em:
-```
+---
+
+## Manual Steps for the First HTTPS Certificate
+
+After the deployment process was triggered via GitHub Actions and the containers were successfully launched on the AWS EC2 instance, a few additional steps were necessary.  
+Because this was the first time the application interacted with **Let's Encrypt**, no SSL certificate had been issued yet. Therefore, the following manual actions were performed:
+
+### Step 1: Edit the `docker-compose.prod.yml`
+
+Replace `--staging` with `--force-renewal` in the Certbot command:
+
+```bash
 certonly --webroot --webroot-path=/var/www/html --email ${EMAIL} --agree-tos --no-eff-email --staging -d ${DOMAIN}
 ```
-E logo em seguida executando o comando:
-docker compose  --env-file .env.production -f docker-compose.prod.yml up -d --force-recreate --no-deps certbot
 
-- 2. Atualizar o arquivo de configuração do Nginx
+Then run:
 
-Edite manualmente o arquivo nginx-conf/nginx.conf para a versão SSL.
+```bash
+docker compose --env-file .env.production -f docker-compose.prod.yml up -d --force-recreate --no-deps certbot
 ```
+
+### Step 2: Update Nginx Configuration for SSL
+
+Manually edit `nginx-conf/nginx.conf` to include SSL directives:
+
+```nginx
 server {
     listen 80;
     server_name ages-wimbelemdon-api.duckdns.org;
@@ -156,16 +223,24 @@ server {
     }
 }
 ```
-Após isso, o serviço foi reiniciado manualmente:
-```
-docker compose --env-file .env.production  -f docker-compose.prod.yml up -d --force-recreate --no-deps webserver
+
+Restart the webserver:
+
+```bash
+docker compose --env-file .env.production -f docker-compose.prod.yml up -d --force-recreate --no-deps webserver
 ```
 
-- 3. Atualizar, no Github secrets, as seguintes variáveis:
-    - DOCKER_COMPOSE_PROD_CONTENT_HTTPS
-    - NGINX_CONF_CONTENT
-A variável `DOCKER_COMPOSE_PROD_CONTENT_HTTPS` passa a ter o seguinte conteúdo:
-```
+---
+
+## Automation for Future Deployments
+
+Once the initial certificate is issued, future deployments are fully automated.
+
+### Updated `DOCKER_COMPOSE_PROD_CONTENT_HTTPS`
+
+The updated configuration automatically renews certificates every 12 hours:
+
+```yaml
 version: '3.8'
 
 services:
@@ -198,6 +273,8 @@ services:
   webserver:
     image: nginx:latest
     restart: unless-stopped
+    env_file:
+      - .env.production
     ports:
       - "80:80"
       - "443:443"
@@ -214,14 +291,26 @@ services:
 
   certbot:
     image: certbot/certbot
+    env_file:
+      - .env.production
     volumes:
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
       - web-root:/var/www/html
     depends_on:
       - webserver
-    command: certonly --webroot --webroot-path=/var/www/html --email ${EMAIL} --agree-tos --no-eff-email --force-renewal -d ${DOMAIN}
-
+    entrypoint: /bin/sh
+    command: >
+      -c "
+        sleep 5s  # wait Nginx to boot before challenge;
+        certbot certonly --webroot --webroot-path=/var/www/html --email ${EMAIL} --agree-tos --no-eff-email -d ${DOMAIN} --non-interactive --quiet || true;
+        echo 'Starting Certbot renewal loop...';
+        while true; do 
+          echo "Running scheduled Certbot renewal check";
+          certbot renew --webroot --webroot-path=/var/www/html --quiet;
+          sleep 12h;
+        done
+      "
 volumes:
   wbd_database:
   certbot-etc:
@@ -243,8 +332,10 @@ networks:
   app-network:
     driver: bridge
 ```
-E a variável `NGINX_CONF_CONTENT` foi inserida no Github secrets com o seguinte conteúdo:
-```
+
+### Updated `NGINX_CONF_CONTENT`
+
+```nginx
 server {
     listen 80;
     server_name ${DOMAIN};
@@ -282,4 +373,16 @@ server {
 }
 ```
 
+---
 
+## Summary
+
+This setup provides:
+
+* **Automatic HTTPS management** via Let's Encrypt (Certbot).
+* **Secure routing** through Nginx as a reverse proxy.
+* **Continuous integration and deployment** using GitHub Actions.
+* **Container orchestration** and isolation through Docker Compose.
+* **Persistent storage** for SSL certificates and database data.
+
+This ensures that the backend API remains secure, maintainable, and automatically deployable with minimal manual intervention.
