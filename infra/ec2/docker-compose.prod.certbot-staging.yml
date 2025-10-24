@@ -30,8 +30,6 @@ services:
   webserver:
     image: nginx:latest
     restart: unless-stopped
-    env_file:
-      - .env.production
     ports:
       - "80:80"
       - "443:443"
@@ -48,26 +46,14 @@ services:
 
   certbot:
     image: certbot/certbot
-    env_file:
-      - .env.production
     volumes:
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
       - web-root:/var/www/html
     depends_on:
       - webserver
-    entrypoint: /bin/sh
-    command: >
-      -c "
-        sleep 5s  # wait Nginx to boot before challenge;
-        certbot certonly --webroot --webroot-path=/var/www/html --email ${EMAIL} --agree-tos --no-eff-email -d ${DOMAIN} --non-interactive --quiet || true;
-        echo 'Starting Certbot renewal loop...';
-        while true; do 
-          echo 'Running scheduled Certbot renewal check';
-          certbot renew --webroot --webroot-path=/var/www/html --quiet;
-          sleep 12h;
-        done
-      "
+    command: certonly --webroot --webroot-path=/var/www/html --email ${EMAIL} --agree-tos --no-eff-email --staging -d ${DOMAIN}
+
 volumes:
   wbd_database:
   certbot-etc:
