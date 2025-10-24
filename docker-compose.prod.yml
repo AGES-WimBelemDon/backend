@@ -52,12 +52,15 @@ services:
       - web-root:/var/www/html
     depends_on:
       - webserver
+    entrypoint: /bin/sh
     command: >
-      sh -c "
+      -c "
+        sleep 5s  # wait Nginx to boot before challenge
+        
         certbot certonly --webroot --webroot-path=/var/www/html \
           --email ${EMAIL} --agree-tos --no-eff-email \
           -d ${DOMAIN} --non-interactive --quiet || true
-        
+        echo 'Starting Certbot renewal loop...'
         while true; do 
           certbot renew --webroot --webroot-path=/var/www/html --quiet
           sleep 12h
