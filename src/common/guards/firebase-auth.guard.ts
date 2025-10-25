@@ -5,6 +5,8 @@ import {
   Injectable,
   UnauthorizedException,
 } from "@nestjs/common";
+import { Reflector } from '@nestjs/core';
+import { IS_PUBLIC_KEY } from 'src/common/decorators/public.decorator';
 import { Request } from "express";
 import * as admin from "firebase-admin";
 import { FIREBASE_ADMIN } from "src/modules/firebase/firebase.config.module";
@@ -12,10 +14,18 @@ import { FIREBASE_ADMIN } from "src/modules/firebase/firebase.config.module";
 @Injectable()
 export class FirebaseAuthGuard implements CanActivate {
   constructor(
+    private readonly reflector: Reflector,
     @Inject(FIREBASE_ADMIN) private readonly firebaseAdmin: admin.app.App
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const targets = [context.getHandler(), context.getClass()];
+
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, targets);
+    if (isPublic) {
+      return true;
+    }
+
     const request = context.switchToHttp().getRequest<Request>();
     const token = this.extractTokenFromHeader(request);
 

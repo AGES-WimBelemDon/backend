@@ -5,6 +5,8 @@ import {
   ForbiddenException,
   Inject,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { IS_PUBLIC_KEY } from 'src/common/decorators/public.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Request } from 'express';
 import { UserStatus } from '@prisma/client';
@@ -15,10 +17,18 @@ import { Role } from 'src/common/enums/roles.enum';
 export class DbGuard implements CanActivate {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly reflector: Reflector,
     @Inject(DEV_CONFIG) private readonly devConfig: DevConfigType,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const targets = [context.getHandler(), context.getClass()];
+
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, targets);
+    if (isPublic) {
+      return true;
+    }
+
     const request = context.switchToHttp().getRequest<Request>();
 
     const firebaseToken = request['firebaseToken'];
