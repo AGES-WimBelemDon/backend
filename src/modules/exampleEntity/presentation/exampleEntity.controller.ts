@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagg
 import { ExampleEntityService } from "../application/exampleEntity.service";
 import { ExampleEntity } from "../domain/exampleEntity.entity";
 import { CreateExampleEntityDTO } from "../application/create-exampleEntity.dto";
-import { FirebaseAuthGuard } from "src/modules/auth/guards/firebase-auth.guard";
+import { FirebaseAuthGuard } from "src/common/guards/firebase-auth.guard";
 @ApiTags("example-entity")
 @Controller("example-entity")
 @ApiBearerAuth("JWT-auth")
