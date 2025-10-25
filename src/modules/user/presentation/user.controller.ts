@@ -9,7 +9,7 @@ import {
   Req,
   UseGuards,
 } from "@nestjs/common";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { UserService } from "../application/user.service";
 import {
   RegisterUserDTO,
@@ -17,17 +17,23 @@ import {
   UserResponseDTO,
   UserDetailedResponseDTO,
 } from "../application/user.dtos";
-import { FirebaseAuthGuard } from "src/modules/auth/guards/firebase-auth.guard";
+import { Roles } from "src/common/decorators/roles.decorator";
+import { RolesGuard } from "src/common/guards/role.guard";
+import { FirebaseAuthGuard } from "src/common/guards/firebase-auth.guard";
+import { DbGuard } from "src/common/guards/db.guard";
+import { Role } from "src/common/enums/roles.enum";
 import { AuthErrorCode } from "../domain/exceptions/auth.exception";
+import { Public } from "src/common/decorators/public.decorator";
 
 @Controller("user")
 @ApiTags("user")
+@ApiBearerAuth("JWT-auth")
+@UseGuards(FirebaseAuthGuard, DbGuard, RolesGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post("register")
-  // TODO: Enable guard when admin users are implemented
-  // @UseGuards(FirebaseAuthGuard)
+  @Roles(Role.Admin)
   @ApiOperation({ summary: "Register a new user" })
   @ApiResponse({
     status: 201,
@@ -40,6 +46,7 @@ export class UserController {
   }
 
   @Post("login")
+  @Public()
   @ApiOperation({ summary: "Login user" })
   @ApiResponse({
     status: 200,
@@ -67,8 +74,7 @@ export class UserController {
   }
 
   @Get()
-  @UseGuards(FirebaseAuthGuard)
-  // TODO: Implement RBAC guard for admin-only access
+  @Roles(Role.Admin, Role.Manager)
   @ApiOperation({ summary: "Get all users" })
   @ApiResponse({
     status: 200,
@@ -80,7 +86,7 @@ export class UserController {
   }
 
   @Get(":id")
-  @UseGuards(FirebaseAuthGuard)
+  @Roles(Role.Admin, Role.Manager)
   @ApiOperation({ summary: "Get user by ID" })
   @ApiResponse({
     status: 200,
@@ -95,7 +101,7 @@ export class UserController {
   }
 
   @Patch("disable/:id")
-  @UseGuards(FirebaseAuthGuard)
+  @Roles(Role.Admin)
   @ApiOperation({ summary: "Disable a user" })
   @ApiResponse({ status: 204, description: "User disabled" })
   async disableUser(@Param("id", ParseIntPipe) id: number): Promise<void> {
@@ -103,7 +109,7 @@ export class UserController {
   }
 
   @Patch("enable/:id")
-  @UseGuards(FirebaseAuthGuard)
+  @Roles(Role.Admin)
   @ApiOperation({ summary: "Enable a user" })
   @ApiResponse({ status: 204, description: "User enabled" })
   async enableUser(@Param("id", ParseIntPipe) id: number): Promise<void> {
