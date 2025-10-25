@@ -11,6 +11,7 @@ import { AddressModule } from './modules/address/address.module';
 import { LevelModule } from './modules/level/level.module';
 import { EnrollmentModule } from './modules/enrollment/enrollment.module';
 import { AssessmentModule } from './modules/assessment/assessment.module';
+import { ClassModule } from './modules/class/class.module';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { AssessmentModule } from './modules/assessment/assessment.module';
     AddressModule,
     LevelModule,
     EnrollmentModule,
-    AssessmentModule
+    AssessmentModule,
+    ClassModule
   ],
 })
 export class AppModule {}

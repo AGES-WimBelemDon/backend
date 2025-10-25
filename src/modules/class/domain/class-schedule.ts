@@ -1,16 +1,16 @@
 import { DayOfWeek } from "src/common/enums/domain.enums";
-
+interface ClassScheduleProps{
+  id?: number,
+  classId?: number,
+  dayOfWeek: DayOfWeek
+} 
 export class ClassSchedule {
-  id: number;
-  classId: number;
+  id?: number;
+  classId?: number;
   daysOfWeek: DayOfWeek;
-  constructor(
-    id: number,
-    classId: number,
-    daysOfWeek: DayOfWeek,
-  ) {
-    this.id = id;
-    this.classId = classId;
-    this.daysOfWeek = daysOfWeek;
+  constructor(props: ClassScheduleProps) {
+    this.daysOfWeek = props.dayOfWeek;
+    this.id = props.id;
+    this.classId = props.classId;
   }
 }
