@@ -1,0 +1,50 @@
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+  Inject,
+} from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { Request } from 'express';
+import { UserStatus } from '@prisma/client';
+import { DEV_CONFIG, DevConfigType } from 'src/config/dev.config.module';
+import { Role } from 'src/common/enums/roles.enum';
+
+@Injectable()
+export class DbGuard implements CanActivate {
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(DEV_CONFIG) private readonly devConfig: DevConfigType,
+  ) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest<Request>();
+
+    const firebaseToken = request['firebaseToken'];
+    if (!firebaseToken?.uid) {
+      return false;
+    }
+
+    const dbUser = await this.prisma.user.findUnique({
+      where: { uidFirebase: firebaseToken.uid },
+      select: { id: true, role: true, status: true, email: true },
+    });
+
+    if (!dbUser) {
+      throw new ForbiddenException('User not registered in system');
+    }
+
+    if (dbUser.status !== UserStatus.ATIVO) {
+      throw new ForbiddenException('User account is disabled');
+    }
+
+    request['user'] = dbUser;
+
+    if (this.devConfig?.enabled) {
+      request['user'].role = this.devConfig.role || (Role.Developer as string);
+    }
+
+    return true;
+  }
+}

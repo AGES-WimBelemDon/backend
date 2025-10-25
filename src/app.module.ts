@@ -16,14 +16,14 @@ import { ActivityModule } from './modules/activity/activity.module';
 
 @Module({
   imports: [
-    ExampleEntityModule,
-    PrismaModule,
-    FirebaseModule,
     ConfigModule.forRoot({
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
       ignoreEnvFile: process.env.NODE_ENV === 'production',
-      isGlobal: true
+      isGlobal: true,
     }),
+    ExampleEntityModule,
+    PrismaModule,
+    FirebaseModule,
     FrequencyModule,
     StudentModule,
     FamilyMemberModule,
