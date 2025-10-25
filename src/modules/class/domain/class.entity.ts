@@ -65,7 +65,6 @@ export class Class {
     return this.state;
   }
 
-
   getTeachers(): Teacher[] {
     return this.teachers;
   }

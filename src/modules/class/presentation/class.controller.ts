@@ -1,8 +1,8 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { ClassService } from "../application/class.service";
-import { CreateClassDTO } from "../application/create-class.request.dto";
-
+import { CreateClassDTO } from "../application/dtos/create-class.request.dto";
+import { ClassResponseDTO } from "../application/dtos";
 
 @ApiTags("class")
 @Controller("class")
@@ -31,8 +31,9 @@ export class ClassController {
     status: 500,
     description: "Internal server error",
   })
-  async createClass(@Body() createClassDto: CreateClassDTO) {
-    const classEntity = await this.classService.createClass(createClassDto);
-    return;
+  async createClass(
+    @Body() createClassDto: CreateClassDTO,
+  ): Promise<ClassResponseDTO> {
+    return await this.classService.createClass(createClassDto);
   }
 }

@@ -4,16 +4,22 @@ import { ClassService } from "./application/class.service";
 import { LevelModule } from "../level/level.module";
 import { CLASS_QUERIES_TOKEN } from "./application/class.service.query.interfaces";
 import { ClassQueryServicePrisma } from "./infrastructure/class.query.service.prisma";
+import { ClassRepository } from "./infrastructure/class.repository.prisma";
+import { CLASS_REPOSITORY_TOKEN } from "./domain/class.repository.interface";
 
 @Module({
-    imports: [LevelModule],
-    controllers: [ClassController],
-    providers: [
-        ClassService,
-        {
-            provide : CLASS_QUERIES_TOKEN,
-            useClass: ClassQueryServicePrisma
-        }
-    ]
+  imports: [LevelModule],
+  controllers: [ClassController],
+  providers: [
+    ClassService,
+    {
+      provide: CLASS_QUERIES_TOKEN,
+      useClass: ClassQueryServicePrisma,
+    },
+    {
+      provide: CLASS_REPOSITORY_TOKEN,
+      useClass: ClassRepository,
+    },
+  ],
 })
 export class ClassModule {}

@@ -15,34 +15,34 @@ import { DayOfWeek, StudentStatus } from "src/common/enums/domain.enums";
 import { transformDateStringToDate } from "src/common/transformers/string.to.date.transformer";
 
 export class CreateClassDTO {
-  @ApiProperty({ 
-    example: "Guitar Class", 
-    description: "Name of the class" 
+  @ApiProperty({
+    example: "Guitar Class",
+    description: "Name of the class",
   })
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({ 
-    example: 1, 
-    description: "Activity ID" 
+  @ApiProperty({
+    example: 1,
+    description: "Activity ID",
   })
   @IsNumber()
   @IsNotEmpty()
   activityId: number;
 
-  @ApiProperty({ 
-    example: 1, 
-    description: "Level ID" 
+  @ApiProperty({
+    example: 1,
+    description: "Level ID",
   })
   @IsNumber()
   @IsNotEmpty()
   levelId: number;
 
-  @ApiProperty({ 
-    example: StudentStatus.ATIVO, 
+  @ApiProperty({
+    example: StudentStatus.ATIVO,
     description: "Class status",
-    enum: StudentStatus
+    enum: StudentStatus,
   })
   @IsEnum(StudentStatus)
   @IsNotEmpty()
@@ -53,7 +53,7 @@ export class CreateClassDTO {
     description: "List of teacher IDs assigned to the class",
     required: false,
     type: [Number],
-    isArray: true
+    isArray: true,
   })
   @IsArray()
   @IsOptional()
@@ -61,9 +61,10 @@ export class CreateClassDTO {
   @Type(() => Number)
   teacherIds?: number[];
 
-  @ApiProperty({ 
-    example: true, 
-    description: "Defines whether the class is recurrent (repeats weekly on specified days)" 
+  @ApiProperty({
+    example: true,
+    description:
+      "Defines whether the class is recurrent (repeats weekly on specified days)",
   })
   @IsBoolean()
   @IsNotEmpty()
@@ -72,7 +73,7 @@ export class CreateClassDTO {
   @ApiProperty({
     example: "2025-03-01",
     description: "Class start date (YYYY-MM-DD format)",
-    type: Date
+    type: Date,
   })
   @IsDate()
   @Type(() => Date)
@@ -84,7 +85,7 @@ export class CreateClassDTO {
     description: "Class end date (optional, YYYY-MM-DD format)",
     required: false,
     type: Date,
-    nullable: true
+    nullable: true,
   })
   @Transform(transformDateStringToDate, { toClassOnly: true })
   @IsOptional()
@@ -94,7 +95,7 @@ export class CreateClassDTO {
   @ApiProperty({
     example: "09:00:00",
     description: "Class start time (HH:mm:ss format)",
-    pattern: "^\\d{2}:\\d{2}:\\d{2}$"
+    pattern: "^\\d{2}:\\d{2}:\\d{2}$",
   })
   @IsString()
   @Matches(/^\d{2}:\d{2}:\d{2}$/, {
@@ -106,7 +107,7 @@ export class CreateClassDTO {
   @ApiProperty({
     example: "10:00:00",
     description: "Class end time (HH:mm:ss format)",
-    pattern: "^\\d{2}:\\d{2}:\\d{2}$"
+    pattern: "^\\d{2}:\\d{2}:\\d{2}$",
   })
   @IsString()
   @Matches(/^\d{2}:\d{2}:\d{2}$/, {
@@ -117,11 +118,12 @@ export class CreateClassDTO {
 
   @ApiProperty({
     example: ["SEGUNDA", "QUARTA", "SEXTA"],
-    description: "Days of the week when the class occurs (required if isRecurrent is true)",
+    description:
+      "Days of the week when the class occurs (required if isRecurrent is true)",
     enum: DayOfWeek,
     isArray: true,
     required: false,
-    type: [String]
+    type: [String],
   })
   @IsArray()
   @IsOptional()
