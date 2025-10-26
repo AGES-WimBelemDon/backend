@@ -142,20 +142,6 @@ export class ClassRepository implements IClassRepository {
     const teacherIds = classObj.getTeachers().map((t) => t.id);
     const schedules = classObj.getSchedules();
     const classData = ClassMapper.toPersistence(classObj);
-    const schedulesUpsert = schedules.map((schedule) => ({
-      where: {
-        classId_dayOfWeek: {
-          classId: classId,
-          dayOfWeek: schedule.daysOfWeek,
-        },
-      },
-      create: {
-        dayOfWeek: schedule.daysOfWeek,
-      },
-      update: {
-        dayOfWeek: schedule.daysOfWeek,
-      },
-    }));
 
     const updatedClass = await this.prisma.class.update({
       where: { id: classId },
@@ -173,7 +159,7 @@ export class ClassRepository implements IClassRepository {
           set: teacherIds.map((id) => ({ id })),
         },
         schedules: {
-          deleteMany: {}, // Delete all existing schedules
+          deleteMany: {},
           create: schedules.map((schedule) => ({
             dayOfWeek: schedule.daysOfWeek,
           })),

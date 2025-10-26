@@ -4,7 +4,7 @@ import { CreateClassDTO } from "../application/dtos/create-class.request.dto";
 import { ClassQueryFilters, ClassResponseDTO } from "../application/dtos";
 import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query } from "@nestjs/common";
 import { ClassState } from "src/common/enums/domain.enums";
-import { UpdateClassDTO } from "../application/dtos/update-class.dto";
+import { UpdateClassDTO } from "../application/dtos/update-class.request.dto";
 
 @ApiTags("classes")
 @Controller("classes")
@@ -456,10 +456,121 @@ export class ClassController {
     return await this.classService.findMyClasses(userId, filterDto);
   }
   @Patch(':classId')
-  async updateStudent(
+  @ApiOperation({
+    summary: "Update an existing class",
+    description:
+      "Updates class information. All fields are optional. " +
+      "Validates level and teacher IDs, time values, and recurrent class rules.",
+  })
+  @ApiParam({
+    name: "classId",
+    type: Number,
+    description: "Class ID to update",
+    example: 1,
+  })
+  @ApiBody({
+    type: UpdateClassDTO,
+    examples: {
+      updateName: {
+        summary: "Update name only",
+        value: {
+          name: "Advanced Guitar Class - Level 2",
+        },
+      },
+      updateSchedule: {
+        summary: "Update schedule",
+        value: {
+          dayOfWeek: ["SEGUNDA", "QUARTA"],
+          startTime: "10:00:00",
+          endTime: "11:30:00",
+        },
+      },
+      updateTeachers: {
+        summary: "Update teachers",
+        value: {
+          teacherIds: [3, 4],
+        },
+      },
+      fullUpdate: {
+        summary: "Multiple fields",
+        value: {
+          name: "Intermediate Piano Class",
+          levelId: 2,
+          teacherIds: [2, 5],
+          startTime: "14:00:00",
+          endTime: "15:30:00",
+          dayOfWeek: ["TERCA", "QUINTA"],
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Class updated successfully",
+    type: ClassResponseDTO,
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Validation failed",
+    content: {
+      "application/json": {
+        examples: {
+          invalidTeacher: {
+            summary: "Invalid teacher ID",
+            value: {
+              statusCode: 400,
+              message: "Cannot create class: invalid teacher ID(s) provided: 99",
+              error: "Bad Request",
+            },
+          },
+          recurrentWithoutDays: {
+            summary: "Missing days for recurrent class",
+            value: {
+              statusCode: 400,
+              message: "Cannot create recurrent class: dayOfWeek array cannot be empty when isRecurrent is true",
+              error: "Bad Request",
+            },
+          },
+          invalidTime: {
+            summary: "Invalid time value",
+            value: {
+              statusCode: 400,
+              message: "Cannot update class: invalid start time provided (must be 00:00:00 to 23:59:59)",
+              error: "Bad Request",
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Resource not found",
+    content: {
+      "application/json": {
+        examples: {
+          classNotFound: {
+            value: {
+              statusCode: 404,
+              message: "Class with ID 99 not found",
+              error: "Not Found",
+            },
+          },
+          levelNotFound: {
+            value: {
+              statusCode: 404,
+              message: "Level with ID 99 not found",
+              error: "Not Found",
+            },
+          },
+        },
+      },
+    },
+  })
+  async updateClass(
     @Param('classId', ParseIntPipe) classId: number,
-    @Body() updateStudentDto: UpdateClassDTO,
-  ): Promise<void> {
-  await this.classService.update(classId, updateStudentDto);
+    @Body() updateClassDto: UpdateClassDTO,
+  ): Promise<ClassResponseDTO> {
+    return await this.classService.update(classId, updateClassDto);
   }
 }

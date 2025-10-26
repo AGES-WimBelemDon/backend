@@ -15,7 +15,7 @@ import {
 import { ClassQueryFilters, ClassResponseDTO } from "./dtos";
 import { ClassResponseMapper } from "./mappers";
 import { ClassState } from "src/common/enums/domain.enums";
-import { UpdateClassDTO } from "./dtos/update-class.dto";
+import { UpdateClassDTO } from "./dtos/update-class.request.dto";
 
 @Injectable()
 export class ClassService {
@@ -124,16 +124,18 @@ export class ClassService {
         "Cannot create recurrent class: dayOfWeek array cannot be empty when isRecurrent is true",
       );
     };
-    let schedules: ClassSchedule[] | undefined;
-    if (dto.dayOfWeek?.length) {
-      schedules = dto.dayOfWeek.map(
-        (day) => new ClassSchedule({ dayOfWeek: day }),
-      );
+    let schedules: ClassSchedule[] | null | undefined;
+    if (dto.dayOfWeek !== undefined) {
+      schedules = dto.dayOfWeek === null || dto.dayOfWeek.length === 0 
+        ? null 
+        : dto.dayOfWeek.map((day) => new ClassSchedule({ dayOfWeek: day }));
     }
     this.updateClassProperties(existingClass, dto,teachers,schedules);
     const classObj = await this.classRepository.update(existingClass);
     return ClassResponseMapper.toDTO(classObj);
   }
+
+
   private async validateAndGetTeachers(teacherIds?: number[]): Promise<Teacher[]> {
     if (!teacherIds || teacherIds.length === 0) {
       return [];
@@ -156,20 +158,19 @@ export class ClassService {
     classEntity: Class,
     dto: UpdateClassDTO,
     teachers: Teacher[],
-    schedules?: ClassSchedule[]
+    schedules?: ClassSchedule[] | null
   ): void {
     dto.name !== undefined && classEntity.setName(dto.name);
     dto.activityId !== undefined && classEntity.setActivityId(dto.activityId);
     dto.levelId !== undefined && classEntity.setLevelId(dto.levelId);
-    dto.state !== undefined && classEntity.setState(dto.state);
     dto.isRecurrent !== undefined && classEntity.setIsRecurrent(dto.isRecurrent);
     dto.startDate !== undefined && classEntity.setStartDate(dto.startDate);
     dto.endDate !== undefined && classEntity.setEndDate(dto.endDate);
     
-    dto.startTime && classEntity.setStartTime(new Date(`1970-01-01T${dto.startTime}`));
-    dto.endTime && classEntity.setEndTime(new Date(`1970-01-01T${dto.endTime}`));
+    dto.startTime !== undefined && classEntity.setStartTime(new Date(`1970-01-01T${dto.startTime}`));
+    dto.endTime !== undefined && classEntity.setEndTime(new Date(`1970-01-01T${dto.endTime}`));
     
-    teachers.length > 0 && classEntity.setTeachers(teachers);
-    schedules !== undefined && classEntity.setSchedules(schedules);
+    dto.teacherIds !== undefined && classEntity.setTeachers(teachers);
+    schedules !== undefined && classEntity.setSchedules(schedules ?? []);
   }
 }
