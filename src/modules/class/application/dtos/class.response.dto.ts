@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { TeacherResponseDTO } from "./teacher.response.dto";
 import { ClassScheduleResponseDTO } from "./classSchedule.response.dto";
+import { ClassState } from "src/common/enums/domain.enums";
 
 export class ClassResponseDTO {
   @ApiProperty({
@@ -28,10 +29,10 @@ export class ClassResponseDTO {
   levelId: number;
 
   @ApiProperty({
-    description: "Class status",
-    example: "ATIVO",
+    description: "Class state",
+    example: ClassState.ATIVA,
   })
-  state: string;
+  state: ClassState;
 
   @ApiProperty({
     description: "List of teachers assigned to the class",

@@ -40,15 +40,6 @@ export class CreateClassDTO {
   levelId: number;
 
   @ApiProperty({
-    example: StudentStatus.ATIVO,
-    description: "Class status",
-    enum: StudentStatus,
-  })
-  @IsEnum(StudentStatus)
-  @IsNotEmpty()
-  state: string;
-
-  @ApiProperty({
     example: [1, 2, 3],
     description: "List of teacher IDs assigned to the class",
     required: false,

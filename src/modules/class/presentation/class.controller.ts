@@ -3,7 +3,7 @@ import { ClassService } from "../application/class.service";
 import { CreateClassDTO } from "../application/dtos/create-class.request.dto";
 import { ClassQueryFilters, ClassResponseDTO } from "../application/dtos";
 import { Body, Controller, Get, Post, Query } from "@nestjs/common";
-import { StudentStatus } from "src/common/enums/domain.enums";
+import { ClassState } from "src/common/enums/domain.enums";
 
 @ApiTags("classes")
 @Controller("classes")
@@ -29,7 +29,6 @@ export class ClassController {
           name: "Advanced Guitar Class",
           activityId: 1,
           levelId: 2,
-          state: "ATIVO",
           teacherIds: [1, 2],
           isRecurrent: true,
           startDate: "2025-03-01",
@@ -46,7 +45,6 @@ export class ClassController {
           name: "Piano Workshop",
           activityId: 3,
           levelId: 1,
-          state: "ATIVO",
           teacherIds: [5],
           isRecurrent: false,
           startDate: "2025-03-15",
@@ -61,7 +59,6 @@ export class ClassController {
           name: "Beginner Violin Class",
           activityId: 2,
           levelId: 1,
-          state: "ATIVO",
           isRecurrent: true,
           startDate: "2025-04-01",
           startTime: "10:00:00",
@@ -81,7 +78,7 @@ export class ClassController {
         name: "Advanced Guitar Class",
         activityId: 1,
         levelId: 2,
-        state: "ATIVO",
+        state: "ATIVA",
         teachers: [
           { id: 1, fullName: "John Smith" },
           { id: 2, fullName: "Jane Doe" },
@@ -210,9 +207,9 @@ export class ClassController {
   @ApiQuery({
     name: "state",
     required: false,
-    enum: [...Object.values(StudentStatus), "ALL"],
+    enum: [...Object.values(ClassState), "ALL"],
     description: "Filter by class status. Use 'ALL' to retrieve classes of all statuses",
-    example: "ATIVO",
+    example: "ATIVA",
   })
   @ApiResponse({
     status: 200,
@@ -225,7 +222,7 @@ export class ClassController {
           name: "Advanced Guitar Class",
           activityId: 1,
           levelId: 2,
-          state: "ATIVO",
+          state: "ATIVA",
           teachers: [
             { id: 1, fullName: "John Smith" },
             { id: 2, fullName: "Jane Doe" },
@@ -246,7 +243,7 @@ export class ClassController {
           name: "Beginner Piano Class",
           activityId: 2,
           levelId: 1,
-          state: "ATIVO",
+          state: "ATIVA",
           teachers: [{ id: 3, fullName: "Mary Johnson" }],
           isRecurrent: true,
           startDate: "2025-04-01",

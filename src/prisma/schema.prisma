@@ -85,7 +85,7 @@ model Class {
   name        String
   activityId  Int       @map("activity_id")
   levelId     Int       @map("level_id")
-  state       String
+  state       ClassState
   teacher     User[]    @relation("ClassTeacher")
   activity    Activity  @relation(fields: [activityId], references: [id])
   level       Level     @relation(fields: [levelId], references: [id])
@@ -237,6 +237,11 @@ enum StudentStatus {
 enum FrequencyStatus {
   PRESENTE
   AUSENTE
+}
+
+enum ClassState {
+  ATIVA
+  INATIVA
 }
 
 enum Race {

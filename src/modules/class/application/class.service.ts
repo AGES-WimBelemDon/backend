@@ -14,6 +14,7 @@ import {
 } from "../domain/class.repository.interface";
 import { ClassQueryFilters, ClassResponseDTO } from "./dtos";
 import { ClassResponseMapper } from "./mappers";
+import { ClassState } from "src/common/enums/domain.enums";
 
 @Injectable()
 export class ClassService {
@@ -61,6 +62,7 @@ export class ClassService {
     }
     const classEntity = new Class({
       ...createClassDto,
+      state: ClassState.ATIVA,
       startTime: new Date(`1970-01-01T${createClassDto.startTime}`),
       endTime: new Date(`1970-01-01T${createClassDto.endTime}`),
       schedules: schedules,

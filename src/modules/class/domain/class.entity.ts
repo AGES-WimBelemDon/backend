@@ -1,3 +1,4 @@
+import { ClassState } from "src/common/enums/domain.enums";
 import { ClassSchedule } from "./class-schedule";
 import { Teacher } from "./teacher";
 
@@ -5,7 +6,7 @@ interface ClassProps {
   name: string;
   activityId: number;
   levelId: number;
-  state: string;
+  state: ClassState;
   teachers?: Teacher[];
   id?: number;
   isRecurrent: boolean;
@@ -21,7 +22,7 @@ export class Class {
   name: string;
   activityId: number;
   levelId: number;
-  state: string;
+  state: ClassState;
   teachers: Teacher[];
   isRecurrent: boolean;
   startDate: Date;
@@ -61,7 +62,7 @@ export class Class {
     return this.levelId;
   }
 
-  getState(): string {
+  getState(): ClassState {
     return this.state;
   }
 
@@ -105,7 +106,7 @@ export class Class {
     this.levelId = levelId;
   }
 
-  setState(state: string): void {
+  setState(state: ClassState): void {
     this.state = state;
   }
 
