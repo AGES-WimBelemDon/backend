@@ -116,4 +116,80 @@ export class ClassRepository implements IClassRepository {
   
       return classes.map((item) => ClassMapper.toDomain(item));
   }
+  async findById(classId: number): Promise<Class | null> {
+    const classInstance = await this.prisma.class.findUnique({
+      where: {
+        id: classId
+      },
+      include: {
+        teacher: {
+          select: {
+            id: true,
+            fullName: true,
+          },
+        },
+        schedules: true,
+      },
+    });
+    
+    if (!classInstance) {
+      return null;
+    }
+    return ClassMapper.toDomain(classInstance);
+  }
+  async update(classObj: Class): Promise<Class> {
+    const classId = classObj.getId()!;
+    const teacherIds = classObj.getTeachers().map((t) => t.id);
+    const schedules = classObj.getSchedules();
+    const classData = ClassMapper.toPersistence(classObj);
+    const schedulesUpsert = schedules.map((schedule) => ({
+      where: {
+        classId_dayOfWeek: {
+          classId: classId,
+          dayOfWeek: schedule.daysOfWeek,
+        },
+      },
+      create: {
+        dayOfWeek: schedule.daysOfWeek,
+      },
+      update: {
+        dayOfWeek: schedule.daysOfWeek,
+      },
+    }));
+
+    const updatedClass = await this.prisma.class.update({
+      where: { id: classId },
+      data: {
+        name: classData.name,
+        activityId: classData.activityId,
+        levelId: classData.levelId,
+        state: classData.state,
+        isRecurrent: classData.isRecurrent,
+        startDate: classData.startDate,
+        endDate: classData.endDate,
+        startTime: classData.startTime,
+        endTime: classData.endTime,
+        teacher: {
+          set: teacherIds.map((id) => ({ id })),
+        },
+        schedules: {
+          deleteMany: {}, // Delete all existing schedules
+          create: schedules.map((schedule) => ({
+            dayOfWeek: schedule.daysOfWeek,
+          })),
+        },
+      },
+      include: {
+        teacher: {
+          select: {
+            id: true,
+            fullName: true,
+          },
+        },
+        schedules: true,
+      },
+    });
+
+    return ClassMapper.toDomain(updatedClass);
+  }
 }

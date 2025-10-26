@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { CreateClassDTO } from "./dtos/create-class.request.dto";
 import { LevelService } from "src/modules/level/application/level.service";
 import { ClassSchedule } from "../domain/class-schedule";
@@ -15,6 +15,7 @@ import {
 import { ClassQueryFilters, ClassResponseDTO } from "./dtos";
 import { ClassResponseMapper } from "./mappers";
 import { ClassState } from "src/common/enums/domain.enums";
+import { UpdateClassDTO } from "./dtos/update-class.dto";
 
 @Injectable()
 export class ClassService {
@@ -30,17 +31,7 @@ export class ClassService {
   async createClass(createClassDto: CreateClassDTO): Promise<ClassResponseDTO> {
     await this.levelService.getById(createClassDto.levelId);
     // await this.activityService.getById(createClassDto.activityId);
-    let teachers: Teacher[] = [];
-    if (createClassDto.teacherIds?.length) {
-      teachers = await this.classQueriesService.getManyByTeacherId(
-        createClassDto.teacherIds,
-      );
-      if (teachers.length !== createClassDto.teacherIds.length) {
-        throw new BadRequestException(
-          "Cannot create class: an invalid teacherId was passed",
-        );
-      }
-    }
+    const teachers = await this.validateAndGetTeachers(createClassDto.teacherIds);
     if (createClassDto.isRecurrent && !createClassDto.dayOfWeek?.length) {
       throw new BadRequestException(
         "Cannot create recurrent class: dayOfWeek array cannot be empty when isRecurrent is true",
@@ -95,5 +86,90 @@ export class ClassService {
   ): Promise<ClassResponseDTO[]>{
     const classes = await this.classRepository.findMyClasses(userId,filters);
     return classes.map(classObj => ClassResponseMapper.toDTO(classObj));
+  }
+  async findById(
+    classId: number
+  ) : Promise<Class>{
+    const classInstance = await this.classRepository.findById(classId);
+    if (!classInstance) {
+    throw new NotFoundException(
+      `Class with ID ${classId} not found`
+    );
+  }
+    return classInstance;
+  }
+  async update(
+    classId: number,
+    dto: UpdateClassDTO
+  ): Promise<ClassResponseDTO>{
+    const existingClass = await this.findById(classId);
+    if(dto.levelId){
+      await this.levelService.getById(dto.levelId);
+    };
+    const teachers = await this.validateAndGetTeachers(dto.teacherIds);
+    //await this.activityService.findById(dto.activityId);
+    if (dto.startTime && !this.isValidTime(dto.startTime)) {
+      throw new BadRequestException(
+        "Cannot update class: invalid start time provided (must be 00:00:00 to 23:59:59)",
+      );
+    }
+
+    if (dto.endTime && !this.isValidTime(dto.endTime)) {
+      throw new BadRequestException(
+        "Cannot update class: invalid end time provided (must be 00:00:00 to 23:59:59)",
+      );
+    }
+    if (dto.isRecurrent && !dto.dayOfWeek?.length) {
+      throw new BadRequestException(
+        "Cannot create recurrent class: dayOfWeek array cannot be empty when isRecurrent is true",
+      );
+    };
+    let schedules: ClassSchedule[] | undefined;
+    if (dto.dayOfWeek?.length) {
+      schedules = dto.dayOfWeek.map(
+        (day) => new ClassSchedule({ dayOfWeek: day }),
+      );
+    }
+    this.updateClassProperties(existingClass, dto,teachers,schedules);
+    const classObj = await this.classRepository.update(existingClass);
+    return ClassResponseMapper.toDTO(classObj);
+  }
+  private async validateAndGetTeachers(teacherIds?: number[]): Promise<Teacher[]> {
+    if (!teacherIds || teacherIds.length === 0) {
+      return [];
+    }
+
+    const teachers = await this.classQueriesService.getManyByTeacherId(teacherIds);
+    
+    if (teachers.length !== teacherIds.length) {
+      const foundIds = teachers.map(t => t.id);
+      const missingIds = teacherIds.filter(id => !foundIds.includes(id));
+      
+      throw new BadRequestException(
+        `Cannot create class: invalid teacher ID(s) provided: ${missingIds.join(', ')}`
+      );
+    }
+
+    return teachers;
+  }
+  private updateClassProperties(
+    classEntity: Class,
+    dto: UpdateClassDTO,
+    teachers: Teacher[],
+    schedules?: ClassSchedule[]
+  ): void {
+    dto.name !== undefined && classEntity.setName(dto.name);
+    dto.activityId !== undefined && classEntity.setActivityId(dto.activityId);
+    dto.levelId !== undefined && classEntity.setLevelId(dto.levelId);
+    dto.state !== undefined && classEntity.setState(dto.state);
+    dto.isRecurrent !== undefined && classEntity.setIsRecurrent(dto.isRecurrent);
+    dto.startDate !== undefined && classEntity.setStartDate(dto.startDate);
+    dto.endDate !== undefined && classEntity.setEndDate(dto.endDate);
+    
+    dto.startTime && classEntity.setStartTime(new Date(`1970-01-01T${dto.startTime}`));
+    dto.endTime && classEntity.setEndTime(new Date(`1970-01-01T${dto.endTime}`));
+    
+    teachers.length > 0 && classEntity.setTeachers(teachers);
+    schedules !== undefined && classEntity.setSchedules(schedules);
   }
 }

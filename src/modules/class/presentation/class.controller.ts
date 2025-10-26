@@ -2,8 +2,9 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery, ApiParam } from 
 import { ClassService } from "../application/class.service";
 import { CreateClassDTO } from "../application/dtos/create-class.request.dto";
 import { ClassQueryFilters, ClassResponseDTO } from "../application/dtos";
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query } from "@nestjs/common";
 import { ClassState } from "src/common/enums/domain.enums";
+import { UpdateClassDTO } from "../application/dtos/update-class.dto";
 
 @ApiTags("classes")
 @Controller("classes")
@@ -438,17 +439,6 @@ export class ClassController {
     },
   })
   @ApiResponse({
-    status: 404,
-    description: "Not Found - User does not exist",
-    schema: {
-      example: {
-        statusCode: 404,
-        message: "User with ID 99 not found",
-        error: "Not Found",
-      },
-    },
-  })
-  @ApiResponse({
     status: 500,
     description: "Internal server error",
     schema: {
@@ -464,5 +454,12 @@ export class ClassController {
     @Param("userId", ParseIntPipe) userId: number
   ): Promise<ClassResponseDTO[]> {
     return await this.classService.findMyClasses(userId, filterDto);
+  }
+  @Patch(':classId')
+  async updateStudent(
+    @Param('classId', ParseIntPipe) classId: number,
+    @Body() updateStudentDto: UpdateClassDTO,
+  ): Promise<void> {
+  await this.classService.update(classId, updateStudentDto);
   }
 }

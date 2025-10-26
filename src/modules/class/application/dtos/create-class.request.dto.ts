@@ -11,7 +11,7 @@ import {
   IsString,
   Matches,
 } from "class-validator";
-import { DayOfWeek, StudentStatus } from "src/common/enums/domain.enums";
+import { DayOfWeek } from "src/common/enums/domain.enums";
 import { transformDateStringToDate } from "src/common/transformers/string.to.date.transformer";
 
 export class CreateClassDTO {
