@@ -5,8 +5,8 @@ import { ClassQueryFilters, ClassResponseDTO } from "../application/dtos";
 import { Body, Controller, Get, Post, Query } from "@nestjs/common";
 import { StudentStatus } from "src/common/enums/domain.enums";
 
-@ApiTags("class")
-@Controller("class")
+@ApiTags("classes")
+@Controller("classes")
 export class ClassController {
   constructor(private readonly classService: ClassService) {}
 
