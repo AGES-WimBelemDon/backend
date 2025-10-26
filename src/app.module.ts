@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { ExampleEntityModule } from './modules/exampleEntity/exampleEntity.module';
+import { FiltersModule } from './modules/filters/filters.module';
 import { FirebaseModule } from './modules/firebase/firebase.module';
 import { FrequencyModule } from './modules/frequency/frequency.module';
 import { StudentModule } from './modules/student/student.module';
@@ -23,6 +24,7 @@ import { ActivityModule } from './modules/activity/activity.module';
     }),
     ExampleEntityModule,
     PrismaModule,
+    FiltersModule,
     FirebaseModule,
     FrequencyModule,
     StudentModule,
