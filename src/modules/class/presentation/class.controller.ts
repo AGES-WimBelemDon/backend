@@ -1,8 +1,8 @@
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery } from "@nestjs/swagger";
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery, ApiParam } from "@nestjs/swagger";
 import { ClassService } from "../application/class.service";
 import { CreateClassDTO } from "../application/dtos/create-class.request.dto";
 import { ClassQueryFilters, ClassResponseDTO } from "../application/dtos";
-import { Body, Controller, Get, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Query } from "@nestjs/common";
 import { ClassState } from "src/common/enums/domain.enums";
 
 @ApiTags("classes")
@@ -311,5 +311,158 @@ export class ClassController {
     @Query() filterDto: ClassQueryFilters
   ): Promise<ClassResponseDTO[]> {
     return await this.classService.findClasses(filterDto);
+  }
+  @Get("my-classes/:userId")
+  @ApiOperation({
+    summary: "Get classes assigned to a specific teacher",
+    description:
+      "Retrieves all classes where the specified user is assigned as a teacher. " +
+      "Results can be filtered by class ID, level ID, activity ID, or status.",
+  })
+  @ApiParam({
+    name: "userId",
+    type: Number,
+    description: "The ID of the teacher/user whose classes to retrieve",
+    example: 1,
+  })
+  @ApiQuery({
+    name: "classId",
+    required: false,
+    type: Number,
+    description: "Filter by specific class ID",
+    example: 1,
+  })
+  @ApiQuery({
+    name: "levelId",
+    required: false,
+    type: Number,
+    description: "Filter by level ID",
+    example: 2,
+  })
+  @ApiQuery({
+    name: "activityId",
+    required: false,
+    type: Number,
+    description: "Filter by activity ID",
+    example: 3,
+  })
+  @ApiQuery({
+    name: "state",
+    required: false,
+    enum: [...Object.values(ClassState), "ALL"],
+    description: "Filter by class status. Use 'ALL' to retrieve classes of all statuses",
+    example: ClassState.ATIVA,
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Teacher's classes retrieved successfully",
+    type: [ClassResponseDTO],
+    schema: {
+      example: [
+        {
+          id: 1,
+          name: "Advanced Guitar Class",
+          activityId: 1,
+          levelId: 2,
+          state: "ATIVA",
+          teachers: [
+            { id: 1, fullName: "John Smith" },
+            { id: 2, fullName: "Jane Doe" },
+          ],
+          isRecurrent: true,
+          startDate: "2025-03-01",
+          endDate: "2025-06-01",
+          startTime: "09:00:00",
+          endTime: "10:30:00",
+          schedules: [
+            { id: 1, dayOfWeek: "SEGUNDA" },
+            { id: 2, dayOfWeek: "QUARTA" },
+            { id: 3, dayOfWeek: "SEXTA" },
+          ],
+        },
+        {
+          id: 3,
+          name: "Intermediate Piano Class",
+          activityId: 2,
+          levelId: 2,
+          state: "ATIVA",
+          teachers: [{ id: 1, fullName: "John Smith" }],
+          isRecurrent: true,
+          startDate: "2025-03-10",
+          endDate: null,
+          startTime: "11:00:00",
+          endTime: "12:30:00",
+          schedules: [
+            { id: 6, dayOfWeek: "TERCA" },
+            { id: 7, dayOfWeek: "QUINTA" },
+          ],
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Bad Request - Invalid parameters",
+    content: {
+      "application/json": {
+        schema: {
+          type: "object",
+          properties: {
+            statusCode: { type: "number", example: 400 },
+            message: { type: "array", items: { type: "string" } },
+            error: { type: "string", example: "Bad Request" },
+          },
+        },
+        examples: {
+          invalidUserId: {
+            summary: "Invalid userId format",
+            value: {
+              statusCode: 400,
+              message: ["userId must be a number"],
+              error: "Bad Request",
+            },
+          },
+          invalidFilters: {
+            summary: "Invalid filter parameters",
+            value: {
+              statusCode: 400,
+              message: [
+                "classId must be an integer number",
+                "state must be a valid enum value",
+              ],
+              error: "Bad Request",
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Not Found - User does not exist",
+    schema: {
+      example: {
+        statusCode: 404,
+        message: "User with ID 99 not found",
+        error: "Not Found",
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: "Internal server error",
+    schema: {
+      example: {
+        statusCode: 500,
+        message: "Internal server error",
+        error: "Failed to retrieve teacher's classes",
+      },
+    },
+  })
+  async findMyClasses(
+    @Query() filterDto: ClassQueryFilters,
+    @Param("userId", ParseIntPipe) userId: number
+  ): Promise<ClassResponseDTO[]> {
+    return await this.classService.findMyClasses(userId, filterDto);
   }
 }

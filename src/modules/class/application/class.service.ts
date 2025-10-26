@@ -89,4 +89,11 @@ export class ClassService {
       const classes = await this.classRepository.findClasses(filters);
       return classes.map(classObj => ClassResponseMapper.toDTO(classObj));
     }
+  async findMyClasses(
+    userId: number,
+    filters: ClassQueryFilters
+  ): Promise<ClassResponseDTO[]>{
+    const classes = await this.classRepository.findMyClasses(userId,filters);
+    return classes.map(classObj => ClassResponseMapper.toDTO(classObj));
+  }
 }
