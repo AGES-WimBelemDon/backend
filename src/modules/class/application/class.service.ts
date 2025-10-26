@@ -12,7 +12,7 @@ import {
   CLASS_REPOSITORY_TOKEN,
   IClassRepository,
 } from "../domain/class.repository.interface";
-import { ClassResponseDTO } from "./dtos";
+import { ClassQueryFilters, ClassResponseDTO } from "./dtos";
 import { ClassResponseMapper } from "./mappers";
 
 @Injectable()
@@ -81,4 +81,10 @@ export class ClassService {
       seconds <= 59
     );
   }
+  async findClasses(
+      filters: ClassQueryFilters,
+    ): Promise<ClassResponseDTO[]> {
+      const classes = await this.classRepository.findClasses(filters);
+      return classes.map(classObj => ClassResponseMapper.toDTO(classObj));
+    }
 }

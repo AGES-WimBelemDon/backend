@@ -1,8 +1,9 @@
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from "@nestjs/swagger";
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery } from "@nestjs/swagger";
 import { ClassService } from "../application/class.service";
 import { CreateClassDTO } from "../application/dtos/create-class.request.dto";
-import { ClassResponseDTO } from "../application/dtos";
-import { Body, Controller, Post } from "@nestjs/common";
+import { ClassQueryFilters, ClassResponseDTO } from "../application/dtos";
+import { Body, Controller, Get, Post, Query } from "@nestjs/common";
+import { StudentStatus } from "src/common/enums/domain.enums";
 
 @ApiTags("class")
 @Controller("class")
@@ -177,5 +178,141 @@ export class ClassController {
     @Body() createClassDto: CreateClassDTO,
   ): Promise<ClassResponseDTO> {
     return await this.classService.createClass(createClassDto);
+  }
+  @Get()
+  @ApiOperation({
+    summary: "Get all classes with optional filters",
+    description:
+      "Retrieves a list of classes. Results can be filtered by class ID, level ID, activity ID, or status. " +
+      "Returns all classes if no filters are provided.",
+  })
+  @ApiQuery({
+    name: "classId",
+    required: false,
+    type: Number,
+    description: "Filter by specific class ID",
+    example: 1,
+  })
+  @ApiQuery({
+    name: "levelId",
+    required: false,
+    type: Number,
+    description: "Filter by level ID",
+    example: 2,
+  })
+  @ApiQuery({
+    name: "activityId",
+    required: false,
+    type: Number,
+    description: "Filter by activity ID",
+    example: 3,
+  })
+  @ApiQuery({
+    name: "state",
+    required: false,
+    enum: [...Object.values(StudentStatus), "ALL"],
+    description: "Filter by class status. Use 'ALL' to retrieve classes of all statuses",
+    example: "ATIVO",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Classes retrieved successfully",
+    type: [ClassResponseDTO],
+    schema: {
+      example: [
+        {
+          id: 1,
+          name: "Advanced Guitar Class",
+          activityId: 1,
+          levelId: 2,
+          state: "ATIVO",
+          teachers: [
+            { id: 1, fullName: "John Smith" },
+            { id: 2, fullName: "Jane Doe" },
+          ],
+          isRecurrent: true,
+          startDate: "2025-03-01",
+          endDate: "2025-06-01",
+          startTime: "09:00:00",
+          endTime: "10:30:00",
+          schedules: [
+            { id: 1, dayOfWeek: "SEGUNDA" },
+            { id: 2, dayOfWeek: "QUARTA" },
+            { id: 3, dayOfWeek: "SEXTA" },
+          ],
+        },
+        {
+          id: 2,
+          name: "Beginner Piano Class",
+          activityId: 2,
+          levelId: 1,
+          state: "ATIVO",
+          teachers: [{ id: 3, fullName: "Mary Johnson" }],
+          isRecurrent: true,
+          startDate: "2025-04-01",
+          endDate: null,
+          startTime: "14:00:00",
+          endTime: "15:30:00",
+          schedules: [
+            { id: 4, dayOfWeek: "TERCA" },
+            { id: 5, dayOfWeek: "QUINTA" },
+          ],
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Bad Request - Invalid query parameters",
+    content: {
+      "application/json": {
+        schema: {
+          type: "object",
+          properties: {
+            statusCode: { type: "number", example: 400 },
+            message: { type: "array", items: { type: "string" } },
+            error: { type: "string", example: "Bad Request" },
+          },
+        },
+        examples: {
+          invalidClassId: {
+            summary: "Invalid classId format",
+            value: {
+              statusCode: 400,
+              message: [
+                "classId must be an integer number",
+              ],
+              error: "Bad Request",
+            },
+          },
+          invalidState: {
+            summary: "Invalid state value",
+            value: {
+              statusCode: 400,
+              message: [
+                "state must be a valid enum value",
+              ],
+              error: "Bad Request",
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: "Internal server error",
+    schema: {
+      example: {
+        statusCode: 500,
+        message: "Internal server error",
+        error: "Failed to retrieve classes",
+      },
+    },
+  })
+  async findClasses(
+    @Query() filterDto: ClassQueryFilters
+  ): Promise<ClassResponseDTO[]> {
+    return await this.classService.findClasses(filterDto);
   }
 }
