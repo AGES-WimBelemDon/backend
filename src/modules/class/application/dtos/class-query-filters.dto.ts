@@ -40,7 +40,8 @@ export class ClassQueryFilters {
   activityId?: number;
 
   @ApiProperty({
-    description: "Filter by class state. Use 'ALL' to retrieve classes of all states",
+    description:
+      "Filter by class state. Use 'ALL' to retrieve classes of all states",
     required: false,
     default: "ALL",
     enum: [...Object.values(ClassState), "ALL"],

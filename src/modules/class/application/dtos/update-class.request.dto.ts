@@ -56,14 +56,16 @@ export class UpdateClassDTO extends PartialType(CreateClassDTO) {
 
   @ApiProperty({
     example: "ATIVA",
-    description: "Class status. Cannot be set to INATIVA - use DELETE endpoint to deactivate classes",
+    description:
+      "Class status. Cannot be set to INATIVA - use DELETE endpoint to deactivate classes",
     enum: ClassState,
     required: false,
   })
   @IsOptional()
   @IsEnum(ClassState)
   @IsNotIn([ClassState.INATIVA], {
-    message: "Cannot set class to INATIVA through update. Use DELETE endpoint to deactivate classes",
+    message:
+      "Cannot set class to INATIVA through update. Use DELETE endpoint to deactivate classes",
   })
   state?: ClassState;
 }

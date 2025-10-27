@@ -191,7 +191,7 @@ export class ClassController {
     },
   })
   async createClass(
-    @Body() createClassDto: CreateClassDTO
+    @Body() createClassDto: CreateClassDTO,
   ): Promise<ClassResponseDTO> {
     return await this.classService.createClass(createClassDto);
   }
@@ -324,7 +324,7 @@ export class ClassController {
     },
   })
   async findClasses(
-    @Query() filterDto: ClassQueryFilters
+    @Query() filterDto: ClassQueryFilters,
   ): Promise<ClassResponseDTO[]> {
     return await this.classService.findClasses(filterDto);
   }
@@ -467,7 +467,7 @@ export class ClassController {
   })
   async findMyClasses(
     @Query() filterDto: ClassQueryFilters,
-    @Param("userId", ParseIntPipe) userId: number
+    @Param("userId", ParseIntPipe) userId: number,
   ): Promise<ClassResponseDTO[]> {
     return await this.classService.findMyClasses(userId, filterDto);
   }
@@ -595,7 +595,7 @@ export class ClassController {
   })
   async updateClass(
     @Param("classId", ParseIntPipe) classId: number,
-    @Body() updateClassDto: UpdateClassDTO
+    @Body() updateClassDto: UpdateClassDTO,
   ): Promise<ClassResponseDTO> {
     return await this.classService.update(classId, updateClassDto);
   }
@@ -685,7 +685,8 @@ export class ClassController {
             summary: "Invalid class state",
             value: {
               statusCode: 409,
-              message: "Class with ID (numeric string is expectd) is already inactive and cannot be deleted again",
+              message:
+                "Class with ID (numeric string is expectd) is already inactive and cannot be deleted again",
               error: "Conflict",
             },
           },

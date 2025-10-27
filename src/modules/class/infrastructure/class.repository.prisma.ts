@@ -4,7 +4,8 @@ import { Injectable } from "@nestjs/common";
 import { ClassMapper } from "./class.mapper";
 import { PrismaService } from "src/prisma/prisma.service";
 import { ClassQueryFilters } from "../application/dtos";
-import { ClassState, StudentStatus } from "src/common/enums/domain.enums";
+import { Prisma } from "@prisma/client";
+
 @Injectable()
 export class ClassRepository implements IClassRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -39,87 +40,87 @@ export class ClassRepository implements IClassRepository {
 
     return ClassMapper.toDomain(createdClass);
   }
-  async findClasses(
-      filters: ClassQueryFilters,
-    ): Promise<Class[]> {
-      const where: any = {};
-  
-      if (filters.classId !== undefined) {
-        where.id = filters.classId;
-      }
-  
-      if (filters.levelId !== undefined) {
-        where.levelId = filters.levelId;
-      }
-      if(filters.activityId !== undefined){
-        where.activityId = filters.activityId;
-      }
-  
-      if (filters.state && filters.state !== "ALL") {
-        where.state = filters.state as ClassState;
-      }
-  
-      const classes = await this.prisma.class.findMany({
-        where,
-        include: {
-          teacher: {
-            select: {
-              id: true,
-              fullName: true,
-            },
-          },
-          schedules: true,
-        },
-          orderBy: {
-            id: "asc",
-          },
-        });
-  
-      return classes.map((item) => ClassMapper.toDomain(item));
+  async findClasses(filters: ClassQueryFilters): Promise<Class[]> {
+    const where: Prisma.ClassWhereInput = {};
+
+    if (filters.classId !== undefined) {
+      where.id = filters.classId;
     }
-    async findMyClasses(userId: number,
-      filters: ClassQueryFilters): Promise<Class[]> {
-      const where: any = {};
-      where.teacher = {
-        some : {id : userId}
-      }
-      if (filters.classId !== undefined) {
-        where.id = filters.classId;
-      }
-  
-      if (filters.levelId !== undefined) {
-        where.levelId = filters.levelId;
-      }
-      if(filters.activityId !== undefined){
-        where.activityId = filters.activityId;
-      }
-  
-      if (filters.state && filters.state !== "ALL") {
-        where.state = filters.state as ClassState;
-      }
-  
-      const classes = await this.prisma.class.findMany({
-        where,
-        include: {
-          teacher: {
-            select: {
-              id: true,
-              fullName: true,
-            },
+
+    if (filters.levelId !== undefined) {
+      where.levelId = filters.levelId;
+    }
+    if (filters.activityId !== undefined) {
+      where.activityId = filters.activityId;
+    }
+
+    if (filters.state && filters.state !== "ALL") {
+      where.state = filters.state;
+    }
+
+    const classes = await this.prisma.class.findMany({
+      where,
+      include: {
+        teacher: {
+          select: {
+            id: true,
+            fullName: true,
           },
-          schedules: true,
         },
-          orderBy: {
-            id: "asc",
+        schedules: true,
+      },
+      orderBy: {
+        id: "asc",
+      },
+    });
+
+    return classes.map((item) => ClassMapper.toDomain(item));
+  }
+  async findMyClasses(
+    userId: number,
+    filters: ClassQueryFilters,
+  ): Promise<Class[]> {
+    const where: Prisma.ClassWhereInput = {};
+    where.teacher = {
+      some: { id: userId },
+    };
+    if (filters.classId !== undefined) {
+      where.id = filters.classId;
+    }
+
+    if (filters.levelId !== undefined) {
+      where.levelId = filters.levelId;
+    }
+    if (filters.activityId !== undefined) {
+      where.activityId = filters.activityId;
+    }
+
+    if (filters.state && filters.state !== "ALL") {
+      where.state = filters.state;
+    }
+
+    const classes = await this.prisma.class.findMany({
+      where,
+      include: {
+        teacher: {
+          select: {
+            id: true,
+            fullName: true,
           },
-        });
-  
-      return classes.map((item) => ClassMapper.toDomain(item));
+        },
+        schedules: true,
+      },
+      orderBy: {
+        id: "asc",
+      },
+    });
+
+    return classes.map((item) => ClassMapper.toDomain(item));
   }
   async findById(classId: number): Promise<Class | null> {
     const classInstance = await this.prisma.class.findUnique({
       where: {
-        id: classId
+        id: classId,
       },
       include: {
         teacher: {
@@ -131,7 +132,7 @@ export class ClassRepository implements IClassRepository {
         schedules: true,
       },
     });
-    
+
     if (!classInstance) {
       return null;
     }
