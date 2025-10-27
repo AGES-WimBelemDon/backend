@@ -85,14 +85,28 @@ model Class {
   name        String
   activityId  Int       @map("activity_id")
   levelId     Int       @map("level_id")
-  state       String
+  state       ClassState
   teacher     User[]    @relation("ClassTeacher")
   activity    Activity  @relation(fields: [activityId], references: [id])
   level       Level     @relation(fields: [levelId], references: [id])
   frequencies Frequency[]
   students    Enrollment[]
-
+  isRecurrent Boolean   @default(true) @map("is_recurrent")
+  startDate   DateTime  @map("start_date") @db.Date
+  endDate     DateTime? @map("end_date")   @db.Date
+  startTime   DateTime  @map("start_time") @db.Time
+  endTime     DateTime  @map("end_time")   @db.Time
+  schedules   ClassSchedule[]
   @@map("class")
+}
+model ClassSchedule {
+  id        Int       @id @default(autoincrement())
+  classId   Int       @map("class_id")
+  dayOfWeek DayOfWeek @map("day_of_week")
+  class     Class     @relation(fields: [classId], references: [id], onDelete: Cascade)
+  @@unique([classId, dayOfWeek])
+  @@index([classId])
+  @@map("class_schedule")
 }
 
 model Frequency {
@@ -225,6 +239,11 @@ enum FrequencyStatus {
   AUSENTE
 }
 
+enum ClassState {
+  ATIVA
+  INATIVA
+}
+
 enum Race {
   BRANCA
   PRETA
@@ -283,6 +302,15 @@ enum EducationLevel {
 enum NoteTypes{
   ATESTADO_MEDICO
   SEM_JUSTIFICATIVA
+}
+enum DayOfWeek {
+  SEGUNDA
+  TERCA
+  QUARTA
+  QUINTA
+  SEXTA
+  SABADO
+  DOMINGO
 }
 
 model ExampleEntity {
