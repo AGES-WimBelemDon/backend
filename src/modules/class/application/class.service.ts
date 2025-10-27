@@ -1,4 +1,9 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { CreateClassDTO } from "./dtos/create-class.request.dto";
 import { LevelService } from "src/modules/level/application/level.service";
 import { ClassSchedule } from "../domain/class-schedule";
@@ -28,22 +33,24 @@ export class ClassService {
     @Inject(CLASS_QUERIES_TOKEN)
     private readonly classQueriesService: IClassQueries,
     @Inject(CLASS_REPOSITORY_TOKEN)
-    private readonly classRepository: IClassRepository,
+    private readonly classRepository: IClassRepository
   ) {}
 
   async createClass(createClassDto: CreateClassDTO): Promise<ClassResponseDTO> {
     await this.levelService.getById(createClassDto.levelId);
     // await this.activityService.getById(createClassDto.activityId);
-    const teachers = await this.validateAndGetTeachers(createClassDto.teacherIds);
+    const teachers = await this.validateAndGetTeachers(
+      createClassDto.teacherIds
+    );
     if (createClassDto.isRecurrent && !createClassDto.dayOfWeek?.length) {
       throw new BadRequestException(
-        "Cannot create recurrent class: dayOfWeek array cannot be empty when isRecurrent is true",
+        "Cannot create recurrent class: dayOfWeek array cannot be empty when isRecurrent is true"
       );
     }
     let schedules: ClassSchedule[] = [];
     if (createClassDto.dayOfWeek?.length) {
       schedules = createClassDto.dayOfWeek.map(
-        (day) => new ClassSchedule({ dayOfWeek: day }),
+        (day) => new ClassSchedule({ dayOfWeek: day })
       );
     }
     if (
@@ -51,7 +58,7 @@ export class ClassService {
       !this.isValidTime(createClassDto.endTime)
     ) {
       throw new BadRequestException(
-        "Cannot create class: invalid start or end time provided.",
+        "Cannot create class: invalid start or end time provided."
       );
     }
     const classEntity = new Class({
@@ -77,81 +84,78 @@ export class ClassService {
       seconds <= 59
     );
   }
-  async findClasses(
-      filters: ClassQueryFilters,
-    ): Promise<ClassResponseDTO[]> {
-      const classes = await this.classRepository.findClasses(filters);
-      return classes.map(classObj => ClassResponseMapper.toDTO(classObj));
-    }
+  async findClasses(filters: ClassQueryFilters): Promise<ClassResponseDTO[]> {
+    const classes = await this.classRepository.findClasses(filters);
+    return classes.map((classObj) => ClassResponseMapper.toDTO(classObj));
+  }
   async findMyClasses(
     userId: number,
     filters: ClassQueryFilters
-  ): Promise<ClassResponseDTO[]>{
-    const classes = await this.classRepository.findMyClasses(userId,filters);
-    return classes.map(classObj => ClassResponseMapper.toDTO(classObj));
+  ): Promise<ClassResponseDTO[]> {
+    const classes = await this.classRepository.findMyClasses(userId, filters);
+    return classes.map((classObj) => ClassResponseMapper.toDTO(classObj));
   }
-  async findById(
-    classId: number
-  ) : Promise<Class>{
+  async findById(classId: number): Promise<Class> {
     const classInstance = await this.classRepository.findById(classId);
     if (!classInstance) {
-    throw new NotFoundException(
-      `Class with ID ${classId} not found`
-    );
-  }
+      throw new NotFoundException(`Class with ID ${classId} not found`);
+    }
     return classInstance;
   }
   async update(
     classId: number,
     dto: UpdateClassDTO
-  ): Promise<ClassResponseDTO>{
+  ): Promise<ClassResponseDTO> {
     const existingClass = await this.findById(classId);
-    if(dto.levelId){
+    if (dto.levelId) {
       await this.levelService.getById(dto.levelId);
-    };
+    }
     const teachers = await this.validateAndGetTeachers(dto.teacherIds);
     //await this.activityService.findById(dto.activityId);
     if (dto.startTime && !this.isValidTime(dto.startTime)) {
       throw new BadRequestException(
-        "Cannot update class: invalid start time provided (must be 00:00:00 to 23:59:59)",
+        "Cannot update class: invalid start time provided (must be 00:00:00 to 23:59:59)"
       );
     }
 
     if (dto.endTime && !this.isValidTime(dto.endTime)) {
       throw new BadRequestException(
-        "Cannot update class: invalid end time provided (must be 00:00:00 to 23:59:59)",
+        "Cannot update class: invalid end time provided (must be 00:00:00 to 23:59:59)"
       );
     }
     if (dto.isRecurrent && !dto.dayOfWeek?.length) {
       throw new BadRequestException(
-        "Cannot create recurrent class: dayOfWeek array cannot be empty when isRecurrent is true",
+        "Cannot create recurrent class: dayOfWeek array cannot be empty when isRecurrent is true"
       );
-    };
+    }
     let schedules: ClassSchedule[] | null | undefined;
     if (dto.dayOfWeek !== undefined) {
-      schedules = dto.dayOfWeek === null || dto.dayOfWeek.length === 0 
-        ? null 
-        : dto.dayOfWeek.map((day) => new ClassSchedule({ dayOfWeek: day }));
+      schedules =
+        dto.dayOfWeek === null || dto.dayOfWeek.length === 0
+          ? null
+          : dto.dayOfWeek.map((day) => new ClassSchedule({ dayOfWeek: day }));
     }
-    this.updateClassProperties(existingClass, dto,teachers,schedules);
+    this.updateClassProperties(existingClass, dto, teachers, schedules);
     const classObj = await this.classRepository.update(existingClass);
     return ClassResponseMapper.toDTO(classObj);
   }
 
-
-  private async validateAndGetTeachers(teacherIds?: number[]): Promise<Teacher[]> {
+  private async validateAndGetTeachers(
+    teacherIds?: number[]
+  ): Promise<Teacher[]> {
     if (!teacherIds || teacherIds.length === 0) {
       return [];
     }
 
-    const teachers = await this.classQueriesService.getManyByTeacherId(teacherIds);
-    
+    const teachers =
+      await this.classQueriesService.getManyByTeacherId(teacherIds);
+
     if (teachers.length !== teacherIds.length) {
-      const foundIds = teachers.map(t => t.id);
-      const missingIds = teacherIds.filter(id => !foundIds.includes(id));
-      
+      const foundIds = teachers.map((t) => t.id);
+      const missingIds = teacherIds.filter((id) => !foundIds.includes(id));
+
       throw new BadRequestException(
-        `Cannot create class: invalid teacher ID(s) provided: ${missingIds.join(', ')}`
+        `Cannot create class: invalid teacher ID(s) provided: ${missingIds.join(", ")}`
       );
     }
 
@@ -166,13 +170,16 @@ export class ClassService {
     dto.name !== undefined && classEntity.setName(dto.name);
     dto.activityId !== undefined && classEntity.setActivityId(dto.activityId);
     dto.levelId !== undefined && classEntity.setLevelId(dto.levelId);
-    dto.isRecurrent !== undefined && classEntity.setIsRecurrent(dto.isRecurrent);
+    dto.isRecurrent !== undefined &&
+      classEntity.setIsRecurrent(dto.isRecurrent);
     dto.startDate !== undefined && classEntity.setStartDate(dto.startDate);
     dto.endDate !== undefined && classEntity.setEndDate(dto.endDate);
-    
-    dto.startTime !== undefined && classEntity.setStartTime(new Date(`1970-01-01T${dto.startTime}`));
-    dto.endTime !== undefined && classEntity.setEndTime(new Date(`1970-01-01T${dto.endTime}`));
-    
+
+    dto.startTime !== undefined &&
+      classEntity.setStartTime(new Date(`1970-01-01T${dto.startTime}`));
+    dto.endTime !== undefined &&
+      classEntity.setEndTime(new Date(`1970-01-01T${dto.endTime}`));
+
     dto.teacherIds !== undefined && classEntity.setTeachers(teachers);
     schedules !== undefined && classEntity.setSchedules(schedules ?? []);
   }
@@ -180,21 +187,35 @@ export class ClassService {
   async deleteClass(classId: number): Promise<DeleteClassResponseDTO> {
     const classInstance = await this.findById(classId);
 
-    if (classInstance.endDate) {
-      throw new BadRequestException(`Class with ID ${classId} is already finalized`);
+    if (classInstance.state === ClassState.INATIVA) {
+      return {
+        id: classInstance.id!,
+        name: classInstance.name,
+        state: classInstance.state,
+        endDate: classInstance.endDate!.toISOString(),
+        message: "Class was already inactive. No changes were applied.",
+      };
     }
 
-    const currentDate = new Date();
+    const effectiveEndDate = classInstance.endDate ?? new Date();
 
-    classInstance.setEndDate(currentDate);
+    classInstance.setState(ClassState.INATIVA);
+
+    if (!classInstance.endDate) {
+      classInstance.setEndDate(effectiveEndDate);
+    }
 
     await this.classRepository.update(classInstance);
 
-    await this.enrollmentService.finishEnrollmentsByClassId(classId, currentDate);
+    await this.enrollmentService.finishEnrollmentsByClassId(
+      classId,
+      effectiveEndDate
+    );
 
     return {
       id: classInstance.id!,
       name: classInstance.name,
+      state: classInstance.state,
       endDate: classInstance.endDate!.toISOString(),
       message: "Class deleted logically. All enrollments have been finalized.",
     };

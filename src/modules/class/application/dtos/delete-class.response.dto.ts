@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { ClassState } from "src/common/enums/domain.enums";
 
 export class DeleteClassResponseDTO {
   @ApiProperty({
@@ -12,6 +13,12 @@ export class DeleteClassResponseDTO {
     example: "Advanced Guitar Class",
   })
   name: string;
+
+  @ApiProperty({
+    description: "New state of the class",
+    example: "INATIVA",
+  })
+  state: ClassState;
 
   @ApiProperty({
     description: "Date when the class and its enrollments were finalized",

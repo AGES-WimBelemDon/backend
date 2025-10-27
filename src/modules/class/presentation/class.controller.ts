@@ -597,8 +597,8 @@ export class ClassController {
   @ApiOperation({
     summary: "Soft delete a class",
     description:
-      "Performs a logical deletion of a class by setting its endDate to the current date. " +
-      "Also updates all enrollments linked to that class, setting their endDate as well. " +
+      "Marks the class as INATIVA and sets its endDate to the current date. " +
+      "Also updates all related enrollments, ending them at the same date. " +
       "This operation does not physically remove data from the database.",
   })
   @ApiParam({
@@ -616,6 +616,7 @@ export class ClassController {
       example: {
         id: 1,
         name: "Advanced Guitar Class",
+        status: "INATIVA",
         endDate: "2025-10-26T15:30:00.000Z",
         message:
           "Class deleted logically. All enrollments have been finalized.",
