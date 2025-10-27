@@ -5,12 +5,13 @@ import {
   IsArray,
   IsDate,
   IsEnum,
+  IsNotIn,
   IsNumber,
   IsOptional,
   ValidateIf,
 } from "class-validator";
 import { Transform } from "class-transformer";
-import { DayOfWeek } from "src/common/enums/domain.enums";
+import { ClassState, DayOfWeek } from "src/common/enums/domain.enums";
 import { transformDateStringToDate } from "src/common/transformers/string.to.date.transformer";
 
 export class UpdateClassDTO extends PartialType(CreateClassDTO) {
@@ -52,4 +53,17 @@ export class UpdateClassDTO extends PartialType(CreateClassDTO) {
   @IsArray()
   @IsEnum(DayOfWeek, { each: true })
   dayOfWeek?: DayOfWeek[];
+
+  @ApiProperty({
+    example: "ATIVA",
+    description: "Class status. Cannot be set to INATIVA - use DELETE endpoint to deactivate classes",
+    enum: ClassState,
+    required: false,
+  })
+  @IsOptional()
+  @IsEnum(ClassState)
+  @IsNotIn([ClassState.INATIVA], {
+    message: "Cannot set class to INATIVA through update. Use DELETE endpoint to deactivate classes",
+  })
+  state?: ClassState;
 }

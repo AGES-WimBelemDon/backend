@@ -507,6 +507,12 @@ export class ClassController {
           teacherIds: [3, 4],
         },
       },
+      updateState: {
+        summary: "Update class state",
+        value: {
+          state: "ATIVA",
+        },
+      },
       fullUpdate: {
         summary: "Multiple fields",
         value: {
@@ -516,6 +522,7 @@ export class ClassController {
           startTime: "14:00:00",
           endTime: "15:30:00",
           dayOfWeek: ["TERCA", "QUINTA"],
+          state: "ATIVA",
         },
       },
     },

@@ -175,7 +175,7 @@ export class ClassService {
       classEntity.setIsRecurrent(dto.isRecurrent);
     dto.startDate !== undefined && classEntity.setStartDate(dto.startDate);
     dto.endDate !== undefined && classEntity.setEndDate(dto.endDate);
-
+    dto.state !== undefined && classEntity.setState(dto.state);
     dto.startTime !== undefined &&
       classEntity.setStartTime(new Date(`1970-01-01T${dto.startTime}`));
     dto.endTime !== undefined &&
