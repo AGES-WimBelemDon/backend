@@ -6,9 +6,10 @@ import { CLASS_QUERIES_TOKEN } from "./application/class.service.query.interface
 import { ClassQueryServicePrisma } from "./infrastructure/class.query.service.prisma";
 import { ClassRepository } from "./infrastructure/class.repository.prisma";
 import { CLASS_REPOSITORY_TOKEN } from "./domain/class.repository.interface";
+import { EnrollmentModule } from "../enrollment/enrollment.module";
 
 @Module({
-  imports: [LevelModule],
+  imports: [LevelModule, EnrollmentModule],
   controllers: [ClassController],
   providers: [
     ClassService,

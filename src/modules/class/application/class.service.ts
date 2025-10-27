@@ -16,11 +16,14 @@ import { ClassQueryFilters, ClassResponseDTO } from "./dtos";
 import { ClassResponseMapper } from "./mappers";
 import { ClassState } from "src/common/enums/domain.enums";
 import { UpdateClassDTO } from "./dtos/update-class.request.dto";
+import { EnrollmentService } from "src/modules/enrollment/application/enrollment.service";
+import { DeleteClassResponseDTO } from "./dtos/delete-class.response.dto";
 
 @Injectable()
 export class ClassService {
   constructor(
     private readonly levelService: LevelService,
+    private readonly enrollmentService: EnrollmentService,
 
     @Inject(CLASS_QUERIES_TOKEN)
     private readonly classQueriesService: IClassQueries,
@@ -172,5 +175,28 @@ export class ClassService {
     
     dto.teacherIds !== undefined && classEntity.setTeachers(teachers);
     schedules !== undefined && classEntity.setSchedules(schedules ?? []);
+  }
+
+  async deleteClass(classId: number): Promise<DeleteClassResponseDTO> {
+    const classInstance = await this.findById(classId);
+
+    if (classInstance.endDate) {
+      throw new BadRequestException(`Class with ID ${classId} is already finalized`);
+    }
+
+    const currentDate = new Date();
+
+    classInstance.setEndDate(currentDate);
+
+    await this.classRepository.update(classInstance);
+
+    await this.enrollmentService.finishEnrollmentsByClassId(classId, currentDate);
+
+    return {
+      id: classInstance.id!,
+      name: classInstance.name,
+      endDate: classInstance.endDate!.toISOString(),
+      message: "Class deleted logically. All enrollments have been finalized.",
+    };
   }
 }

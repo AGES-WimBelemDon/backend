@@ -1,10 +1,28 @@
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery, ApiParam } from "@nestjs/swagger";
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiQuery,
+  ApiParam,
+} from "@nestjs/swagger";
 import { ClassService } from "../application/class.service";
 import { CreateClassDTO } from "../application/dtos/create-class.request.dto";
 import { ClassQueryFilters, ClassResponseDTO } from "../application/dtos";
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+} from "@nestjs/common";
 import { ClassState } from "src/common/enums/domain.enums";
 import { UpdateClassDTO } from "../application/dtos/update-class.request.dto";
+import { DeleteClassResponseDTO } from "../application/dtos/delete-class.response.dto";
 
 @ApiTags("classes")
 @Controller("classes")
@@ -173,7 +191,7 @@ export class ClassController {
     },
   })
   async createClass(
-    @Body() createClassDto: CreateClassDTO,
+    @Body() createClassDto: CreateClassDTO
   ): Promise<ClassResponseDTO> {
     return await this.classService.createClass(createClassDto);
   }
@@ -209,7 +227,8 @@ export class ClassController {
     name: "state",
     required: false,
     enum: [...Object.values(ClassState), "ALL"],
-    description: "Filter by class status. Use 'ALL' to retrieve classes of all statuses",
+    description:
+      "Filter by class status. Use 'ALL' to retrieve classes of all statuses",
     example: "ATIVA",
   })
   @ApiResponse({
@@ -277,9 +296,7 @@ export class ClassController {
             summary: "Invalid classId format",
             value: {
               statusCode: 400,
-              message: [
-                "classId must be an integer number",
-              ],
+              message: ["classId must be an integer number"],
               error: "Bad Request",
             },
           },
@@ -287,9 +304,7 @@ export class ClassController {
             summary: "Invalid state value",
             value: {
               statusCode: 400,
-              message: [
-                "state must be a valid enum value",
-              ],
+              message: ["state must be a valid enum value"],
               error: "Bad Request",
             },
           },
@@ -351,7 +366,8 @@ export class ClassController {
     name: "state",
     required: false,
     enum: [...Object.values(ClassState), "ALL"],
-    description: "Filter by class status. Use 'ALL' to retrieve classes of all statuses",
+    description:
+      "Filter by class status. Use 'ALL' to retrieve classes of all statuses",
     example: ClassState.ATIVA,
   })
   @ApiResponse({
@@ -455,7 +471,7 @@ export class ClassController {
   ): Promise<ClassResponseDTO[]> {
     return await this.classService.findMyClasses(userId, filterDto);
   }
-  @Patch(':classId')
+  @Patch(":classId")
   @ApiOperation({
     summary: "Update an existing class",
     description:
@@ -519,7 +535,8 @@ export class ClassController {
             summary: "Invalid teacher ID",
             value: {
               statusCode: 400,
-              message: "Cannot create class: invalid teacher ID(s) provided: 99",
+              message:
+                "Cannot create class: invalid teacher ID(s) provided: 99",
               error: "Bad Request",
             },
           },
@@ -527,7 +544,8 @@ export class ClassController {
             summary: "Missing days for recurrent class",
             value: {
               statusCode: 400,
-              message: "Cannot create recurrent class: dayOfWeek array cannot be empty when isRecurrent is true",
+              message:
+                "Cannot create recurrent class: dayOfWeek array cannot be empty when isRecurrent is true",
               error: "Bad Request",
             },
           },
@@ -535,7 +553,8 @@ export class ClassController {
             summary: "Invalid time value",
             value: {
               statusCode: 400,
-              message: "Cannot update class: invalid start time provided (must be 00:00:00 to 23:59:59)",
+              message:
+                "Cannot update class: invalid start time provided (must be 00:00:00 to 23:59:59)",
               error: "Bad Request",
             },
           },
@@ -568,9 +587,90 @@ export class ClassController {
     },
   })
   async updateClass(
-    @Param('classId', ParseIntPipe) classId: number,
-    @Body() updateClassDto: UpdateClassDTO,
+    @Param("classId", ParseIntPipe) classId: number,
+    @Body() updateClassDto: UpdateClassDTO
   ): Promise<ClassResponseDTO> {
     return await this.classService.update(classId, updateClassDto);
+  }
+
+  @Delete(":classId")
+  @ApiOperation({
+    summary: "Soft delete a class",
+    description:
+      "Performs a logical deletion of a class by setting its endDate to the current date. " +
+      "Also updates all enrollments linked to that class, setting their endDate as well. " +
+      "This operation does not physically remove data from the database.",
+  })
+  @ApiParam({
+    name: "classId",
+    required: true,
+    type: Number,
+    description: "ID of the class to be logically deleted",
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Class and related enrollments logically deleted successfully",
+    type: DeleteClassResponseDTO,
+    schema: {
+      example: {
+        id: 1,
+        name: "Advanced Guitar Class",
+        endDate: "2025-10-26T15:30:00.000Z",
+        message:
+          "Class deleted logically. All enrollments have been finalized.",
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Not Found - Class not found",
+    schema: {
+      example: {
+        statusCode: 404,
+        message: "Class with ID 99 not found",
+        error: "Not Found",
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Bad Request - Invalid ID",
+    content: {
+      "application/json": {
+        schema: {
+          type: "object",
+          properties: {
+            statusCode: { type: "number", example: 400 },
+            message: { type: "string" },
+            error: { type: "string", example: "Bad Request" },
+          },
+        },
+        examples: {
+          invalidId: {
+            summary: "Invalid ID parameter",
+            value: {
+              statusCode: 400,
+              message: "Validation failed (numeric string is expected)",
+              error: "Bad Request",
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: "Internal Server Error",
+    schema: {
+      example: {
+        statusCode: 500,
+        message: "Internal server error",
+        error: "Failed to logically delete class",
+      },
+    },
+  })
+  async deleteClass(@Param("classId", ParseIntPipe) classId: number) {
+    return await this.classService.deleteClass(classId);
   }
 }

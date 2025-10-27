@@ -34,10 +34,11 @@ export class EnrollmentService {
     @Inject(ENROLLMENT_QUERIES_TOKEN)
     private readonly enrollmentQueryService: IEnrollmentQueries,
     @Inject(StudentService)
-    private readonly studentService: StudentService,) {}
+    private readonly studentService: StudentService
+  ) {}
 
   async createEnrollments(
-    data: CreateEnrollmentRequestDTO,
+    data: CreateEnrollmentRequestDTO
   ): Promise<CreateEnrollmentResponseDTO> {
     const { classId, studentIds } = data;
     // TODO: it's necessary to validate the class
@@ -54,12 +55,12 @@ export class EnrollmentService {
 
     const foundStudentIds = students.map((s) => s.getId());
     const missingStudentIds = studentIds.filter(
-      (id) => !foundStudentIds.includes(id),
+      (id) => !foundStudentIds.includes(id)
     );
 
     if (missingStudentIds.length > 0) {
       throw new NotFoundException(
-        `Students with IDs ${missingStudentIds.join(", ")} not found.`,
+        `Students with IDs ${missingStudentIds.join(", ")} not found.`
       );
     }
 
@@ -70,7 +71,7 @@ export class EnrollmentService {
       const existingEnrollment =
         await this.enrollmentRepository.findActiveByStudentAndClass(
           studentId,
-          classId,
+          classId
         );
 
       if (existingEnrollment) {
@@ -116,13 +117,13 @@ export class EnrollmentService {
   }
 
   async findEnrollments(
-    filters: EnrollmentQueryFilters,
+    filters: EnrollmentQueryFilters
   ): Promise<EnrollmentListItemDTO[]> {
     return await this.enrollmentQueryService.findEnrollments(filters);
   }
 
   async reactivateEnrollment(
-    id: number,
+    id: number
   ): Promise<ReactivateEnrollmentResponseDTO> {
     const enrollment = await this.enrollmentRepository.findById(id);
 
@@ -130,14 +131,15 @@ export class EnrollmentService {
       throw new NotFoundException(`Enrollment with ID ${id} not found.`);
     }
 
-    const enrollmentData = await this.enrollmentQueryService.findEnrollmentWithStudentAndClass(id);
+    const enrollmentData =
+      await this.enrollmentQueryService.findEnrollmentWithStudentAndClass(id);
     if (!enrollmentData) {
       throw new NotFoundException(`Enrollment with ID ${id} not found.`);
     }
 
     if (enrollmentData.student.status !== "ATIVO") {
       throw new BadRequestException(
-        `Cannot reactivate enrollment: student ${enrollmentData.student.id} is not active.`,
+        `Cannot reactivate enrollment: student ${enrollmentData.student.id} is not active.`
       );
     }
 
@@ -159,7 +161,10 @@ export class EnrollmentService {
           id: enrollmentData.class.id,
           name: enrollmentData.class.name,
         },
-        enrollmentDate: enrollment.getEnrollmentDate().toISOString().split("T")[0],
+        enrollmentDate: enrollment
+          .getEnrollmentDate()
+          .toISOString()
+          .split("T")[0],
         endDate: null,
         warnings,
       };
@@ -167,15 +172,15 @@ export class EnrollmentService {
     const existingActive =
       await this.enrollmentRepository.findActiveByStudentAndClass(
         enrollment.getStudentId(),
-        enrollment.getClassId(),
+        enrollment.getClassId()
       );
 
     if (existingActive && existingActive.getId() !== id) {
       throw new ConflictException(
-        `Student ${enrollment.getStudentId()} already has an active enrollment in class ${enrollment.getClassId()}.`,
+        `Student ${enrollment.getStudentId()} already has an active enrollment in class ${enrollment.getClassId()}.`
       );
     }
-    
+
     enrollment.reactivate();
     const updated = await this.enrollmentRepository.update(enrollment);
 
@@ -205,10 +210,35 @@ export class EnrollmentService {
 
     if (!enrollment.isActive()) {
       throw new BadRequestException(
-        `Enrollment with ID ${id} is already inactive.`,
+        `Enrollment with ID ${id} is already inactive.`
       );
     }
 
     await this.enrollmentRepository.softDelete(id);
+  }
+
+  async finishEnrollmentsByClassId(
+    classId: number,
+    endDate: Date
+  ): Promise<void> {
+    const activeEnrollments = await this.findEnrollments({
+      classId,
+      endDateNull: true,
+    });
+
+    if (!activeEnrollments || activeEnrollments.length === 0) {
+      return;
+    }
+
+    for (const enrollment of activeEnrollments) {
+      const enrollmentEntity = await this.enrollmentRepository.findById(
+        enrollment.enrollmentId
+      );
+
+      if (enrollmentEntity && enrollmentEntity.isActive()) {
+        enrollmentEntity.setEndDate(endDate);
+        await this.enrollmentRepository.update(enrollmentEntity);
+      }
+    }
   }
 }
