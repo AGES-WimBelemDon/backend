@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Inject,
   Injectable,
   NotFoundException,
@@ -186,15 +187,11 @@ export class ClassService {
 
   async deleteClass(classId: number): Promise<DeleteClassResponseDTO> {
     const classInstance = await this.findById(classId);
-
     if (classInstance.state === ClassState.INATIVA) {
-      return {
-        id: classInstance.id!,
-        name: classInstance.name,
-        state: classInstance.state,
-        endDate: classInstance.endDate!.toISOString(),
-        message: "Class was already inactive. No changes were applied.",
-      };
+      throw new ConflictException(
+        `Class with ID ${classId} is already inactive and cannot be deleted again`
+      );
+
     }
 
     const effectiveEndDate = classInstance.endDate ?? new Date();
@@ -216,7 +213,7 @@ export class ClassService {
       id: classInstance.id!,
       name: classInstance.name,
       state: classInstance.state,
-      endDate: classInstance.endDate!.toISOString(),
+      endDate: classInstance.endDate!.toISOString().split("T")[0],
       message: "Class deleted logically. All enrollments have been finalized.",
     };
   }

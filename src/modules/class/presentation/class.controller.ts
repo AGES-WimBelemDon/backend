@@ -661,6 +661,32 @@ export class ClassController {
     },
   })
   @ApiResponse({
+    status: 409,
+    description: "Conflict - Class already deleted",
+    content: {
+      "application/json": {
+        schema: {
+          type: "object",
+          properties: {
+            statusCode: { type: "number", example: 409 },
+            message: { type: "string" },
+            error: { type: "string", example: "Conflict Exception" },
+          },
+        },
+        examples: {
+          invalidId: {
+            summary: "Invalid class state",
+            value: {
+              statusCode: 409,
+              message: "Class with ID (numeric string is expectd) is already inactive and cannot be deleted again",
+              error: "Conflict",
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
     status: 500,
     description: "Internal Server Error",
     schema: {
