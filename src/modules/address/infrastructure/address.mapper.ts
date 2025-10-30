@@ -1,5 +1,6 @@
+import { AddressResponseDTO } from '../application/address-response.dto';
 import { AddressEntity } from '../domain/address.entity';
-import { Address as PrismaAddress } from '@prisma/client';
+import { Address, Address as PrismaAddress } from '@prisma/client';
 
 export class AddressMapper {
     static toDomain(prismaAddress: PrismaAddress): AddressEntity {
@@ -14,16 +15,27 @@ export class AddressMapper {
             number: prismaAddress.number || undefined,
         });
     }
-    static toResponse(address: AddressEntity) {
+    static toResponse(address: AddressEntity): AddressResponseDTO {
         return {
-            id: address.getId(),
+            id: address.getId()!,
             street: address.getStreet(),
             city: address.getCity(),
             state: address.getState(),
             cep: address.getCep(),
             neighborhood: address.getNeighborhood(),
-            complement: address.getComplement(),
-            number: address.getNumber(),
+            complement: address.getComplement()!,
+            number: address.getNumber()!,
         };
-    }
+    };
+    static toPersistence(address: AddressEntity) {
+        return {
+            cep: address.getCep(),
+            street: address.getStreet(),
+            number: address.getNumber() ?? null,
+            complement: address.getComplement() ?? null,
+            neighborhood: address.getNeighborhood(),
+            city: address.getCity(),
+            state: address.getState(),
+        };
+  }
 }

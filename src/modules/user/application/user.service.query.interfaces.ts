@@ -1,17 +1,13 @@
-import { UserDetailedResponseDTO, UserResponseDTO } from "./user.dtos";
+import { User } from "../domain/exceptions/user.entity";
 
 export const USER_REPOSITORY_TOKEN = "IUserRepository";
 
 export interface IUserRepository {
-  createUser(
-    uid: string,
-    email: string,
-    name: string,
-  ): Promise<UserResponseDTO>;
-  findAll(): Promise<UserResponseDTO[]>;
-  findById(id: number): Promise<UserDetailedResponseDTO | null>;
-  findByUid(uid: string): Promise<UserResponseDTO | null>;
-  findByEmail(email: string): Promise<UserResponseDTO | null>;
+  createUser(user: User): Promise<User>
+  findAll(): Promise<User[]>;
+  findById(id: number): Promise<User | null>;
+  findByUid(uid: string): Promise<User | null>;
+  findByEmail(email: string): Promise<User | null>;
   disableUser(id: number): Promise<void>;
   enableUser(id: number): Promise<void>;
 }

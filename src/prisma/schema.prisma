@@ -7,30 +7,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model User {
-  id            Int      @id @default(autoincrement())
-  uidFirebase   String   @unique @map("uid_firebase")
-  fullName      String   @map("full_name")
-  email         String   @unique
-  roleId        Int?     @map("role_id")
-  addressId     Int      @map("address_id")
-  createdAt     DateTime @default(now()) @map("created_at")
-  status        UserStatus @default(ATIVO)
-  role          Role?    @relation("Roles", fields: [roleId], references: [id])
-  address       Address  @relation(fields: [addressId], references: [id])
-  classes       Class[]  @relation("ClassTeacher")
+  id          Int        @id @default(autoincrement())
+  uidFirebase String     @unique @map("uid_firebase")
+  fullName    String     @map("full_name")
+  email       String     @unique
+  role        Role       @default(any)
+  addressId   Int?       @map("address_id")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  status      UserStatus @default(ATIVO)
+  address     Address?   @relation(fields: [addressId], references: [id])
+  classes     Class[]    @relation("ClassTeacher")
 
   @@map("user")
-}
-
-model Role {
-  id          Int     @id @default(autoincrement())
-  name        String  @unique
-  description String?
-
-  users User[]  @relation("Roles")
-
-  @@map("role")
 }
 
 model Student {
@@ -312,7 +302,15 @@ enum DayOfWeek {
   SABADO
   DOMINGO
 }
-
+enum Role {
+  any
+  admin
+  manager
+  teacher
+  psychologist
+  intern
+  developer
+}
 model ExampleEntity {
   id        String   @id
   name      String   

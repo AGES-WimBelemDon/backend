@@ -1,22 +1,15 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { UserStatus } from "@prisma/client";
-import { IsEmail, IsString } from "class-validator";
-
-export class RoleDTO {
-  @ApiProperty({ example: 1, description: "Role ID" })
-  id: number;
-
-  @ApiProperty({ example: "Admin", description: "Role name" })
-  name: string;
-
-  @ApiProperty({ example: "Administrator role", description: "Role description", nullable: true })
-  description: string | null;
-}
+import { Type } from "class-transformer";
+import { IsEmail, IsEnum, IsOptional, IsString, ValidateNested } from "class-validator";
+import { Role } from "src/common/enums/roles.enum";
+import { AddressResponseDTO } from "src/modules/address/application/address-response.dto";
+import { CreateAddressDTO } from "src/modules/address/application/create-address.dto";
 
 export class RegisterUserDTO {
   @ApiProperty({
     example: "user@example.com",
-    description: "Email of the user to be registered",
+    description: "Email of the user to be registered. Must be unique and valid.",
   })
   @IsEmail()
   email: string;
@@ -27,6 +20,33 @@ export class RegisterUserDTO {
   })
   @IsString()
   name: string;
+
+  @ApiProperty({
+    example: Role.Teacher,
+    description: "User role in the system",
+    enum: Role,
+  })
+  @IsEnum(Role)
+  role: Role;
+
+  @ApiProperty({
+    example: {
+      cep: "12345-678",
+      street: "Rua Example",
+      number: "123",
+      complement: "Apt 4B",
+      neighborhood: "Centro",
+      city: "São Paulo",
+      state: "SP",
+    },
+    description: "User address information (optional). If provided, creates a new address record.",
+    required: false,
+    type: CreateAddressDTO,
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => CreateAddressDTO)
+  address?: CreateAddressDTO;
 }
 
 export class LoginUserDTO {
@@ -51,10 +71,27 @@ export class UserResponseDTO {
   @ApiProperty({ example: "ATIVO", description: "User account status", enum: UserStatus })
   status: UserStatus;
 
-  @ApiProperty({ type: RoleDTO, nullable: true, description: "User role" })
-  role: RoleDTO | null;
-}
+  @ApiProperty({ 
+    example: Role.Teacher, 
+    description: "User role in the system", 
+    enum: Role 
+  })
+  role: Role;
 
-export class UserDetailedResponseDTO extends UserResponseDTO {
-  // Can add additional fields here if needed in the future
+  @ApiProperty({ 
+    example: {
+      id: 1,
+      cep: "12345-678",
+      street: "Rua Example",
+      number: "123",
+      complement: "Apt 4B",
+      neighborhood: "Centro",
+      city: "São Paulo",
+      state: "SP"
+    },
+    description: "User address information",
+    nullable: true,
+    required: false
+  })
+  address: AddressResponseDTO | null;
 }

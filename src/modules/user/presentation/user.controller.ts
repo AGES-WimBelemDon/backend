@@ -14,8 +14,7 @@ import { UserService } from "../application/user.service";
 import {
   RegisterUserDTO,
   LoginUserDTO,
-  UserResponseDTO,
-  UserDetailedResponseDTO,
+  UserResponseDTO
 } from "../application/user.dtos";
 import { Roles } from "src/common/decorators/roles.decorator";
 import { RolesGuard } from "src/common/guards/role.guard";
@@ -91,12 +90,12 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: "User found",
-    type: UserDetailedResponseDTO,
+    type: UserResponseDTO,
   })
   @ApiResponse({ status: 404, description: "User not found" })
   async findById(
     @Param("id", ParseIntPipe) id: number,
-  ): Promise<UserDetailedResponseDTO | null> {
+  ): Promise<UserResponseDTO | null> {
     return this.userService.findById(id);
   }
 

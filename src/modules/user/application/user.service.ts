@@ -10,13 +10,15 @@ import {
 import {
   RegisterUserDTO,
   UserResponseDTO,
-  LoginUserDTO,
-  UserDetailedResponseDTO,
+  LoginUserDTO
 } from "./user.dtos";
 import { FirebaseService } from "src/modules/firebase/application/firebase.service";
 import { UserStatus } from "@prisma/client";
 import { AuthException, AuthErrorCode } from "../domain/exceptions/auth.exception";
 import { auth } from "firebase-admin";
+import { User } from "../domain/exceptions/user.entity";
+import { AddressEntity } from "src/modules/address/domain/address.entity";
+import { UserResponseMapper } from "./mapper/user.response.mapper";
 
 @Injectable()
 export class UserService {
@@ -38,12 +40,28 @@ export class UserService {
       if (!firebaseUser) {
         firebaseUser = await this.firebaseService.createFirebaseUser(user);
       }
-      const dbUser = await this.userRepository.createUser(
-        firebaseUser.uid,
-        user.email,
-        user.name,
-      );
-      return dbUser;
+      const userEntity = new User({
+        uidFirebase: firebaseUser.uid,
+        email: user.email,
+        fullName: user.name,
+        role: user.role,
+      });
+      if (user.address) {
+        const addressEntity = new AddressEntity({
+          cep: user.address.cep,
+          street: user.address.street,
+          number: user.address.number,
+          complement: user.address.complement,
+          neighborhood: user.address.neighborhood,
+          city: user.address.city,
+          state: user.address.state,
+        });
+        userEntity.setAddress(addressEntity);
+      }
+
+      const createdUser = await this.userRepository.createUser(userEntity);
+      
+      return UserResponseMapper.toDTO(createdUser);
     } catch (error) {
       if (firebaseUser?.uid) {
         await this.firebaseService.deleteFirebaseUser(firebaseUser.uid);
@@ -71,22 +89,27 @@ export class UserService {
       );
     }
 
-    if (!(user.status === UserStatus.ATIVO)) {
+    if (!(user.getStatus() === UserStatus.ATIVO)) {
       throw new AuthException(
         AuthErrorCode.USER_INACTIVE,
         "User account is not active"
       );
     }
     
-    return user;
+    return UserResponseMapper.toDTO(user);
   }
 
   async findAll(): Promise<UserResponseDTO[]> {
-    return this.userRepository.findAll();
+    const users = await this.userRepository.findAll();
+    return UserResponseMapper.toDTOList(users);
   }
 
-  async findById(id: number): Promise<UserDetailedResponseDTO | null> {
-    return this.userRepository.findById(id);
+  async findById(id: number): Promise<UserResponseDTO | null> {
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      return null;
+    }
+    return UserResponseMapper.toDTO(user);
   }
 
   async disableUser(id: number): Promise<void> {
