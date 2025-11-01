@@ -8,6 +8,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from 'src/common/decorators/public.decorator';
 import { Request } from "express";
+import { RequestWithFirebase } from "src/common/interfaces/request.interface";
 import * as admin from "firebase-admin";
 import { FIREBASE_ADMIN } from "src/modules/firebase/firebase.config.module";
 
@@ -26,7 +27,7 @@ export class FirebaseAuthGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest<Request>();
+  const request = context.switchToHttp().getRequest<RequestWithFirebase>();
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
@@ -35,7 +36,7 @@ export class FirebaseAuthGuard implements CanActivate {
 
     try {
       const decodedToken = await this.firebaseAdmin.auth().verifyIdToken(token);
-      request['firebaseToken'] = {
+      request.firebaseToken = {
         uid: decodedToken.uid,
         email: decodedToken.email,
         name: decodedToken.name,

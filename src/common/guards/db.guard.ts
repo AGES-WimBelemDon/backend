@@ -8,7 +8,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from 'src/common/decorators/public.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Request } from 'express';
+import { RequestUserPayload, RequestWithDbUser } from 'src/common/interfaces/request.interface';
 import { UserStatus } from '@prisma/client';
 import { DEV_CONFIG, DevConfigType } from 'src/config/dev.config.module';
 import { Role } from 'src/common/enums/roles.enum';
@@ -29,16 +29,16 @@ export class DbGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest<Request>();
+    const request = context.switchToHttp().getRequest<RequestWithDbUser>();
 
-    const firebaseToken = request['firebaseToken'];
+    const firebaseToken = request.firebaseToken;
     if (!firebaseToken?.uid) {
       return false;
     }
 
     const dbUser = await this.prisma.user.findUnique({
       where: { uidFirebase: firebaseToken.uid },
-      select: { id: true, role: true, status: true, email: true },
+      select: { id: true, role: true, status: true },
     });
 
     if (!dbUser) {
@@ -49,10 +49,10 @@ export class DbGuard implements CanActivate {
       throw new ForbiddenException('User account is disabled');
     }
 
-    request['user'] = dbUser;
+    request.user = dbUser as RequestUserPayload;
 
     if (this.devConfig?.enabled) {
-      request['user'].role = this.devConfig.role || (Role.Developer as string);
+      request.user.role = (this.devConfig.role as Role) || Role.Developer;
     }
 
     return true;
