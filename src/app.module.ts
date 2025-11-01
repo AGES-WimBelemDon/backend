@@ -12,6 +12,7 @@ import { LevelModule } from './modules/level/level.module';
 import { EnrollmentModule } from './modules/enrollment/enrollment.module';
 import { AssessmentModule } from './modules/assessment/assessment.module';
 import { ClassModule } from './modules/class/class.module';
+import { ActivityModule } from './modules/activity/activity.module';
 
 @Module({
   imports: [
@@ -31,7 +32,8 @@ import { ClassModule } from './modules/class/class.module';
     LevelModule,
     EnrollmentModule,
     AssessmentModule,
-    ClassModule
+    ClassModule,
+    ActivityModule
   ],
 })
 export class AppModule {}
