@@ -9,9 +9,8 @@ import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from 'src/common/decorators/public.decorator';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RequestUserPayload, RequestWithDbUser } from 'src/common/interfaces/request.interface';
-import { UserStatus } from '@prisma/client';
+import { Role, UserStatus } from '@prisma/client';
 import { DEV_CONFIG, DevConfigType } from 'src/config/dev.config.module';
-import { Role } from 'src/common/enums/roles.enum';
 
 @Injectable()
 export class DbGuard implements CanActivate {
@@ -52,7 +51,7 @@ export class DbGuard implements CanActivate {
     request.user = dbUser as RequestUserPayload;
 
     if (this.devConfig?.enabled) {
-      request.user.role = (this.devConfig.role as Role) || Role.Developer;
+      request.user.role = (this.devConfig.role as Role) || Role.developer;
     }
 
     return true;

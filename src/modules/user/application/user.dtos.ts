@@ -1,13 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { UserStatus } from "@prisma/client";
+import { Role, UserStatus } from "@prisma/client";
 import { Type } from "class-transformer";
 import { IsEmail, IsEnum, IsOptional, IsString, ValidateNested } from "class-validator";
-import { Role } from "src/common/enums/roles.enum";
 import { AddressResponseDTO } from "src/modules/address/application/address-response.dto";
 import { CreateAddressDTO } from "src/modules/address/application/create-address.dto";
 
 export class GetUsersQueryDTO {
-  @ApiProperty({ example: Role.Teacher, description: 'Filter by user role', enum: Role, required: false })
+  @ApiProperty({ example: Role.teacher, description: 'Filter by user role', enum: Role, required: false })
   @IsOptional()
   @IsEnum(Role)
   role?: Role;
@@ -34,7 +33,7 @@ export class RegisterUserDTO {
   name: string;
 
   @ApiProperty({
-    example: Role.Teacher,
+    example: Role.teacher,
     description: "User role in the system",
     enum: Role,
   })
@@ -84,7 +83,7 @@ export class UserResponseDTO {
   status: UserStatus;
 
   @ApiProperty({ 
-    example: Role.Teacher, 
+    example: Role.teacher, 
     description: "User role in the system", 
     enum: Role 
   })

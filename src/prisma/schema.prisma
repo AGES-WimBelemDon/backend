@@ -13,7 +13,7 @@ model User {
   uidFirebase String     @unique @map("uid_firebase")
   fullName    String     @map("full_name")
   email       String     @unique
-  role        Role       @default(any)
+  role        Role       @default(teacher)
   addressId   Int?       @map("address_id")
   createdAt   DateTime   @default(now()) @map("created_at")
   status      UserStatus @default(ATIVO)
@@ -289,10 +289,11 @@ enum EducationLevel {
   POS_GRADUACAO
 }
 
-enum NoteTypes{
+enum NoteTypes {
   ATESTADO_MEDICO
   SEM_JUSTIFICATIVA
 }
+
 enum DayOfWeek {
   SEGUNDA
   TERCA
@@ -302,8 +303,8 @@ enum DayOfWeek {
   SABADO
   DOMINGO
 }
+
 enum Role {
-  any
   admin
   manager
   teacher
@@ -311,6 +312,7 @@ enum Role {
   intern
   developer
 }
+
 model ExampleEntity {
   id        String   @id
   name      String   

@@ -1,5 +1,5 @@
+import { Role } from "@prisma/client";
 import { UserStatus } from "src/common/enums/domain.enums";
-import { Role } from "src/common/enums/roles.enum";
 import { AddressEntity } from "src/modules/address/domain/address.entity";
 import { Class } from "src/modules/class/domain/class.entity";
 

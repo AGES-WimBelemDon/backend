@@ -4,7 +4,7 @@ import {
   BadRequestException,
   ForbiddenException,
 } from "@nestjs/common";
-import { Prisma } from "@prisma/client";
+import { Prisma, Role } from "@prisma/client";
 import {
   USER_REPOSITORY_TOKEN,
   IUserRepository,
@@ -22,8 +22,9 @@ import { auth } from "firebase-admin";
 import { User } from "../domain/exceptions/user.entity";
 import { AddressEntity } from "src/modules/address/domain/address.entity";
 import { UserResponseMapper } from "./mapper/user.response.mapper";
-import { Role } from "src/common/enums/roles.enum";
 import { RequestWithUser } from "src/common/interfaces/request.interface";
+
+const restrictedRoles: Role[] = [Role.admin, Role.manager];
 
 @Injectable()
 export class UserService {
@@ -39,10 +40,8 @@ export class UserService {
       throw new BadRequestException("Email already registered");
     }
 
-    const requestingUserRole = request.user?.role as Role;
-    if (requestingUserRole !== Role.Admin
-      && [Role.Admin, Role.Manager].includes(user.role)
-    ) {
+    const requestingUserRole = request.user.role;
+    if (requestingUserRole !== Role.admin && restrictedRoles.includes(user.role)) {
       throw new ForbiddenException("Insufficient permissions to assign this role");
     }
 
@@ -112,13 +111,13 @@ export class UserService {
   }
 
   async findAll(request: RequestWithUser, query: GetUsersQueryDTO): Promise<UserResponseDTO[]> {
-    const requestingUserRole = request.user?.role as Role;
+    const requestingUserRole = request.user.role;
     
     const requestedRole = query.role;
-    
-    const isAdmin = requestingUserRole === Role.Admin;
 
-    if (!isAdmin && requestedRole && [Role.Admin, Role.Manager].includes(requestedRole)) {
+    const isAdmin = requestingUserRole === Role.admin;
+
+    if (!isAdmin && requestedRole && restrictedRoles.includes(requestedRole)) {
       throw new ForbiddenException('Insufficient permissions to query Admin/Manager users');
     }
 
@@ -126,7 +125,7 @@ export class UserService {
       status: query.status,
       role: {
         equals: requestedRole || undefined,
-        notIn: !isAdmin ? [Role.Admin, Role.Manager] : undefined,
+        notIn: !isAdmin ? restrictedRoles : undefined,
       }
     };
 
@@ -142,9 +141,7 @@ export class UserService {
     }
 
     const requestingUserRole = request.user?.role as Role;
-    if (requestingUserRole !== Role.Admin
-      && [Role.Admin, Role.Manager].includes(user.getRole())
-    ) {
+    if (requestingUserRole !== Role.admin && restrictedRoles.includes(user.getRole())) {
       throw new ForbiddenException("Insufficient permissions to view this user");
     }
 
@@ -162,9 +159,7 @@ export class UserService {
       throw new BadRequestException("User not found");
     }
 
-    if (requestingUser.role !== Role.Admin
-      && [Role.Admin, Role.Manager].includes(userToDisable.getRole())
-    ) {
+    if (requestingUser.role !== Role.admin && restrictedRoles.includes(userToDisable.getRole())) {
       throw new ForbiddenException("Insufficient permissions to disable this user");
     }
     
@@ -179,9 +174,7 @@ export class UserService {
       throw new BadRequestException("User not found");
     }
 
-    if (requestingUser.role !== Role.Admin
-      && [Role.Admin, Role.Manager].includes(userToEnable.getRole())
-    ) {
+    if (requestingUser.role !== Role.admin && restrictedRoles.includes(userToEnable.getRole())) {
       throw new ForbiddenException("Insufficient permissions to enable this user");
     }
 

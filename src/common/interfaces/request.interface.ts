@@ -1,6 +1,5 @@
-import { UserStatus } from "@prisma/client";
+import { Role, UserStatus } from "@prisma/client";
 import { Request } from "express";
-import { Role } from "src/common/enums/roles.enum";
 
 export interface RequestUserPayload {
   id: number;

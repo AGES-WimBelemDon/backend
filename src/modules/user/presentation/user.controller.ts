@@ -25,8 +25,7 @@ import { Roles } from "src/common/decorators/roles.decorator";
 import { RolesGuard } from "src/common/guards/role.guard";
 import { FirebaseAuthGuard } from "src/common/guards/firebase-auth.guard";
 import { DbGuard } from "src/common/guards/db.guard";
-import { Role } from "src/common/enums/roles.enum";
-import { UserStatus } from "@prisma/client";
+import { Role, UserStatus } from "@prisma/client";
 import { AuthErrorCode } from "../domain/exceptions/auth.exception";
 import { Public } from "src/common/decorators/public.decorator";
 import { RequestWithUser } from "src/common/interfaces/request.interface";
@@ -39,7 +38,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post("register")
-  @Roles(Role.Admin, Role.Manager)
+  @Roles(Role.admin, Role.manager)
   @ApiOperation({ summary: "Register a new user" })
   @ApiResponse({
     status: 201,
@@ -83,7 +82,7 @@ export class UserController {
   }
 
   @Get()
-  @Roles(Role.Admin, Role.Manager)
+  @Roles(Role.admin, Role.manager)
   @ApiOperation({ summary: "Get all users" })
   @ApiResponse({
     status: 200,
@@ -100,7 +99,7 @@ export class UserController {
   }
 
   @Get(":id")
-  @Roles(Role.Admin, Role.Manager)
+  @Roles(Role.admin, Role.manager)
   @ApiOperation({ summary: "Get user by ID" })
   @ApiResponse({
     status: 200,
@@ -116,7 +115,7 @@ export class UserController {
   }
 
   @Patch("disable/:id")
-  @Roles(Role.Admin, Role.Manager)
+  @Roles(Role.admin, Role.manager)
   @HttpCode(204)
   @ApiOperation({ summary: "Disable a user" })
   @ApiResponse({ status: 204, description: "User disabled" })
@@ -128,7 +127,7 @@ export class UserController {
   }
 
   @Patch("enable/:id")
-  @Roles(Role.Admin, Role.Manager)
+  @Roles(Role.admin, Role.manager)
   @HttpCode(204)
   @ApiOperation({ summary: "Enable a user" })
   @ApiResponse({ status: 204, description: "User enabled" })

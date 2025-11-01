@@ -1,8 +1,7 @@
-import { User as PrismaUser, Address as PrismaAddress, Class as PrismaClass } from "@prisma/client";
+import { User as PrismaUser, Address as PrismaAddress, Class as PrismaClass, Role } from "@prisma/client";
 import { AddressMapper } from "src/modules/address/infrastructure/address.mapper";
 import { ClassMapper } from "src/modules/class/infrastructure/class.mapper";
 import { User } from "../domain/exceptions/user.entity";
-import { Role } from "src/common/enums/roles.enum";
 
 type PrismaUserWithRelations = PrismaUser & {
   address?: PrismaAddress | null;
