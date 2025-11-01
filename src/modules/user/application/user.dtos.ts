@@ -6,6 +6,18 @@ import { Role } from "src/common/enums/roles.enum";
 import { AddressResponseDTO } from "src/modules/address/application/address-response.dto";
 import { CreateAddressDTO } from "src/modules/address/application/create-address.dto";
 
+export class GetUsersQueryDTO {
+  @ApiProperty({ example: Role.Teacher, description: 'Filter by user role', enum: Role, required: false })
+  @IsOptional()
+  @IsEnum(Role)
+  role?: Role;
+
+  @ApiProperty({ example: UserStatus.ATIVO, description: 'Filter by user status', enum: UserStatus, required: false })
+  @IsOptional()
+  @IsEnum(UserStatus)
+  status?: UserStatus;
+}
+
 export class RegisterUserDTO {
   @ApiProperty({
     example: "user@example.com",

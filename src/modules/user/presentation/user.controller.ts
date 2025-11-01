@@ -7,22 +7,29 @@ import {
   Patch,
   Post,
   Req,
+  Request,
   UseGuards,
+  Query,
+  HttpCode,
 } from "@nestjs/common";
+import { ApiQuery } from "@nestjs/swagger";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { UserService } from "../application/user.service";
 import {
   RegisterUserDTO,
   LoginUserDTO,
-  UserResponseDTO
+  UserResponseDTO,
+  GetUsersQueryDTO,
 } from "../application/user.dtos";
 import { Roles } from "src/common/decorators/roles.decorator";
 import { RolesGuard } from "src/common/guards/role.guard";
 import { FirebaseAuthGuard } from "src/common/guards/firebase-auth.guard";
 import { DbGuard } from "src/common/guards/db.guard";
 import { Role } from "src/common/enums/roles.enum";
+import { UserStatus } from "@prisma/client";
 import { AuthErrorCode } from "../domain/exceptions/auth.exception";
 import { Public } from "src/common/decorators/public.decorator";
+import { RequestWithUser } from "src/common/interfaces/request.interface";
 
 @Controller("user")
 @ApiTags("user")
@@ -32,7 +39,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post("register")
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Manager)
   @ApiOperation({ summary: "Register a new user" })
   @ApiResponse({
     status: 201,
@@ -40,8 +47,11 @@ export class UserController {
     type: UserResponseDTO,
   })
   @ApiResponse({ status: 400, description: "Email already in use" })
-  async register(@Body() dto: RegisterUserDTO): Promise<UserResponseDTO> {
-    return this.userService.register(dto);
+  async register(
+    @Request() request: RequestWithUser,
+    @Body() user: RegisterUserDTO,
+  ): Promise<UserResponseDTO> {
+    return this.userService.register(user, request);
   }
 
   @Post("login")
@@ -80,8 +90,13 @@ export class UserController {
     description: "List of users",
     type: [UserResponseDTO],
   })
-  async findAll(): Promise<UserResponseDTO[]> {
-    return this.userService.findAll();
+  @ApiQuery({ name: 'role', required: false, enum: Role })
+  @ApiQuery({ name: 'status', required: false, enum: UserStatus })
+  async findAll(
+    @Request() request: RequestWithUser,
+    @Query() query: GetUsersQueryDTO,
+  ): Promise<UserResponseDTO[]> {
+    return this.userService.findAll(request, query);
   }
 
   @Get(":id")
@@ -94,24 +109,33 @@ export class UserController {
   })
   @ApiResponse({ status: 404, description: "User not found" })
   async findById(
+    @Request() request: RequestWithUser,
     @Param("id", ParseIntPipe) id: number,
   ): Promise<UserResponseDTO | null> {
-    return this.userService.findById(id);
+    return this.userService.findById(id, request);
   }
 
   @Patch("disable/:id")
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Manager)
+  @HttpCode(204)
   @ApiOperation({ summary: "Disable a user" })
   @ApiResponse({ status: 204, description: "User disabled" })
-  async disableUser(@Param("id", ParseIntPipe) id: number): Promise<void> {
-    return this.userService.disableUser(id);
+  async disableUser(
+    @Request() request: RequestWithUser,
+    @Param("id", ParseIntPipe) id: number,
+  ): Promise<void> {
+    return this.userService.disableUser(id, request);
   }
 
   @Patch("enable/:id")
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Manager)
+  @HttpCode(204)
   @ApiOperation({ summary: "Enable a user" })
   @ApiResponse({ status: 204, description: "User enabled" })
-  async enableUser(@Param("id", ParseIntPipe) id: number): Promise<void> {
-    return this.userService.enableUser(id);
+  async enableUser(
+    @Request() request: RequestWithUser,
+    @Param("id", ParseIntPipe) id: number,
+  ): Promise<void> {
+    return this.userService.enableUser(id, request);
   }
 }
