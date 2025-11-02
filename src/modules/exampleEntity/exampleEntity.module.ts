@@ -4,7 +4,6 @@ import { ExampleEntityontroller } from "./presentation/exampleEntity.controller"
 import { PrismaExampleEntityRepository } from "./infrastructure/exampleEntity.repository";
 import { ExampleEntityService } from "./application/exampleEntity.service";
 import { FirebaseModule } from "../firebase/firebase.module";
-import { AuthModule } from "../auth/auth.module";
 
 @Module({
     controllers : [ExampleEntityontroller],
@@ -16,6 +15,6 @@ import { AuthModule } from "../auth/auth.module";
         ExampleEntityService,     
     ],
   exports: [EXAMPLE_ENTITY_REPOSITORY_TOKEN, ExampleEntityService],
-  imports: [FirebaseModule, AuthModule]
+  imports: [FirebaseModule]
 })
 export class ExampleEntityModule {}

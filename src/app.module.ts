@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from './modules/auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { ExampleEntityModule } from './modules/exampleEntity/exampleEntity.module';
@@ -12,19 +11,19 @@ import { LevelModule } from './modules/level/level.module';
 import { EnrollmentModule } from './modules/enrollment/enrollment.module';
 import { AssessmentModule } from './modules/assessment/assessment.module';
 import { ClassModule } from './modules/class/class.module';
+import { UserModule } from './modules/user/user.module';
 import { ActivityModule } from './modules/activity/activity.module';
 
 @Module({
   imports: [
-    AuthModule,
-    ExampleEntityModule,
-    PrismaModule,
-    FirebaseModule,
     ConfigModule.forRoot({
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
       ignoreEnvFile: process.env.NODE_ENV === 'production',
-      isGlobal: true
+      isGlobal: true,
     }),
+    ExampleEntityModule,
+    PrismaModule,
+    FirebaseModule,
     FrequencyModule,
     StudentModule,
     FamilyMemberModule,
@@ -33,6 +32,8 @@ import { ActivityModule } from './modules/activity/activity.module';
     EnrollmentModule,
     AssessmentModule,
     ClassModule,
+    AssessmentModule,
+    UserModule,
     ActivityModule
   ],
 })
