@@ -38,6 +38,13 @@ async function bootstrap() {
     forbidNonWhitelisted: true
   }));
   app.useGlobalFilters(new HttpExceptionFilter());
+  // TODO: Enable once all controllers are secured properly
+  // TODO: Add @ApiBearerAuth("JWT-auth") to all controllers
+  // app.useGlobalGuards(
+  //   app.get(FirebaseAuthGuard),
+  //   app.get(DbGuard),
+  //   app.get(RolesGuard),
+  // );
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

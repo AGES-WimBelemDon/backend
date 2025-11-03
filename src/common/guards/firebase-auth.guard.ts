@@ -27,7 +27,7 @@ export class FirebaseAuthGuard implements CanActivate {
       return true;
     }
 
-  const request = context.switchToHttp().getRequest<RequestWithFirebase>();
+    const request = context.switchToHttp().getRequest<RequestWithFirebase>();
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
