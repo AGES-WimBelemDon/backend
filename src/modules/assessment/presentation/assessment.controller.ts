@@ -15,6 +15,7 @@ import { AssessmentService } from "../application/assessment.service";
 import { CreateAssessmentDto } from "../application/create-assessment.request.dto";
 import { UpdateAnswerBatchDto } from "../application/update-answer.dto";
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
@@ -34,6 +35,7 @@ import { AssessmentResponseDto } from "../application/create-assesment.response.
 
 @ApiTags("assessment")
 @Controller("assessment")
+@ApiBearerAuth("JWT-auth")
 export class AssessmentController {
   constructor(private readonly assessmentService: AssessmentService) {}
 

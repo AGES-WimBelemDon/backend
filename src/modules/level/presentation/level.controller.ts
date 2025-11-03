@@ -2,10 +2,11 @@ import { Controller, Get, HttpStatus } from "@nestjs/common";
 import { LevelService } from "../application/level.service";
 import { LevelMapper } from "../infrastructure/level.mapper";
 import { LevelResponseDTO } from "../application/level.response.dto";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 @ApiTags("level")
 @Controller("level")
+@ApiBearerAuth("JWT-auth")
 export class LevelController{
     constructor(
         private readonly levelService: LevelService

@@ -5,6 +5,7 @@ import {
   ApiBody,
   ApiQuery,
   ApiParam,
+  ApiBearerAuth,
 } from "@nestjs/swagger";
 import { ClassService } from "../application/class.service";
 import { CreateClassDTO } from "../application/dtos/create-class.request.dto";
@@ -26,6 +27,7 @@ import { DeleteClassResponseDTO } from "../application/dtos/delete-class.respons
 
 @ApiTags("classes")
 @Controller("classes")
+@ApiBearerAuth("JWT-auth")
 export class ClassController {
   constructor(private readonly classService: ClassService) {}
 

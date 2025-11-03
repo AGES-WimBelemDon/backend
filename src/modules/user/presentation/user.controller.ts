@@ -33,12 +33,11 @@ import { RequestWithUser } from "src/common/interfaces/request.interface";
 @Controller("user")
 @ApiTags("user")
 @ApiBearerAuth("JWT-auth")
-@UseGuards(FirebaseAuthGuard, DbGuard, RolesGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post("register")
   @Roles(Role.admin, Role.manager)
+  @Post("register")
   @ApiOperation({ summary: "Register a new user" })
   @ApiResponse({
     status: 201,

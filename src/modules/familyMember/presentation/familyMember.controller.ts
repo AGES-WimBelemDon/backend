@@ -15,6 +15,7 @@ import {
     ApiResponse,
     ApiTags,
     ApiParam,
+    ApiBearerAuth,
 } from '@nestjs/swagger';
 import { FamilyMemberService } from '../application/familyMember.service';
 import { CreateFamilyMemberDTO } from '../application/createFamilyMember.dto';
@@ -25,6 +26,7 @@ import { CreateAddressDTO } from 'src/modules/address/application/create-address
 
 @ApiTags('family-member')
 @Controller('family-member')
+@ApiBearerAuth("JWT-auth")
 export class FamilyMemberController {
     constructor(private readonly familyMemberService: FamilyMemberService) { }
 
