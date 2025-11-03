@@ -321,8 +321,9 @@ enum Role {
   manager
   teacher
   psychologist
-  intern
-  developer
+  psychology_intern
+  social_worker
+  social_work_intern
 }
 
 model ExampleEntity {

@@ -31,10 +31,6 @@ export class RolesGuard implements CanActivate {
       return false;
     }
 
-    if (process.env.NODE_ENV === 'development' && userRole === Role.developer) {
-      return true;
-    }
-
     const hasAnyValidRole = requiredRoles.some((role) => userRole === role);
 
     if (!hasAnyValidRole) {

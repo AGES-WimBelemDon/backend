@@ -16,7 +16,7 @@ const devConfigProvider: Provider = {
     const configRole = configService.get<string>('DEV_ROLE');
     const role = ALL_ROLES.includes(configRole as typeof ALL_ROLES[number])
       ? (configRole as typeof ALL_ROLES[number])
-      : Role.developer;
+      : Role.teacher;
     
     const enabled = configService.get<string>('DEV_ROLE_OVERRIDE') === 'true';
 
