@@ -34,6 +34,7 @@ async function bootstrap() {
     ],
     credentials: true,
   });
+  app.setGlobalPrefix("api/v1", { exclude: ['docs'] });
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("docs", app, document);
   app.useGlobalPipes(new ValidationPipe({
