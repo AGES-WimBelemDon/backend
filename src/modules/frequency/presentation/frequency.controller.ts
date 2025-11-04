@@ -1,5 +1,5 @@
 import { Controller, Get, Param, ParseIntPipe, Body, Patch, HttpCode, Query, Post } from "@nestjs/common";
-import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FrequencyService } from "../application/frequency.service";
 import {
     UserClassesResponseDTO,
@@ -13,6 +13,7 @@ import { CustomParseDatePipe } from "src/common/pipes/CustomParseDatePipe";
 
 @Controller("frequency")
 @ApiTags("frequency-resource")
+@ApiBearerAuth("JWT-auth")
 export class FrequencyConstroller{
     constructor(private frequencyService: FrequencyService ){}
     

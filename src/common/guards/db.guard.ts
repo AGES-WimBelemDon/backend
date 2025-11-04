@@ -51,7 +51,7 @@ export class DbGuard implements CanActivate {
     request.user = dbUser as RequestUserPayload;
 
     if (this.devConfig?.enabled) {
-      request.user.role = (this.devConfig.role as Role) || Role.developer;
+      request.user.role = (this.devConfig.role as Role) || Role.teacher;
     }
 
     return true;

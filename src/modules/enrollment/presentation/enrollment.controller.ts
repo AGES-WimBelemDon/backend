@@ -18,6 +18,7 @@ import {
   ApiBody,
   ApiParam,
   ApiQuery,
+  ApiBearerAuth,
 } from "@nestjs/swagger";
 import { EnrollmentService } from "../application/enrollment.service";
 import {
@@ -30,6 +31,7 @@ import { EnrollmentQueryFilterDto } from "../application/dtos/enrollment-query.d
 
 @Controller("enrollments")
 @ApiTags("enrollment-resource")
+@ApiBearerAuth("JWT-auth")
 export class EnrollmentController {
   constructor(private readonly enrollmentService: EnrollmentService) {}
 

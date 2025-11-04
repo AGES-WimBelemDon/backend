@@ -3,6 +3,9 @@ import { AppModule } from "./app.module";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { ValidationPipe } from "@nestjs/common";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
+import { FirebaseAuthGuard } from "./common/guards/firebase-auth.guard";
+import { DbGuard } from "./common/guards/db.guard";
+import { RolesGuard } from "./common/guards/role.guard";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -31,6 +34,7 @@ async function bootstrap() {
     ],
     credentials: true,
   });
+  app.setGlobalPrefix("api/v1", { exclude: ['docs'] });
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("docs", app, document);
   app.useGlobalPipes(new ValidationPipe({
@@ -38,6 +42,11 @@ async function bootstrap() {
     forbidNonWhitelisted: true
   }));
   app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalGuards(
+    app.get(FirebaseAuthGuard),
+    app.get(DbGuard),
+    app.get(RolesGuard),
+  );
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

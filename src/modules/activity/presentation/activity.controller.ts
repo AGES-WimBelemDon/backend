@@ -11,6 +11,7 @@ import {
 } from "@nestjs/common";
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiNotFoundResponse,
@@ -26,6 +27,7 @@ import { UpdateActivityDto } from "../application/update-activity.dto";
 
 @ApiTags("activities")
 @Controller("activities")
+@ApiBearerAuth("JWT-auth")
 export class ActivityController {
   constructor(private readonly activityService: ActivityService) {}
 

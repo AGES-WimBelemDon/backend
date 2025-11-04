@@ -148,6 +148,20 @@ export class UserService {
     return UserResponseMapper.toDTO(user);
   }
 
+  async editUser(id: number, request: RequestWithUser): Promise<void> {
+    const userToEdit = await this.userRepository.findById(id);
+    if (!userToEdit) {
+      throw new BadRequestException("User not found");
+    }
+
+    const requestingUser = request.user;
+    if (requestingUser.role !== Role.admin && restrictedRoles.includes(userToEdit.getRole())) {
+      throw new ForbiddenException("Insufficient permissions to edit this user");
+    }
+
+    await this.userRepository.updateUser(userToEdit);
+  }
+
   async disableUser(id: number, request: RequestWithUser): Promise<void> {
     const requestingUser = request.user;
     if (requestingUser.id === id) {

@@ -16,7 +16,8 @@ import {
     ApiResponse, 
     ApiTags,
     ApiParam,
-    ApiQuery
+    ApiQuery,
+    ApiBearerAuth
 } from "@nestjs/swagger";
 import { StudentService } from "../application/student.service";
 import { CreateStudentRequestDTO } from "../application/create-student.request.dto";
@@ -30,6 +31,7 @@ import { StudentStatus } from "src/common/enums/domain.enums";
 
 @ApiTags("students")
 @Controller("students")
+@ApiBearerAuth("JWT-auth")
 export class StudentController {
     constructor(private readonly studentService: StudentService) {}
 

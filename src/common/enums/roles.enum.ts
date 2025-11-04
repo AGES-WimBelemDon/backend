@@ -5,6 +5,7 @@ export const ALL_ROLES = [
   Role.manager,
   Role.teacher,
   Role.psychologist,
-  Role.intern,
-  Role.developer,
+  Role.psychology_intern,
+  Role.social_worker,
+  Role.social_work_intern,
 ] as const;

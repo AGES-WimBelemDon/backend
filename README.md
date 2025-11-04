@@ -129,12 +129,17 @@ conteúdo:
     POSTGRES_USER=admin
     POSTGRES_PASSWORD=admin
     POSTGRES_DB=wbd_database
+    DEV_ROLE=teacher
+    DEV_ROLE_OVERRIDE=false
     FIREBASE_PROJECT_ID="your-project-id"
     FIREBASE_CLIENT_EMAIL="firebase-adminsdk-...@your-project-id.iam.gserviceaccount.com"
     FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...your-private-key...\n-----END PRIVATE KEY-----\n"
     ```
     > O valor das variáveis relacionadas ao Firebase serão disponibilizados através de um canal privado. A variável `FIREBASE_PRIVATE_KEY` não deve ser compartilhada.
-2. Com o Docker Desktop rodando (ou seja, com ele aberto), rode:
+
+As variáveis DEV_ são utilizadas para facilitar o teste em ambiente de desenvolvimento, permitindo a simulação de diferentes papéis de usuário sem a necessidade de atualizar o banco. Ainda é necessário fazer o login com um usuário válido.
+
+1. Com o Docker Desktop rodando (ou seja, com ele aberto), rode:
 
     ``` bash
     docker-compose up --build -d db-wbd
@@ -148,17 +153,17 @@ conteúdo:
     ``` bash
     docker ps
     ```
-3. Instale as dependências do projeto:
+2. Instale as dependências do projeto:
 
     ``` bash
     yarn install
     ```
-4. Gere o cliente Prisma:
+3. Gere o cliente Prisma:
 
     ```bash
     yarn prisma generate
     ```
-5. Realize as migrações do banco de dados:
+4. Realize as migrações do banco de dados:
 
     ```bash
     yarn prisma:migrate:deploy
@@ -241,11 +246,16 @@ conteúdo:
     POSTGRES_USER=admin
     POSTGRES_PASSWORD=admin
     POSTGRES_DB=wbd_database
+    DEV_ROLE=teacher
+    DEV_ROLE_OVERRIDE=false
     FIREBASE_PROJECT_ID="your-project-id"
     FIREBASE_CLIENT_EMAIL="firebase-adminsdk-...@your-project-id.iam.gserviceaccount.com"
     FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...your-private-key...\n-----END PRIVATE KEY-----\n"
     ```
     > O valor das variáveis relacionadas ao Firebase serão disponibilizados através de um canal privado. A variável `FIREBASE_PRIVATE_KEY` não deve ser compartilhada.
+
+As variáveis DEV_ são utilizadas para facilitar o teste em ambiente de desenvolvimento, permitindo a simulação de diferentes papéis de usuário sem a necessidade de atualizar o banco. Ainda é necessário fazer o login com um usuário válido.
+
 2. Com o Docker Desktop rodando (ou seja, com ele aberto), rode:
 
     ``` bash
