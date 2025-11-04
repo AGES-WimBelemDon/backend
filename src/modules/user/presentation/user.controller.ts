@@ -22,9 +22,6 @@ import {
   GetUsersQueryDTO,
 } from "../application/user.dtos";
 import { Roles } from "src/common/decorators/roles.decorator";
-import { RolesGuard } from "src/common/guards/role.guard";
-import { FirebaseAuthGuard } from "src/common/guards/firebase-auth.guard";
-import { DbGuard } from "src/common/guards/db.guard";
 import { Role, UserStatus } from "@prisma/client";
 import { AuthErrorCode } from "../domain/exceptions/auth.exception";
 import { Public } from "src/common/decorators/public.decorator";
@@ -111,6 +108,17 @@ export class UserController {
     @Param("id", ParseIntPipe) id: number,
   ): Promise<UserResponseDTO | null> {
     return this.userService.findById(id, request);
+  }
+
+  @Patch(":id")
+  @Roles(Role.admin, Role.manager)
+  @ApiOperation({ summary: "Edit a user" })
+  @ApiResponse({ status: 200, description: "User edited" })
+  async editUser(
+    @Request() request: RequestWithUser,
+    @Param("id", ParseIntPipe) id: number,
+  ): Promise<void> {
+    return this.userService.editUser(id, request);
   }
 
   @Patch("disable/:id")
