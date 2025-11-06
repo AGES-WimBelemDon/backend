@@ -201,15 +201,15 @@ model Form {
 }
 
 model Doc {
-  id             Int      @id @default(autoincrement())
-  studentId      Int      @map("id_student")
-  slug           String   @unique
-  type           String
-  name           String?
-  enrollmentDate DateTime @default(now()) @map("enrollment_date")
+  id           String    @id
+  studentId    Int
+  originalName String
+  storagePath  String    @unique
+  contentType  String
+  createdAt    DateTime  @default(now())
+  student      Student   @relation("StudentDocs", fields: [studentId], references: [id])
 
-  student Student @relation("StudentDocs", fields: [studentId], references: [id])
-
+  @@index([studentId])
   @@map("doc")
 }
 enum FormType {
