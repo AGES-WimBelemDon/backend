@@ -12,6 +12,7 @@ export const FIREBASE_ADMIN = "FIREBASE_ADMIN";
       useFactory: (configService: ConfigService) => {
         const projectId = configService.getOrThrow<string>("FIREBASE_PROJECT_ID");
         const clientEmail = configService.getOrThrow<string>("FIREBASE_CLIENT_EMAIL");
+        const storageBucket = configService.getOrThrow<string>("FIREBASE_STORAGE_BUCKET");
         const privateKey = configService
           .getOrThrow<string>("FIREBASE_PRIVATE_KEY")
           .replace(/\\n/g, "\n");
@@ -25,6 +26,7 @@ export const FIREBASE_ADMIN = "FIREBASE_ADMIN";
         if (!admin.apps.length) {
           return admin.initializeApp({
             credential: admin.credential.cert(adminConfig),
+            storageBucket: storageBucket
           });
         }
         return admin.app();

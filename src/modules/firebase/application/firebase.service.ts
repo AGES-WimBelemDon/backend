@@ -3,13 +3,18 @@ import { app, auth } from "firebase-admin";
 import { FIREBASE_ADMIN } from "../firebase.config.module";
 import { CreateExampleEntityDTO } from "src/modules/exampleEntity/application/create-exampleEntity.dto";
 import { RegisterUserDTO } from "src/modules/user/application/user.dtos";
-
+import * as admin from 'firebase-admin';
 @Injectable()
 export class FirebaseService {
+  private readonly storage: admin.storage.Storage;
+  private readonly bucket;
   constructor(
     @Inject(FIREBASE_ADMIN) private readonly firebaseAdmin: app.App,
-  ) {}
-
+  ) {
+    this.storage = this.firebaseAdmin.storage();
+    this.bucket = this.storage.bucket();
+  }
+  
   async createFirebaseUser(
     user: RegisterUserDTO,
   ): Promise<auth.UserRecord> {
