@@ -74,4 +74,17 @@ export class FirebaseService {
       );
     }
   }
+  async getPresignedUploadUrl(
+    fileName: string,
+    contentType: string,
+  ): Promise<string> {
+    const options = {
+      version: "v4" as const,
+      action: "write" as const,
+      expires: Date.now() + 15 * 60 * 1000,
+      contentType: contentType,
+    };
+    const [url] = await this.bucket.file(fileName).getSignedUrl(options);
+    return url;
+  }
 }
