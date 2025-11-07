@@ -206,6 +206,7 @@ model Doc {
   originalName String
   storagePath  String    @unique
   contentType  String
+  description  String
   createdAt    DateTime  @default(now())
   student      Student   @relation("StudentDocs", fields: [studentId], references: [id])
 
