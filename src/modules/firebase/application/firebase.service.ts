@@ -87,4 +87,14 @@ export class FirebaseService {
     const [url] = await this.bucket.file(fileName).getSignedUrl(options);
     return url;
   }
+  async getPresignedReadUrl(storagePath: string): Promise<string> {
+    const options = {
+      version: "v4" as const,
+      action: "read" as const,
+      expires: Date.now() + 60 * 60 * 1000,
+    };
+
+    const [readUrl] = await this.bucket.file(storagePath).getSignedUrl(options);
+    return readUrl;
+  }
 }

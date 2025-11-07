@@ -1,25 +1,28 @@
+import { FileStatus } from "src/common/enums/domain.enums";
 import { Student } from "src/modules/student/domain/student.entity";
 
 export interface DocumentProps {
-  id?: string;
+  id: string;
   studentId: number;
   originalName: string;
   storagePath: string;
   contentType: string;
-  description: string;
+  description?: string;
   createdAt?: Date;
   student?: Student;
+  status?: FileStatus;
 }
 
 export class Document {
-  private id?: string;
+  private id: string;
   private studentId: number;
   private originalName: string;
   private storagePath: string;
   private contentType: string;
-  private description: string;
+  private description?: string;
   private createdAt: Date;
   private student?: Student;
+  private status?: FileStatus;
 
   constructor(props: DocumentProps) {
     this.id = props.id;
@@ -30,8 +33,9 @@ export class Document {
     this.description = props.description;
     this.createdAt = props.createdAt ?? new Date();
     this.student = props.student;
+    this.status = props.status ?? FileStatus.PENDING;
   }
-  getId(): string | undefined {
+  getId(): string {
     return this.id;
   }
 
@@ -51,7 +55,7 @@ export class Document {
     return this.contentType;
   }
 
-  getDescription(): string {
+  getDescription(): string | undefined {
     return this.description;
   }
 
@@ -61,6 +65,10 @@ export class Document {
 
   getStudent(): Student | undefined {
     return this.student;
+  }
+
+  getStatus(): FileStatus | undefined {
+    return this.status;
   }
 
   setId(id: string): void {
@@ -89,5 +97,8 @@ export class Document {
 
   setStudent(student: Student): void {
     this.student = student;
+  }
+  setStatus(status: FileStatus): void {
+    this.status = status;
   }
 }
