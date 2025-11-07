@@ -206,7 +206,7 @@ model Document {
   originalName String
   storagePath  String    @unique
   contentType  String
-  description  String
+  description  String?
   createdAt    DateTime  @default(now())
   status       FileStatus @default(PENDING)
   student      Student   @relation("StudentDocs", fields: [studentId], references: [id])
