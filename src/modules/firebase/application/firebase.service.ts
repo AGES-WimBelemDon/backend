@@ -4,10 +4,11 @@ import { FIREBASE_ADMIN } from "../firebase.config.module";
 import { CreateExampleEntityDTO } from "src/modules/exampleEntity/application/create-exampleEntity.dto";
 import { RegisterUserDTO } from "src/modules/user/application/user.dtos";
 import * as admin from 'firebase-admin';
+import { Bucket } from '@google-cloud/storage';
 @Injectable()
 export class FirebaseService {
   private readonly storage: admin.storage.Storage;
-  private readonly bucket;
+  private readonly bucket: Bucket;
   constructor(
     @Inject(FIREBASE_ADMIN) private readonly firebaseAdmin: app.App,
   ) {
@@ -96,5 +97,13 @@ export class FirebaseService {
 
     const [readUrl] = await this.bucket.file(storagePath).getSignedUrl(options);
     return readUrl;
+  }
+  async fileExists(storagePath: string): Promise<boolean> {
+    try {
+      const [exists] = await this.bucket.file(storagePath).exists();
+      return exists;
+    } catch (error) {
+      return false;
+    }
   }
 }
