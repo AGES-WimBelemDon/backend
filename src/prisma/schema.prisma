@@ -208,6 +208,7 @@ model Document {
   contentType  String
   description  String
   createdAt    DateTime  @default(now())
+  status       FileStatus @default(PENDING)
   student      Student   @relation("StudentDocs", fields: [studentId], references: [id])
 
   @@index([studentId])
@@ -326,7 +327,11 @@ enum Role {
   social_worker
   social_work_intern
 }
-
+enum FileStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
 model ExampleEntity {
   id        String   @id
   name      String   
