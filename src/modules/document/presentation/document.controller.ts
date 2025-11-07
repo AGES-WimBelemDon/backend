@@ -1,11 +1,12 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from "@nestjs/common";
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from "@nestjs/swagger";
+import { Controller, Post, Body, HttpCode, HttpStatus, Param, Get, ParseIntPipe } from "@nestjs/common";
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from "@nestjs/swagger";
 import { DocumentService } from "../application/document.service";
 import { GenerateUploadUrlRequestDto } from "../application/dto/generate-upload-url.request.dto";
 import { GenerateUploadUrlResponseDTO } from "../application/dto/generate-upload-url.response.dto";
 import { ConfirmUploadRequestDto } from "../application/dto/confirm-upload.request.dto";
+import { DocumentResponseDto } from "../application/dto/document.response.dto";
 
-@ApiTags("Documents")
+@ApiTags("documents")
 @Controller("documents")
 @ApiBearerAuth("JWT-auth")
 export class DocumentController {
@@ -86,5 +87,74 @@ export class DocumentController {
   })
   async confirmUpload(@Body() dto: ConfirmUploadRequestDto): Promise<void> {
     await this.documentService.confirmUpload(dto);
+  }
+  @Get("student/:studentId")
+  @ApiOperation({
+    summary: "Get all documents for a student",
+    description: "Retrieves all documents belonging to a specific student by their student ID",
+  })
+  @ApiParam({
+    name: "studentId",
+    description: "ID of the student",
+    example: 123,
+    type: Number,
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Documents retrieved successfully",
+    type: [DocumentResponseDto],
+    content: {
+      "application/json": {
+        example: [
+          {
+            id: "550e8400-e29b-41d4-a716-446655440000",
+            studentId: 123,
+            originalName: "student-report.pdf",
+            contentType: "application/pdf",
+            description: "Student progress report for Q1 2024",
+            createdAt: "2024-11-07T12:00:00Z",
+          },
+          {
+            id: "660e8400-e29b-41d4-a716-446655440001",
+            studentId: 123,
+            originalName: "profile-photo.jpg",
+            contentType: "image/jpeg",
+            description: "Student profile photo",
+            createdAt: "2024-11-06T10:30:00Z",
+          },
+        ],
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Invalid student ID format",
+    content: {
+      "application/json": {
+        example: {
+          statusCode: 400,
+          message: "Validation failed (numeric string is expected)",
+          error: "Bad Request",
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Student not found",
+    content: {
+      "application/json": {
+        example: {
+          statusCode: 404,
+          message: "Student not found",
+          error: "Not Found",
+        },
+      },
+    },
+  })
+  async getDocumentsByStudentId(
+    @Param("studentId", ParseIntPipe) studentId: number
+  ): Promise<DocumentResponseDto[]> {
+    return await this.documentService.getDocumentsByStudentId(studentId);
   }
 }

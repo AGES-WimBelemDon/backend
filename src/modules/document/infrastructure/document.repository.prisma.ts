@@ -7,6 +7,14 @@ import { DocumentMapper } from "./document.mapper";
 @Injectable()
 export class PrismaDocumentRepository implements IDocumentRepository {
   constructor(private readonly prisma: PrismaService) {}
+  async getDocumentsByStudentId(studentId: number): Promise<Document[]> {
+    const documents = await this.prisma.document.findMany({
+      where : {
+        studentId : studentId
+      }
+    });
+    return documents.map(document => DocumentMapper.toDomain(document))
+  }
   async upload(document: Document): Promise<void> {
     const data = DocumentMapper.toPersistence(document);
     await this.prisma.document.update({

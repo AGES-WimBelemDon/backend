@@ -8,6 +8,8 @@ import { v4 as uuidv4 } from "uuid";
 import { GenerateUploadUrlResponseDTO } from "./dto/generate-upload-url.response.dto";
 import { ConfirmUploadRequestDto } from "./dto/confirm-upload.request.dto";
 import { FileStatus } from "src/common/enums/domain.enums";
+import { DocumentResponseDto } from "./dto/document.response.dto";
+import { DocumentResponseMapper } from "./mapper/document.response.mapper";
 @Injectable()
 export class DocumentService {
     constructor(
@@ -53,6 +55,16 @@ export class DocumentService {
         }
         document.setStatus(FileStatus.COMPLETED);
         await this.documentRepository.upload(document);
+    }
+    async getDocumentsByStudentId(studentId: number): Promise<DocumentResponseDto[]>{
+        const student = await this.studentService.findById(studentId);
+        if(!student){
+            throw new NotFoundException("Student not found");
+        }
+
+        const documents = await this.documentRepository.getDocumentsByStudentId(studentId);
+        return documents.filter(document=>document.getStatus()===FileStatus.COMPLETED)
+                .map(document=>DocumentResponseMapper.toDTO(document));
     }
 }
 

@@ -6,4 +6,5 @@ export interface IDocumentRepository{
     findById(id: string): Promise<Document | null>;
     upload(document: Document): Promise<void>;
     delete(id: string): Promise<void>;
+    getDocumentsByStudentId(studentId: number): Promise<Document[]>;
 }
