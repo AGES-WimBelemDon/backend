@@ -3,6 +3,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { IDocumentRepository } from "../domain/document.repository";
 import { Document } from "../domain/document.entity";
 import { DocumentMapper } from "./document.mapper";
+import { FileStatus } from "src/common/enums/domain.enums";
 
 @Injectable()
 export class PrismaDocumentRepository implements IDocumentRepository {
@@ -57,4 +58,21 @@ export class PrismaDocumentRepository implements IDocumentRepository {
       }
     });
   }
+  async getPendingDocuments(): Promise<Document[]> {
+    const documents = await this.prisma.document.findMany({
+      where : {
+        status: FileStatus.PENDING
+      }
+    });
+    return documents.map(document => DocumentMapper.toDomain(document));
+  }
+  async deleteMany(ids: string[]): Promise<void> {
+    await this.prisma.document.deleteMany({
+    where: {
+      id: {
+        in: ids,
+      },
+    },
+  });
+}
 }

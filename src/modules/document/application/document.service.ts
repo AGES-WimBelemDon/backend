@@ -10,6 +10,7 @@ import { ConfirmUploadRequestDto } from "./dto/confirm-upload.request.dto";
 import { FileStatus } from "src/common/enums/domain.enums";
 import { DocumentResponseDto } from "./dto/document.response.dto";
 import { DocumentResponseMapper } from "./mapper/document.response.mapper";
+import { Cron, CronExpression } from "@nestjs/schedule";
 @Injectable()
 export class DocumentService {
     constructor(
@@ -89,5 +90,23 @@ export class DocumentService {
         }
         await this.documentRepository.delete(id);
     }
+    @Cron(CronExpression.EVERY_DAY_AT_11AM)
+    async cleanUpPendingFiles() : Promise<void>{
+        const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        const pendingDocuments = await this.documentRepository.getPendingDocuments();
+        const documentsToBeRemoved = pendingDocuments.filter(document=>this.isDocumentOutdated(document,twentyFourHoursAgo));
+        if(!documentsToBeRemoved.length){
+            return;
+        }
+        const idList = documentsToBeRemoved.map(document=>document.getId())
+        await this.documentRepository.deleteMany(idList);
+    };
+    isDocumentOutdated(doc: Document, pastTime: Date): boolean{
+        if(doc.getStatus()===FileStatus.PENDING && doc.getCreatedAt() > pastTime){
+            return true;
+        }
+        return false;
+    }
+
 }
 

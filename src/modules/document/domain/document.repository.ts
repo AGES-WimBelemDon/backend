@@ -7,4 +7,6 @@ export interface IDocumentRepository{
     upload(document: Document): Promise<void>;
     delete(id: string): Promise<void>;
     getDocumentsByStudentId(studentId: number): Promise<Document[]>;
+    getPendingDocuments(): Promise<Document[]>;
+    deleteMany(ids: string[]): Promise<void>;
 }
