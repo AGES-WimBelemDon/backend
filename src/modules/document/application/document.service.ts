@@ -61,10 +61,23 @@ export class DocumentService {
         if(!student){
             throw new NotFoundException("Student not found");
         }
-
-        const documents = await this.documentRepository.getDocumentsByStudentId(studentId);
-        return documents.filter(document=>document.getStatus()===FileStatus.COMPLETED)
-                .map(document=>DocumentResponseMapper.toDTO(document));
+        const completeDocumentList = await this.documentRepository.getDocumentsByStudentId(studentId);
+        const completedDocuments = completeDocumentList
+                .filter(document=>document.getStatus()===FileStatus.COMPLETED);
+        const dtoPromises = completedDocuments.map((doc) =>
+            this.toDocumentResponseWithUrl(doc)
+        );
+        const dtos = await Promise.all(dtoPromises);
+        return dtos.filter((dto): dto is DocumentResponseDto => dto !== null);
+        
+    }
+    async toDocumentResponseWithUrl(document: Document): Promise<DocumentResponseDto | null>{
+        const storagePath = document.getStoragePath();
+        const url = await this.firebaseService.getPresignedReadUrl(storagePath);
+        if(!url){
+            return null;
+        }
+        return DocumentResponseMapper.toDTO(document, url);
     }
 }
 

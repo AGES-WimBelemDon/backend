@@ -100,7 +100,7 @@ export class DocumentController {
     type: Number,
   })
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     description: "Documents retrieved successfully",
     type: [DocumentResponseDto],
     content: {
@@ -113,6 +113,7 @@ export class DocumentController {
             contentType: "application/pdf",
             description: "Student progress report for Q1 2024",
             createdAt: "2024-11-07T12:00:00Z",
+            url: "https://storage.googleapis.com/your-bucket/documents/student-123/550e8400-report.pdf?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=..."
           },
           {
             id: "660e8400-e29b-41d4-a716-446655440001",
@@ -121,18 +122,19 @@ export class DocumentController {
             contentType: "image/jpeg",
             description: "Student profile photo",
             createdAt: "2024-11-06T10:30:00Z",
+            url: "https://storage.googleapis.com/your-bucket/documents/student-123/550e8400-report.pdf?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=..."
           },
         ],
       },
     },
   })
   @ApiResponse({
-    status: 400,
+    status: HttpStatus.BAD_REQUEST,
     description: "Invalid student ID format",
     content: {
       "application/json": {
         example: {
-          statusCode: 400,
+          statusCode: HttpStatus.BAD_REQUEST,
           message: "Validation failed (numeric string is expected)",
           error: "Bad Request",
         },
@@ -140,18 +142,19 @@ export class DocumentController {
     },
   })
   @ApiResponse({
-    status: 404,
+    status: HttpStatus.NOT_FOUND,
     description: "Student not found",
     content: {
       "application/json": {
         example: {
-          statusCode: 404,
+          statusCode: HttpStatus.NOT_FOUND,
           message: "Student not found",
           error: "Not Found",
         },
       },
     },
   })
+  @HttpCode(HttpStatus.OK)
   async getDocumentsByStudentId(
     @Param("studentId", ParseIntPipe) studentId: number
   ): Promise<DocumentResponseDto[]> {

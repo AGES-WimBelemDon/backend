@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { app, auth } from "firebase-admin";
 import { FIREBASE_ADMIN } from "../firebase.config.module";
 import { CreateExampleEntityDTO } from "src/modules/exampleEntity/application/create-exampleEntity.dto";
@@ -88,7 +88,11 @@ export class FirebaseService {
     const [url] = await this.bucket.file(fileName).getSignedUrl(options);
     return url;
   }
-  async getPresignedReadUrl(storagePath: string): Promise<string> {
+  async getPresignedReadUrl(storagePath: string): Promise<string | null> {
+    const exists = await this.fileExists(storagePath);
+    if(!exists){
+      return null;
+    }
     const options = {
       version: "v4" as const,
       action: "read" as const,
