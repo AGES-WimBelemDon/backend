@@ -10,37 +10,37 @@ export class PrismaDocumentRepository implements IDocumentRepository {
   constructor(private readonly prisma: PrismaService) {}
   async getDocumentsByStudentId(studentId: number): Promise<Document[]> {
     const documents = await this.prisma.document.findMany({
-      where : {
-        studentId : studentId
-      }
+      where: {
+        studentId: studentId,
+      },
     });
-    return documents.map(document => DocumentMapper.toDomain(document))
+    return documents.map((document) => DocumentMapper.toDomain(document));
   }
   async upload(document: Document): Promise<void> {
     const data = DocumentMapper.toPersistence(document);
     await this.prisma.document.update({
-      where : {
-        id : data.id
+      where: {
+        id: data.id,
       },
-      data : {
-        contentType : data.contentType,
-        createdAt : data.createdAt,
-        description : data.description,
-        originalName : data.originalName,
-        studentId : data.studentId,
-        status: data.status
-      }
-    })
+      data: {
+        contentType: data.contentType,
+        createdAt: data.createdAt,
+        description: data.description,
+        originalName: data.originalName,
+        studentId: data.studentId,
+        status: data.status,
+      },
+    });
   }
   async findById(id: string): Promise<Document | null> {
     const document = await this.prisma.document.findFirst({
-      where : {
-        id : id
-      }
+      where: {
+        id: id,
+      },
     });
-    if(!document){
+    if (!document) {
       return document;
-    };
+    }
     return DocumentMapper.toDomain(document);
   }
 
@@ -54,25 +54,25 @@ export class PrismaDocumentRepository implements IDocumentRepository {
   async delete(id: string): Promise<void> {
     await this.prisma.document.delete({
       where: {
-        id: id
-      }
+        id: id,
+      },
     });
   }
   async getPendingDocuments(): Promise<Document[]> {
     const documents = await this.prisma.document.findMany({
-      where : {
-        status: FileStatus.PENDING
-      }
+      where: {
+        status: FileStatus.PENDING,
+      },
     });
-    return documents.map(document => DocumentMapper.toDomain(document));
+    return documents.map((document) => DocumentMapper.toDomain(document));
   }
   async deleteMany(ids: string[]): Promise<void> {
     await this.prisma.document.deleteMany({
-    where: {
-      id: {
-        in: ids,
+      where: {
+        id: {
+          in: ids,
+        },
       },
-    },
-  });
-}
+    });
+  }
 }

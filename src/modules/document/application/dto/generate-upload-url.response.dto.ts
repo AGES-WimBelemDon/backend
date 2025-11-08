@@ -8,8 +8,10 @@ export class GenerateUploadUrlResponseDTO {
   documentId: string;
 
   @ApiProperty({
-    example: "https://storage.googleapis.com/your-bucket/documents/student-123/550e8400-report.pdf?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=...",
-    description: "Presigned URL for uploading the file to Firebase Storage. Valid for 15 minutes.",
+    example:
+      "https://storage.googleapis.com/your-bucket/documents/student-123/550e8400-report.pdf?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=...",
+    description:
+      "Presigned URL for uploading the file to Firebase Storage. Valid for 15 minutes.",
   })
   url: string;
 }

@@ -1,4 +1,7 @@
-import { Document as PrismaDocument, Student as PrismaStudent } from "@prisma/client";
+import {
+  Document as PrismaDocument,
+  Student as PrismaStudent,
+} from "@prisma/client";
 import { Document } from "../domain/document.entity";
 import { StudentMapper } from "src/modules/student/infrastructure/student.mapper";
 
@@ -17,8 +20,8 @@ export class DocumentMapper {
       description: prismaDocument.description ?? undefined,
       createdAt: prismaDocument.createdAt,
       status: prismaDocument.status,
-      student: prismaDocument.student 
-        ? StudentMapper.toDomain(prismaDocument.student) 
+      student: prismaDocument.student
+        ? StudentMapper.toDomain(prismaDocument.student)
         : undefined,
     });
   }

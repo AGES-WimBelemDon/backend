@@ -10,7 +10,7 @@ export class DocumentResponseMapper {
     dto.description = document.getDescription() ?? "";
     dto.createdAt = document.getCreatedAt();
     dto.url = url;
-    
+
     return dto;
-  };
+  }
 }

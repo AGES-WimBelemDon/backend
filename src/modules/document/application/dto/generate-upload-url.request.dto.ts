@@ -1,6 +1,15 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsString, IsNotEmpty, Matches, IsInt, MaxLength, IsEnum, IsOptional, IsDate } from "class-validator";
+import {
+  IsString,
+  IsNotEmpty,
+  Matches,
+  IsInt,
+  MaxLength,
+  IsEnum,
+  IsOptional,
+  IsDate,
+} from "class-validator";
 import { MimeTypes } from "src/common/enums/mime-type.enum";
 
 export class GenerateUploadUrlRequestDto {
@@ -14,7 +23,8 @@ export class GenerateUploadUrlRequestDto {
 
   @ApiProperty({
     example: "student-report.pdf",
-    description: "Original name of the file to be uploaded. Should include the file extension.",
+    description:
+      "Original name of the file to be uploaded. Should include the file extension.",
     minLength: 1,
     maxLength: 255,
   })
@@ -22,7 +32,8 @@ export class GenerateUploadUrlRequestDto {
   @IsNotEmpty()
   @MaxLength(255)
   @Matches(/^[a-zA-Z0-9._\-\s]+$/, {
-    message: "File name can only contain letters, numbers, dots, hyphens, underscores, and spaces",
+    message:
+      "File name can only contain letters, numbers, dots, hyphens, underscores, and spaces",
   })
   originalName: string;
 
@@ -42,7 +53,7 @@ export class GenerateUploadUrlRequestDto {
     example: "Student progress report for Q1 2024",
     description: "Description of the document",
     maxLength: 500,
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -51,7 +62,8 @@ export class GenerateUploadUrlRequestDto {
 
   @ApiProperty({
     example: "2024-11-07",
-    description: "Date and time when the document was created (optional, defaults to now)",
+    description:
+      "Date and time when the document was created (optional, defaults to now)",
     required: false,
   })
   @IsOptional()

@@ -1,5 +1,21 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Param, Get, ParseIntPipe, Delete } from "@nestjs/common";
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from "@nestjs/swagger";
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Get,
+  ParseIntPipe,
+  Delete,
+} from "@nestjs/common";
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+} from "@nestjs/swagger";
 import { DocumentService } from "../application/document.service";
 import { GenerateUploadUrlRequestDto } from "../application/dto/generate-upload-url.request.dto";
 import { GenerateUploadUrlResponseDTO } from "../application/dto/generate-upload-url.response.dto";
@@ -16,7 +32,8 @@ export class DocumentController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: "Generate presigned URL for document upload",
-    description: "Creates a document record and returns a temporary URL (valid for 15 minutes) to upload a file to Firebase Storage",
+    description:
+      "Creates a document record and returns a temporary URL (valid for 15 minutes) to upload a file to Firebase Storage",
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -32,7 +49,7 @@ export class DocumentController {
     description: "Student not found",
   })
   async getUploadUrl(
-    @Body() dto: GenerateUploadUrlRequestDto
+    @Body() dto: GenerateUploadUrlRequestDto,
   ): Promise<GenerateUploadUrlResponseDTO> {
     return await this.documentService.getPresignedUploadUrl(dto);
   }
@@ -40,7 +57,8 @@ export class DocumentController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: "Confirm document upload completion",
-    description: "Verifies that the file was successfully uploaded to Firebase Storage and updates the document status to COMPLETED",
+    description:
+      "Verifies that the file was successfully uploaded to Firebase Storage and updates the document status to COMPLETED",
   })
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
@@ -61,7 +79,8 @@ export class DocumentController {
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: "Document not found in database or file not found in Firebase Storage",
+    description:
+      "Document not found in database or file not found in Firebase Storage",
     content: {
       "application/json": {
         examples: {
@@ -69,7 +88,8 @@ export class DocumentController {
             summary: "Document not found in database",
             value: {
               statusCode: HttpStatus.NOT_FOUND,
-              message: 'Document with ID "550e8400-e29b-41d4-a716-446655440000" could not be found.',
+              message:
+                'Document with ID "550e8400-e29b-41d4-a716-446655440000" could not be found.',
               error: "Not Found",
             },
           },
@@ -77,7 +97,8 @@ export class DocumentController {
             summary: "File not found in Firebase Storage",
             value: {
               statusCode: HttpStatus.NOT_FOUND,
-              message: "The requested document could not be found in Firebase Storage.",
+              message:
+                "The requested document could not be found in Firebase Storage.",
               error: "Not Found",
             },
           },
@@ -91,7 +112,8 @@ export class DocumentController {
   @Get("student/:studentId")
   @ApiOperation({
     summary: "Get all documents for a student",
-    description: "Retrieves all documents belonging to a specific student by their student ID",
+    description:
+      "Retrieves all documents belonging to a specific student by their student ID",
   })
   @ApiParam({
     name: "studentId",
@@ -113,7 +135,7 @@ export class DocumentController {
             contentType: "application/pdf",
             description: "Student progress report for Q1 2024",
             createdAt: "2024-11-07T12:00:00Z",
-            url: "https://storage.googleapis.com/your-bucket/documents/student-123/550e8400-report.pdf?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=..."
+            url: "https://storage.googleapis.com/your-bucket/documents/student-123/550e8400-report.pdf?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=...",
           },
           {
             id: "660e8400-e29b-41d4-a716-446655440001",
@@ -122,7 +144,7 @@ export class DocumentController {
             contentType: "image/jpeg",
             description: "Student profile photo",
             createdAt: "2024-11-06T10:30:00Z",
-            url: "https://storage.googleapis.com/your-bucket/documents/student-123/550e8400-report.pdf?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=..."
+            url: "https://storage.googleapis.com/your-bucket/documents/student-123/550e8400-report.pdf?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=...",
           },
         ],
       },
@@ -156,7 +178,7 @@ export class DocumentController {
   })
   @HttpCode(HttpStatus.OK)
   async getDocumentsByStudentId(
-    @Param("studentId", ParseIntPipe) studentId: number
+    @Param("studentId", ParseIntPipe) studentId: number,
   ): Promise<DocumentResponseDto[]> {
     return await this.documentService.getDocumentsByStudentId(studentId);
   }
@@ -164,7 +186,8 @@ export class DocumentController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: "Delete a document",
-    description: "Deletes a document record from the database and removes the associated file from Firebase Storage",
+    description:
+      "Deletes a document record from the database and removes the associated file from Firebase Storage",
   })
   @ApiParam({
     name: "id",

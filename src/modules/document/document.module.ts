@@ -7,14 +7,14 @@ import { DOCUMENT_REPOSITORY_TOKEN } from "./domain/document.repository";
 import { PrismaDocumentRepository } from "./infrastructure/document.repository.prisma";
 
 @Module({
-    imports: [FirebaseModule, StudentModule],
-    controllers:[DocumentController],
-    providers: [
-        DocumentService,
-        {
-            provide: DOCUMENT_REPOSITORY_TOKEN,
-            useClass: PrismaDocumentRepository
-        }
-    ]
+  imports: [FirebaseModule, StudentModule],
+  controllers: [DocumentController],
+  providers: [
+    DocumentService,
+    {
+      provide: DOCUMENT_REPOSITORY_TOKEN,
+      useClass: PrismaDocumentRepository,
+    },
+  ],
 })
-export class DocumentModule{}
+export class DocumentModule {}
