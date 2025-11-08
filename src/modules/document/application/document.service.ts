@@ -90,19 +90,22 @@ export class DocumentService {
         }
         await this.documentRepository.delete(id);
     }
-    @Cron(CronExpression.EVERY_DAY_AT_11AM)
+    @Cron(CronExpression.EVERY_DAY_AT_9PM)
     async cleanUpPendingFiles() : Promise<void>{
         const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
         const pendingDocuments = await this.documentRepository.getPendingDocuments();
         const documentsToBeRemoved = pendingDocuments.filter(document=>this.isDocumentOutdated(document,twentyFourHoursAgo));
-        if(!documentsToBeRemoved.length){
+        if(documentsToBeRemoved.length === 0){
             return;
         }
         const idList = documentsToBeRemoved.map(document=>document.getId())
+        const storagePathList = documentsToBeRemoved.map(document=>document.getStoragePath())
+        const deletedDocumentsPromises = storagePathList.map(storagePath=>this.firebaseService.deleteFile(storagePath));
+        await Promise.allSettled(deletedDocumentsPromises);
         await this.documentRepository.deleteMany(idList);
     };
     isDocumentOutdated(doc: Document, pastTime: Date): boolean{
-        if(doc.getStatus()===FileStatus.PENDING && doc.getCreatedAt() > pastTime){
+        if(doc.getStatus()===FileStatus.PENDING && doc.getCreatedAt() < pastTime){
             return true;
         }
         return false;
