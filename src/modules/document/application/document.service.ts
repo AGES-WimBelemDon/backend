@@ -35,14 +35,14 @@ export class DocumentService {
     if (!student) {
       throw new NotFoundException("The document couldn't be created");
     }
-    const url = await this.firebaseService.getPresignedUploadUrl(
-      dto.originalName,
-      dto.contentType,
-    );
     const extension = path.extname(dto.originalName);
     const documentId = uuidv4();
     const userId = `user${dto.studentId}`;
     const storagePath = `${userId}/${documentId}${extension}`;
+    const url = await this.firebaseService.getPresignedUploadUrl(
+      storagePath,
+      dto.contentType,
+    );
     const newDocument = new Document({
       id: documentId,
       studentId: dto.studentId,
