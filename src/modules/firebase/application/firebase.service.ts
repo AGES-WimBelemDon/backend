@@ -110,4 +110,12 @@ export class FirebaseService {
       return false;
     }
   }
+  async deleteFile(storagePath: string): Promise<boolean>{
+    try {
+      await this.bucket.file(storagePath).delete();
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 }

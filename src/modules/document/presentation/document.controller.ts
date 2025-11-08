@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Param, Get, ParseIntPipe } from "@nestjs/common";
+import { Controller, Post, Body, HttpCode, HttpStatus, Param, Get, ParseIntPipe, Delete } from "@nestjs/common";
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from "@nestjs/swagger";
 import { DocumentService } from "../application/document.service";
 import { GenerateUploadUrlRequestDto } from "../application/dto/generate-upload-url.request.dto";
@@ -159,5 +159,62 @@ export class DocumentController {
     @Param("studentId", ParseIntPipe) studentId: number
   ): Promise<DocumentResponseDto[]> {
     return await this.documentService.getDocumentsByStudentId(studentId);
+  }
+  @Delete(":id")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: "Delete a document",
+    description: "Deletes a document record from the database and removes the associated file from Firebase Storage",
+  })
+  @ApiParam({
+    name: "id",
+    description: "Unique identifier of the document to delete",
+    example: "550e8400-e29b-41d4-a716-446655440000",
+    type: String,
+  })
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: "Document and file successfully deleted",
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: "Document file could not be deleted from Firebase Storage",
+    content: {
+      "application/json": {
+        example: {
+          statusCode: 400,
+          message: "Document couldn't be deleted",
+          error: "Bad Request",
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: "Document not found",
+    content: {
+      "application/json": {
+        example: {
+          statusCode: 404,
+          message: "Document not found",
+          error: "Not Found",
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: "Unauthorized - Invalid or missing JWT token",
+    content: {
+      "application/json": {
+        example: {
+          statusCode: 401,
+          message: "Unauthorized",
+        },
+      },
+    },
+  })
+  async deleteDocument(@Param("id") id: string): Promise<void> {
+    await this.documentService.deleteDocument(id);
   }
 }

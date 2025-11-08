@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { FirebaseService } from "src/modules/firebase/application/firebase.service";
 import { GenerateUploadUrlRequestDto } from "./dto/generate-upload-url.request.dto";
 import { StudentService } from "src/modules/student/application/student.service";
@@ -50,7 +50,7 @@ export class DocumentService {
             throw new NotFoundException(`Document with ID "${dto.fileId}" could not be found. Please verify that the file exists and the ID is correct.`)
         }
         const exists = await this.firebaseService.fileExists(document.getStoragePath());
-        if(!true){
+        if(!exists){
             throw new NotFoundException("The requested document could not be found in Firebase Storage.")
         }
         document.setStatus(FileStatus.COMPLETED);
@@ -69,7 +69,6 @@ export class DocumentService {
         );
         const dtos = await Promise.all(dtoPromises);
         return dtos.filter((dto): dto is DocumentResponseDto => dto !== null);
-        
     }
     async toDocumentResponseWithUrl(document: Document): Promise<DocumentResponseDto | null>{
         const storagePath = document.getStoragePath();
@@ -78,6 +77,17 @@ export class DocumentService {
             return null;
         }
         return DocumentResponseMapper.toDTO(document, url);
+    }
+    async deleteDocument(id: string): Promise<void>{
+        const document = await this.documentRepository.findById(id);
+        if(!document){
+            throw new NotFoundException("Document not found");
+        }
+        const wasFirebaseFileDeleted = await this.firebaseService.deleteFile(document.getStoragePath());
+        if(!wasFirebaseFileDeleted){
+            throw new BadRequestException("Document couldn't be deleted")
+        }
+        await this.documentRepository.delete(id);
     }
 }
 
