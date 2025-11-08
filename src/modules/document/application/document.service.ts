@@ -19,7 +19,7 @@ import { FileStatus } from "src/common/enums/domain.enums";
 import { DocumentResponseDto } from "./dto/document.response.dto";
 import { DocumentResponseMapper } from "./mapper/document.response.mapper";
 import { Cron, CronExpression } from "@nestjs/schedule";
-import path from "path";
+import * as path from "path";
 @Injectable()
 export class DocumentService {
   constructor(
@@ -39,7 +39,6 @@ export class DocumentService {
       dto.originalName,
       dto.contentType,
     );
-    const path = require("path");
     const extension = path.extname(dto.originalName);
     const documentId = uuidv4();
     const userId = `user${dto.studentId}`;
