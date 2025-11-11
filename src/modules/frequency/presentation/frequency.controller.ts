@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, Body, Patch, HttpCode, Query, Post } from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe, Body, Patch, HttpCode, Query, Post, Req } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FrequencyService } from "../application/frequency.service";
 import {
@@ -17,52 +17,73 @@ import { CustomParseDatePipe } from "src/common/pipes/CustomParseDatePipe";
 export class FrequencyConstroller{
     constructor(private frequencyService: FrequencyService ){}
     
-    @Get("available-classes/:userId")
+    @Get("available-classes")
     @ApiOperation({
-    summary: "Get available classes for a user",
-    description: "Retrieves a list of all classes a specific user is assigned to.",
-    })
-    @ApiParam({
-        name: "userId",
-        type: "number",
-        description: "The unique identifier of the user",
-        example: 2,
+    summary: "Get available classes for authenticated user",
+    description: "Retrieves a list of all classes the authenticated user is enrolled in, including both regular classes and the general attendance option."
     })
     @ApiResponse({
-        status: 200,
-        description: "Successfully retrieved the list of classes.",
-        type: UserClassesResponseDTO,
-        example:{
-            "classes": [
-                {
-                    "classId": null,
-                    "className": "Geral",
-                    "classState": "ATIVA",
-                    "levelName": null,
-                    "isGeral": true,
-                    "activity": {
-                        "activityId": null,
-                        "activityName": "Atividade geral"
-                    }
-                },
-                {
-                    "classId": 1,
-                    "className": "Tênis I",
-                    "classState": "ATIVA",
-                    "levelName": "Iniciante",
-                    "isGeral": false,
-                    "activity": {
-                        "activityId": 1,
-                        "activityName": "Esportes"
-                    }
+    status: 200,
+    description: "Successfully retrieved the list of classes",
+    type: UserClassesResponseDTO,
+    content: {
+        "application/json": {
+        example: {
+            classes: [
+            {
+                classId: null,
+                className: "Geral",
+                classState: "ATIVA",
+                levelName: null,
+                isGeral: true,
+                activity: {
+                activityId: null,
+                activityName: "Atividade geral"
                 }
-        ]
+            },
+            {
+                classId: 1,
+                className: "Tênis I",
+                classState: "ATIVA",
+                levelName: "Iniciante",
+                isGeral: false,
+                activity: {
+                activityId: 1,
+                activityName: "Esportes"
+                }
+            }
+            ]
+        }
+        }
     }
     })
-    @ApiResponse({ status: 404, description: "User with the specified ID was not found." })
-    @ApiResponse({ status: 500, description: "An unexpected internal server error occurred." })
-    async getUserClasses(@Param("userId", ParseIntPipe) userId: number):Promise<UserClassesResponseDTO>{
-        return await this.frequencyService.getUserClasses(userId);
+    @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+    content: {
+        "application/json": {
+        example: {
+            statusCode: 401,
+            message: "Unauthorized"
+        }
+        }
+    }
+    })
+    @ApiResponse({
+    status: 500,
+    description: "An unexpected internal server error occurred",
+    content: {
+        "application/json": {
+        example: {
+            statusCode: 500,
+            message: "An unexpected internal server error occurred",
+            error: "Internal Server Error"
+        }
+        }
+    }
+    })
+    async getUserClasses(@Req() req: any): Promise<UserClassesResponseDTO> {
+        return await this.frequencyService.getUserClasses(req.user.id);
     }
     @Get("general-attendance")
     @ApiOperation({
