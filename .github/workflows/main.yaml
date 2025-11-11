@@ -52,6 +52,7 @@ jobs:
             echo "FIREBASE_PRIVATE_KEY=${{ secrets.FIREBASE_PRIVATE_KEY }}" >> .env.production
             echo "DOMAIN=${{ secrets.DOMAIN }}" >> .env.production
             echo "EMAIL=${{ secrets.EMAIL }}" >> .env.production
+            echo "FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET }}" >> .env.production
             mkdir -p nginx-conf web-root dhparam
             if [ ! -f dhparam/dhparam-2048.pem ]; then
               openssl dhparam -out dhparam/dhparam-2048.pem 2048
