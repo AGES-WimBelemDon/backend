@@ -16,6 +16,7 @@ import {
   StudentStatus,
   UserStatus,
 } from '@prisma/client';
+import { MimeTypes } from 'src/common/enums/mime-type.enum';
 
 @Controller('filters')
 @ApiTags('filters')
@@ -89,5 +90,10 @@ export class FiltersController {
   @Get('roles')
   getRoles(): Role[] {
     return Object.values(Role);
+  }
+
+  @Get('mime-types')
+  getMimeTypes(): MimeTypes[] {
+    return Object.values(MimeTypes);
   }
 }
