@@ -1,4 +1,4 @@
-import { Answer, Class, Doc, Enrollment, FamilyMember, Frequency, Student as PrismaStudent } from "@prisma/client";
+import { Answer, Document, Enrollment, FamilyMember, Frequency, Student as PrismaStudent } from "@prisma/client";
 import { Student } from "../domain/student.entity";
 import { StudentResponseDTO } from "../application/student.response.dto";
 import { transformDateToISODateString } from "src/common/utils/type.transformation.functions";
@@ -7,7 +7,7 @@ type PrismaStudentWithRelations = PrismaStudent & {
   family?: FamilyMember[];
   frequencies?: Frequency[];
   answers?: Answer[];
-  docs?: Doc[];
+  docs?: Document[];
   classes?: Enrollment[];
 };
 

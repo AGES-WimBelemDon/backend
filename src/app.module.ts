@@ -14,7 +14,8 @@ import { AssessmentModule } from './modules/assessment/assessment.module';
 import { ClassModule } from './modules/class/class.module';
 import { UserModule } from './modules/user/user.module';
 import { ActivityModule } from './modules/activity/activity.module';
-
+import { DocumentModule } from './modules/document/document.module';
+import { ScheduleModule } from '@nestjs/schedule';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -36,7 +37,9 @@ import { ActivityModule } from './modules/activity/activity.module';
     ClassModule,
     AssessmentModule,
     UserModule,
-    ActivityModule
+    ActivityModule,
+    DocumentModule,
+    ScheduleModule.forRoot(),
   ],
 })
 export class AppModule {}

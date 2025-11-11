@@ -1,15 +1,21 @@
-import { BadRequestException, Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { app, auth } from "firebase-admin";
 import { FIREBASE_ADMIN } from "../firebase.config.module";
 import { CreateExampleEntityDTO } from "src/modules/exampleEntity/application/create-exampleEntity.dto";
 import { RegisterUserDTO } from "src/modules/user/application/user.dtos";
-
+import * as admin from 'firebase-admin';
+import { Bucket } from '@google-cloud/storage';
 @Injectable()
 export class FirebaseService {
+  private readonly storage: admin.storage.Storage;
+  private readonly bucket: Bucket;
   constructor(
     @Inject(FIREBASE_ADMIN) private readonly firebaseAdmin: app.App,
-  ) {}
-
+  ) {
+    this.storage = this.firebaseAdmin.storage();
+    this.bucket = this.storage.bucket();
+  }
+  
   async createFirebaseUser(
     user: RegisterUserDTO,
   ): Promise<auth.UserRecord> {
@@ -67,6 +73,49 @@ export class FirebaseService {
       throw new BadRequestException(
         "Invalid or expired Firebase token: " + error.message,
       );
+    }
+  }
+  async getPresignedUploadUrl(
+    fileName: string,
+    contentType: string,
+  ): Promise<string> {
+    const options = {
+      version: "v4" as const,
+      action: "write" as const,
+      expires: Date.now() + 15 * 60 * 1000,
+      contentType: contentType,
+    };
+    const [url] = await this.bucket.file(fileName).getSignedUrl(options);
+    return url;
+  }
+  async getPresignedReadUrl(storagePath: string): Promise<string | null> {
+    const exists = await this.fileExists(storagePath);
+    if(!exists){
+      return null;
+    }
+    const options = {
+      version: "v4" as const,
+      action: "read" as const,
+      expires: Date.now() + 60 * 60 * 1000,
+    };
+
+    const [readUrl] = await this.bucket.file(storagePath).getSignedUrl(options);
+    return readUrl;
+  }
+  async fileExists(storagePath: string): Promise<boolean> {
+    try {
+      const [exists] = await this.bucket.file(storagePath).exists();
+      return exists;
+    } catch (error) {
+      return false;
+    }
+  }
+  async deleteFile(storagePath: string): Promise<boolean>{
+    try {
+      await this.bucket.file(storagePath).delete();
+      return true;
+    } catch (error) {
+      return false;
     }
   }
 }
