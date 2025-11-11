@@ -7,23 +7,25 @@ import { FrequencyMapper } from "./frequency.mapper";
 @Injectable()
 export class PrismaFrequencyRepository implements IFrequencyRepository {
   constructor(private readonly prisma: PrismaService) {}
-  async deleteManyByStudentAndClassAndDate(frequencies: Frequency[]): Promise<boolean> {
-      if(frequencies.length===0){
-        return false;
-      }
-      const whereConditions = frequencies.map(frequency => ({
-          studentId: frequency.getStudentId(),
-          classId: frequency.getClassId(),
-          date: frequency.getDate(),
-      }));
+  async deleteManyByStudentAndClassAndDate(
+    frequencies: Frequency[],
+  ): Promise<boolean> {
+    if (frequencies.length === 0) {
+      return false;
+    }
+    const whereConditions = frequencies.map((frequency) => ({
+      studentId: frequency.getStudentId(),
+      classId: frequency.getClassId(),
+      date: frequency.getDate(),
+    }));
 
-      await this.prisma.frequency.deleteMany({
-          where: {
-          OR: whereConditions
-          }
-      });
-      return true;
-      }
+    await this.prisma.frequency.deleteMany({
+      where: {
+        OR: whereConditions,
+      },
+    });
+    return true;
+  }
   async upsert(frequency: Frequency): Promise<Frequency> {
     const existing = await this.prisma.frequency.findFirst({
       where: {
@@ -32,7 +34,7 @@ export class PrismaFrequencyRepository implements IFrequencyRepository {
         date: frequency.getDate(),
       },
     });
-    const result = existing 
+    const result = existing
       ? await this.prisma.frequency.update({
           where: { id: existing.id },
           data: {
@@ -51,25 +53,27 @@ export class PrismaFrequencyRepository implements IFrequencyRepository {
         });
     return FrequencyMapper.toDomain(result);
   }
-  
+
   async getByClassIdAnDate(id: number, date: Date): Promise<Frequency[]> {
     const results = await this.prisma.frequency.findMany({
       where: {
         classId: id,
-        date: date
-      }
+        date: date,
+      },
     });
-    return results.map(result => FrequencyMapper.toDomain(result));
+    return results.map((result) => FrequencyMapper.toDomain(result));
   }
   async createMany(frequencies: Frequency[]): Promise<boolean> {
     if (frequencies.length === 0) {
       return false;
     }
-    const data = frequencies.map(frequency => FrequencyMapper.createFrequencyToPersistence(frequency));
+    const data = frequencies.map((frequency) =>
+      FrequencyMapper.createFrequencyToPersistence(frequency),
+    );
     const result = await this.prisma.frequency.createMany({
       data,
       skipDuplicates: true,
     });
     return result.count > 0;
-}
+  }
 }

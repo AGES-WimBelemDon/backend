@@ -109,7 +109,7 @@ export class FrequencyService {
   private async isGeneralAttendanceConsistent(
     frequencyList: UpdateGeneralAttendanceItemDTO[],
     date: Date,
-  ): Promise<{isValid:boolean, problematicId: number | null;}> {
+  ): Promise<{ isValid: boolean; problematicId: number | null }> {
     const attendanceListFromDb =
       await this.frequencyQueryService.getGeneralAttendance(date);
     const studentIdVsStatusMap: Map<number, boolean> = new Map();
@@ -122,11 +122,14 @@ export class FrequencyService {
     for (let i = 0; i < frequencyList.length; i++) {
       const fqItem = frequencyList[i];
       const statusDb = studentIdVsStatusMap.get(fqItem.studentId);
-      if (statusDb===undefined || !statusDb === fqItem.generalAttendanceAllowed) {
-        return {isValid:false, problematicId: fqItem.studentId};
+      if (
+        statusDb === undefined ||
+        !statusDb === fqItem.generalAttendanceAllowed
+      ) {
+        return { isValid: false, problematicId: fqItem.studentId };
       }
     }
-    return {isValid:true, problematicId: null};
+    return { isValid: true, problematicId: null };
   }
   public async getAttendanceListByClassAndDate(
     date: Date,
@@ -209,7 +212,9 @@ export class FrequencyService {
   ): Promise<void> {
     const { classId, date, studentList } = updateDto;
     if (studentList.length === 0) {
-      throw new BadRequestException("Invalid request: The 'studentList' field must contain at least one student attendance record.");
+      throw new BadRequestException(
+        "Invalid request: The 'studentList' field must contain at least one student attendance record.",
+      );
     }
     const existingFrequencies =
       await this.frequencyRepository.getByClassIdAnDate(classId, date);
