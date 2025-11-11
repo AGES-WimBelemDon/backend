@@ -20,6 +20,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
 } from "@nestjs/common";
 import { ClassState } from "src/common/enums/domain.enums";
 import { UpdateClassDTO } from "../application/dtos/update-class.request.dto";
@@ -330,18 +331,12 @@ export class ClassController {
   ): Promise<ClassResponseDTO[]> {
     return await this.classService.findClasses(filterDto);
   }
-  @Get("my-classes/:userId")
+  @Get("my-classes")
   @ApiOperation({
     summary: "Get classes assigned to a specific teacher",
     description:
       "Retrieves all classes where the specified user is assigned as a teacher. " +
       "Results can be filtered by class ID, level ID, activity ID, or status.",
-  })
-  @ApiParam({
-    name: "userId",
-    type: Number,
-    description: "The ID of the teacher/user whose classes to retrieve",
-    example: 1,
   })
   @ApiQuery({
     name: "classId",
@@ -433,14 +428,6 @@ export class ClassController {
           },
         },
         examples: {
-          invalidUserId: {
-            summary: "Invalid userId format",
-            value: {
-              statusCode: 400,
-              message: ["userId must be a number"],
-              error: "Bad Request",
-            },
-          },
           invalidFilters: {
             summary: "Invalid filter parameters",
             value: {
@@ -469,9 +456,9 @@ export class ClassController {
   })
   async findMyClasses(
     @Query() filterDto: ClassQueryFilters,
-    @Param("userId", ParseIntPipe) userId: number,
+    @Req() req: any,
   ): Promise<ClassResponseDTO[]> {
-    return await this.classService.findMyClasses(userId, filterDto);
+    return await this.classService.findMyClasses(req.user.userId, filterDto);
   }
   @Patch(":classId")
   @ApiOperation({
