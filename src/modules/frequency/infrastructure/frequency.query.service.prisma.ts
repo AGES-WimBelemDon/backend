@@ -1,13 +1,21 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { IFrequencyQueries } from "../application/frequency.service.query.interfaces";
-import { UserClassesDTO, StudentGeneralAttendanceResponseDTO, EnrolledStudentDTO } from "../application/dtos";
-import { FrequencyDTOMapper,PrismaStudentGeneralFrequency, PrismaStudentClassAttendance } from "./frequency.dto.mapper";
+import {
+  UserClassesDTO,
+  StudentGeneralAttendanceResponseDTO,
+  EnrolledStudentDTO,
+} from "../application/dtos";
+import {
+  FrequencyDTOMapper,
+  PrismaStudentGeneralFrequency,
+  PrismaStudentClassAttendance,
+} from "./frequency.dto.mapper";
 
 @Injectable()
 export class PrismaFrequencyQueryService implements IFrequencyQueries {
-    constructor(private readonly prisma: PrismaService) {}
-    async getMyClasses(userId: number): Promise<UserClassesDTO[]> {
+  constructor(private readonly prisma: PrismaService) {}
+  async getMyClasses(userId: number): Promise<UserClassesDTO[]> {
     const user = await this.prisma.user.findUnique({
       where: {
         id: userId,
@@ -37,9 +45,11 @@ export class PrismaFrequencyQueryService implements IFrequencyQueries {
     if (!user || !user.classes) {
       return [];
     }
-    return user.classes.map(cls => FrequencyDTOMapper.toUserClassesDTO(cls));
+    return user.classes.map((cls) => FrequencyDTOMapper.toUserClassesDTO(cls));
   }
-  async getGeneralAttendance(date: Date): Promise<StudentGeneralAttendanceResponseDTO[]>{
+  async getGeneralAttendance(
+    date: Date,
+  ): Promise<StudentGeneralAttendanceResponseDTO[]> {
     const result = await this.prisma.$queryRaw<PrismaStudentGeneralFrequency[]>`
       WITH 
       freq_query AS (
@@ -100,10 +110,12 @@ export class PrismaFrequencyQueryService implements IFrequencyQueries {
         END AS status
       FROM left_j       
     `;
-    if(!result){
-      return []
-    };
-    const attendanceArray = result.map(arg=>FrequencyDTOMapper.toStudentGeneralAttendanceDTO(arg));
+    if (!result) {
+      return [];
+    }
+    const attendanceArray = result.map((arg) =>
+      FrequencyDTOMapper.toStudentGeneralAttendanceDTO(arg),
+    );
     return attendanceArray;
   }
   async getStudentByClassAndDateAttendanceList(classId: number, date: Date) {
@@ -144,21 +156,25 @@ export class PrismaFrequencyQueryService implements IFrequencyQueries {
         JOIN student s ON s.id = d.id_student
         LEFT JOIN student_attendance a ON a.id_student = d.id_student
       `;
-    return results.map(arg=>FrequencyDTOMapper.toStudentClassAttendanceItemDTO(arg));
-  };
+    return results.map((arg) =>
+      FrequencyDTOMapper.toStudentClassAttendanceItemDTO(arg),
+    );
+  }
   async getStudentsByClassId(classId: number): Promise<EnrolledStudentDTO[]> {
     const enrolledStudents = await this.prisma.enrollment.findMany({
       where: {
-        classId: classId
+        classId: classId,
       },
       select: {
         student: {
           select: {
-            id: true
-          }
-        }
-      }
+            id: true,
+          },
+        },
+      },
     });
-    return enrolledStudents.map(enrollment => ({id: enrollment.student.id}));
+    return enrolledStudents.map((enrollment) => ({
+      id: enrollment.student.id,
+    }));
   }
 }

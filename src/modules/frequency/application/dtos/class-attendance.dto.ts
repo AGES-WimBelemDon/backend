@@ -13,32 +13,32 @@ import { FrequencyStatus, NoteTypes } from "src/common/enums/domain.enums";
 export class StudentClassAttendanceItemDTO {
   @ApiProperty({
     example: 11,
-    description: "The unique ID of the frequency record"
+    description: "The unique ID of the frequency record",
   })
   frequencyId: number;
 
   @ApiProperty({
     example: 1,
-    description: "The ID of the student"
+    description: "The ID of the student",
   })
   studentId: number;
 
   @ApiProperty({
     example: "João Silva",
-    description: "The student's full name"
+    description: "The student's full name",
   })
   studentFullName: string;
 
   @ApiProperty({
     example: 90.55,
-    description: "The student's attendance percentage for this class"
+    description: "The student's attendance percentage for this class",
   })
   attendancePercentage: number;
 
   @ApiProperty({
     example: "AUSENTE",
     description: "The attendance status for this specific date",
-    enum: ["PRESENTE", "AUSENTE"]
+    enum: ["PRESENTE", "AUSENTE"],
   })
   status: string;
 
@@ -46,7 +46,7 @@ export class StudentClassAttendanceItemDTO {
     example: NoteTypes.ATESTADO_MEDICO,
     description: "Additional notes about the student's attendance",
     nullable: true,
-    enum: NoteTypes
+    enum: NoteTypes,
   })
   notes: NoteTypes | null;
 }
@@ -54,19 +54,19 @@ export class StudentClassAttendanceItemDTO {
 export class StudentListByClassAndDateResponseDTO {
   @ApiProperty({
     example: 2,
-    description: "The ID of the class"
+    description: "The ID of the class",
   })
   classId: number;
-  
+
   @ApiProperty({
     example: "2025-09-02",
-    description: "The date of the attendance record"
+    description: "The date of the attendance record",
   })
   date: string;
-  
+
   @ApiProperty({
     type: [StudentClassAttendanceItemDTO],
-    description: "List of students with their attendance details"
+    description: "List of students with their attendance details",
   })
   studentList: StudentClassAttendanceItemDTO[];
 }
@@ -90,7 +90,7 @@ export interface EnrolledStudentDTO {
 export class UpdateAttendanceItemDTO {
   @ApiProperty({
     example: 19,
-    description: "The ID of the frequency record to update"
+    description: "The ID of the frequency record to update",
   })
   @IsNumber()
   @IsNotEmpty()
@@ -98,7 +98,7 @@ export class UpdateAttendanceItemDTO {
 
   @ApiProperty({
     example: 2,
-    description: "The ID of the student"
+    description: "The ID of the student",
   })
   @IsNumber()
   @IsNotEmpty()
@@ -108,7 +108,7 @@ export class UpdateAttendanceItemDTO {
     example: FrequencyStatus.PRESENTE,
     description: "The updated attendance status",
     enum: FrequencyStatus,
-    nullable: false
+    nullable: false,
   })
   @IsEnum(FrequencyStatus)
   @IsNotEmpty()
@@ -118,7 +118,7 @@ export class UpdateAttendanceItemDTO {
     example: NoteTypes.ATESTADO_MEDICO,
     description: "Additional notes about the attendance",
     enum: NoteTypes,
-    nullable: true
+    nullable: true,
   })
   @IsEnum(NoteTypes)
   @IsOptional()
@@ -128,24 +128,24 @@ export class UpdateAttendanceItemDTO {
 export class UpdateClassAttendanceRequestDTO {
   @ApiProperty({
     example: 2,
-    description: "The ID of the class"
+    description: "The ID of the class",
   })
   @IsNumber()
   @Type(() => Number)
   @IsNotEmpty()
   classId: number;
-  
+
   @ApiProperty({
     example: "2025-09-11",
-    description: "The date of the attendance records"
+    description: "The date of the attendance records",
   })
   @IsDate()
   @Transform(({ value }) => new Date(value))
   date: Date;
-  
+
   @ApiProperty({
     type: [UpdateAttendanceItemDTO],
-    description: "List of student attendance records to update"
+    description: "List of student attendance records to update",
   })
   @IsArray()
   @ValidateNested({ each: true })

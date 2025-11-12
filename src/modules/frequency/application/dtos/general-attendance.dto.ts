@@ -11,9 +11,6 @@ import {
 } from "class-validator";
 import { FrequencyStatus } from "src/common/enums/domain.enums";
 
-
-
-
 export class UpdateGeneralAttendanceItemDTO {
   @ApiProperty({
     example: 1,
@@ -59,7 +56,6 @@ export class UpdateGeneralAttendanceRequestDTO {
   studentList: UpdateGeneralAttendanceItemDTO[];
 }
 
-
 export class StudentGeneralAttendanceResponseDTO {
   @ApiProperty({
     example: 1,
@@ -96,14 +92,14 @@ export class GeneralAttendanceResponseDTO {
   @ApiProperty({
     example: "2025-09-20",
     description: "The date of the attendance records",
-    type: String
+    type: String,
   })
   @IsNotEmpty()
   date: string;
-  
+
   @ApiProperty({
     type: [StudentGeneralAttendanceResponseDTO],
-    description: "List of students with their attendance details"
+    description: "List of students with their attendance details",
   })
   @IsArray()
   @ValidateNested({ each: true })
