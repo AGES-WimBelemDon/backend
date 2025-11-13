@@ -32,13 +32,15 @@ import {
 } from "../infrastructure/assessment.mapper";
 import { QuestionsResponseDTO } from "../application/questions.response.dto";
 import { AssessmentResponseDto } from "../application/create-assesment.response.dto";
+import { Roles } from "src/common/decorators/roles.decorator";
+import { Role } from "@prisma/client";
 
 @ApiTags("assessment")
 @Controller("assessment")
 @ApiBearerAuth("JWT-auth")
+@Roles(Role.admin, Role.manager, Role.psychologist, Role.social_worker)
 export class AssessmentController {
   constructor(private readonly assessmentService: AssessmentService) {}
-
   @Get("forms")
   @ApiOperation({
     summary: "Get all assessment forms",

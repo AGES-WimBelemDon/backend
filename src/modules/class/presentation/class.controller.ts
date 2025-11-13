@@ -25,10 +25,13 @@ import {
 import { ClassState } from "src/common/enums/domain.enums";
 import { UpdateClassDTO } from "../application/dtos/update-class.request.dto";
 import { DeleteClassResponseDTO } from "../application/dtos/delete-class.response.dto";
+import { Roles } from "src/common/decorators/roles.decorator";
+import { Role } from "@prisma/client";
 
 @ApiTags("classes")
 @Controller("classes")
 @ApiBearerAuth("JWT-auth")
+@Roles(Role.manager, Role.psychologist, Role.social_worker, Role.teacher)
 export class ClassController {
   constructor(private readonly classService: ClassService) {}
 
@@ -199,6 +202,7 @@ export class ClassController {
     return await this.classService.createClass(createClassDto);
   }
   @Get()
+  @Roles(Role.psychology_intern, Role.social_worker)
   @ApiOperation({
     summary: "Get all classes with optional filters",
     description:
@@ -332,6 +336,7 @@ export class ClassController {
     return await this.classService.findClasses(filterDto);
   }
   @Get("my-classes")
+  @Roles(Role.psychology_intern, Role.social_worker)
   @ApiOperation({
     summary: "Get classes assigned to a specific teacher",
     description:

@@ -28,10 +28,13 @@ import {
   ReactivateEnrollmentResponseDTO,
 } from "../application/dtos";
 import { EnrollmentQueryFilterDto } from "../application/dtos/enrollment-query.dto";
+import { Roles } from "src/common/decorators/roles.decorator";
+import { Role } from "@prisma/client";
 
 @Controller("enrollments")
 @ApiTags("enrollment-resource")
 @ApiBearerAuth("JWT-auth")
+@Roles(Role.admin, Role.manager, Role.psychologist, Role.social_worker, Role.teacher)
 export class EnrollmentController {
   constructor(private readonly enrollmentService: EnrollmentService) {}
 
@@ -69,6 +72,7 @@ export class EnrollmentController {
   }
 
   @Get()
+  @Roles(Role.psychology_intern, Role.social_work_intern)
   @ApiOperation({
     summary: "List enrollments with filters",
     description:

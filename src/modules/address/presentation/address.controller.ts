@@ -4,14 +4,18 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from "@nestjs/swagg
 import { AddressService } from "../application/address.service";
 import { UpdateAddressDTO } from "../application/update-address.dto";
 import { AddressMapper } from "../infrastructure/address.mapper";
+import { Roles } from "src/common/decorators/roles.decorator";
+import { Role } from "@prisma/client";
 
 @ApiTags('address')
 @Controller('address')
 @ApiBearerAuth("JWT-auth")
+@Roles(Role.admin, Role.manager, Role.psychologist, Role.social_worker, Role.teacher)
 export class AddressController {
     constructor(private readonly addressService: AddressService) { }
 
     @Get(':id')
+    @Roles(Role.psychology_intern, Role.social_work_intern)
     @ApiOperation({ summary: 'Search by address ID' })
     @ApiResponse({ status: 200, description: 'Address retrieved successfully.'})
     @ApiResponse({ status: 404, description: "Address not found!" })
