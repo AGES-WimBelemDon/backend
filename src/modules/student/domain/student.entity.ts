@@ -176,7 +176,9 @@ export class Student {
     public setStatus(status: StudentStatus): void {
         this.status = status;
     }
-
+    public setEnrollmentDate(date: Date): void {
+        this.enrollmentDate = date;
+    }
     public setDisenrollmentDate(date: Date | null): void {
         this.disenrollmentDate = date;
     }

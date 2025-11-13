@@ -21,6 +21,7 @@ import {
     SocialProgram, 
     EmploymentStatus 
 } from "src/common/enums/domain.enums";
+import { transformDateStringToDate } from "src/common/transformers/string.to.date.transformer";
 import { CPFValidator } from "src/common/validator/CpfValidator";
 
 export class CreateStudentRequestDTO {
@@ -182,4 +183,15 @@ export class CreateStudentRequestDTO {
     @IsArray()
     @Type(() => Number)
     familyMembersId: number[];
+    @ApiProperty({
+        example: "2025-11-11",
+        description: "Enrollment date of the student",
+        type: String,
+        format: 'date',
+        required: false
+    })  
+    @Transform(transformDateStringToDate, { toClassOnly: true })
+    @IsOptional()
+    @IsDate({ message: "End date must be a valid date (YYYY-MM-DD)" })
+    enrollmentDate?: Date;
 }
