@@ -140,12 +140,47 @@ export class UserService {
       return null;
     }
 
-    const requestingUserRole = request.user?.role as Role;
+    const requestingUserRole = request.user.role as Role;
     if (requestingUserRole !== Role.admin && restrictedRoles.includes(user.getRole())) {
       throw new ForbiddenException("Insufficient permissions to view this user");
     }
 
     return UserResponseMapper.toDTO(user);
+  }
+
+  async getUserRoutes(request: RequestWithUser): Promise<string[]> {
+    const requestingUserRole = request.user.role as Role;
+
+    // This should match the ValidRoute type in the frontend
+    type ValidRoute =
+      | "/"
+      | "/frequencias/atividades"
+      | "/alunos"
+      | "/anamnese"
+      | "/atividades"
+      | "/turmas"
+      | "/usuarios"
+    ;
+
+    const allRoles = [Role.manager, Role.teacher, Role.psychologist, Role.social_worker, Role.psychology_intern, Role.social_work_intern];
+    const routeVisibility = new Map<ValidRoute, Role[]>([
+      ["/", allRoles],
+      ["/frequencias/atividades", allRoles],
+      ["/alunos", allRoles],
+      ["/anamnese", [Role.psychologist, Role.social_worker, Role.psychology_intern, Role.social_work_intern]],
+      ["/atividades", allRoles],
+      ["/turmas", allRoles],
+      ["/usuarios", [Role.manager]],
+    ]);
+
+    const accessibleRoutes: string[] = [];
+    for (const [route, roles] of routeVisibility.entries()) {
+      if (requestingUserRole === Role.admin || roles.includes(requestingUserRole)) {
+        accessibleRoutes.push(route);
+      }
+    }
+
+    return accessibleRoutes;
   }
 
   async editUser(id: number, request: RequestWithUser): Promise<void> {

@@ -30,10 +30,10 @@ import { RequestWithUser } from "src/common/interfaces/request.interface";
 @Controller("user")
 @ApiTags("user")
 @ApiBearerAuth("JWT-auth")
+@Roles(Role.admin, Role.manager)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Roles(Role.admin, Role.manager)
   @Post("register")
   @ApiOperation({ summary: "Register a new user" })
   @ApiResponse({
@@ -78,7 +78,7 @@ export class UserController {
   }
 
   @Get()
-  @Roles(Role.admin, Role.manager)
+  @Roles(Role.teacher, Role.psychologist, Role.social_worker)
   @ApiOperation({ summary: "Get all users" })
   @ApiResponse({
     status: 200,
@@ -95,7 +95,6 @@ export class UserController {
   }
 
   @Get(":id")
-  @Roles(Role.admin, Role.manager)
   @ApiOperation({ summary: "Get user by ID" })
   @ApiResponse({
     status: 200,
@@ -110,8 +109,18 @@ export class UserController {
     return this.userService.findById(id, request);
   }
 
+  @Get("routes")
+  @ApiOperation({ summary: "Get user routes" })
+  @ApiResponse({
+    status: 200,
+    description: "List of user routes",
+    type: [String],
+  })
+  async getUserRoutes(@Req() request: RequestWithUser): Promise<string[]> {
+    return this.userService.getUserRoutes(request);
+  }
+
   @Patch(":id")
-  @Roles(Role.admin, Role.manager)
   @ApiOperation({ summary: "Edit a user" })
   @ApiResponse({ status: 200, description: "User edited" })
   async editUser(
@@ -122,7 +131,6 @@ export class UserController {
   }
 
   @Patch("disable/:id")
-  @Roles(Role.admin, Role.manager)
   @HttpCode(204)
   @ApiOperation({ summary: "Disable a user" })
   @ApiResponse({ status: 204, description: "User disabled" })
@@ -134,7 +142,6 @@ export class UserController {
   }
 
   @Patch("enable/:id")
-  @Roles(Role.admin, Role.manager)
   @HttpCode(204)
   @ApiOperation({ summary: "Enable a user" })
   @ApiResponse({ status: 204, description: "User enabled" })
