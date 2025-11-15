@@ -53,6 +53,9 @@ jobs:
             echo "DOMAIN=${{ secrets.DOMAIN }}" >> .env.production
             echo "EMAIL=${{ secrets.EMAIL }}" >> .env.production
             echo "FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET }}" >> .env.production
+            echo "PROD_ADMIN_EMAIL=${{ secrets.PROD_ADMIN_EMAIL }}" >> .env.production
+            echo "PROD_ADMIN_FIREBASE_ID=${{ secrets.PROD_ADMIN_FIREBASE_ID }}" >> .env.production
+            echo "PROD_ADMIN_FULLNAME=${{ secrets.PROD_ADMIN_FULLNAME }}" >> .env.production
             mkdir -p nginx-conf web-root dhparam
             if [ ! -f dhparam/dhparam-2048.pem ]; then
               openssl dhparam -out dhparam/dhparam-2048.pem 2048
