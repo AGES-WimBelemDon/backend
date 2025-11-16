@@ -78,22 +78,22 @@
       "json",
       "ts"
     ],
-    "rootDir": ".",
+    "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "src/modules/activity/application/**/*.ts",
-      "src/modules/address/application/**/*.ts",
-      "src/modules/assessment/application/**/*.ts",
-      "src/modules/class/application/**/*.ts",
-      "src/modules/enrollment/application/**/*.ts",
-      "src/modules/familyMember/application/**/*.ts",
-      "src/modules/frequency/application/**/*.ts",
-      "src/modules/student/application/**/*.ts"
+      "modules/activity/application/**/*.ts",
+      "modules/address/application/**/*.ts",
+      "modules/assessment/application/**/*.ts",
+      "modules/class/application/**/*.ts",
+      "modules/enrollment/application/**/*.ts",
+      "modules/familyMember/application/**/*.ts",
+      "modules/frequency/application/**/*.ts",
+      "modules/student/application/**/*.ts"
     ],
-    "coverageDirectory": "./coverage",
+    "coverageDirectory": "../coverage",
     "testEnvironment": "node",
     "coveragePathIgnorePatterns": [
       "/node_modules/",
@@ -115,12 +115,8 @@
       }
     },
     "moduleNameMapper": {
-      "^src/(.*)$": "<rootDir>/src/$1"
-    },
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/src/modules/.*/tests/.*\\.spec\\.ts$"
-    ]
+      "^src/(.*)$": "<rootDir>/$1"
+    }
   },
   "prisma": {
     "schema": "src/prisma/schema.prisma"
