@@ -182,6 +182,40 @@ async function main() {
       },
     ],
   });
+  await prisma.question.createMany({
+    data: [
+      { formId: 1, statement: "Como são os relacionamentos dentro da família? Há conflitos frequentes?", isRequired: true },
+      { formId: 1, statement: "Existe suporte emocional da família ou rede de apoio?", isRequired: true },
+      { formId: 1, statement: "Há histórico familiar de doenças mentais ou problemas psicológicos?", isRequired: true },
+      { formId: 1, statement: "Você tem ou está aguardando acesso a serviços básicos de saúde, educação e assistência?", isRequired: true },
+      { formId: 1, statement: "Você possui alguma condição médica crônica? Faz uso de medicações?", isRequired: true },
+      { formId: 1, statement: "Como as questões de saúde impactam seu cotidiano e saúde mental?", isRequired: true },
+      { formId: 1, statement: "Seu filho usa aparelhos eletrônicos, telas, jogos ou redes sociais?", isRequired: true },
+      { formId: 1, statement: "Existe um combinado sobre o tempo de uso?", isRequired: true },
+      { formId: 1, statement: "Relação do educando com os familiares?", isRequired: true },
+      { formId: 1, statement: "Tem amizades? Como se relaciona com colegas?", isRequired: true },
+      { formId: 1, statement: "Tem autonomia para fazer atividades sozinho? Ir a pé para casa/escola?", isRequired: true },
+      { formId: 1, statement: "Como lida com frustrações?", isRequired: true },
+    ],
+  });
+
+await prisma.question.createMany({
+    data: [
+      { formId: 2, statement: "Em que aspectos acreditam que o projeto pode auxiliar o Educando?", isRequired: true },
+      { formId: 2, statement: "Como imaginam o educando no futuro?", isRequired: true },
+      { formId: 2, statement: "O educando é filho biológico, adotivo ou outro? Se adotivo, é ciente da adoção?", isRequired: true },
+      { formId: 2, statement: "A família possui alguma religião? Se sim, qual?", isRequired: true },
+      { formId: 2, statement: "O educando frequentou creches?", isRequired: true },
+      { formId: 2, statement: "Com qual idade o educando ingressou na escola?", isRequired: true },
+      { formId: 2, statement: "Como foi a adaptação à escola?", isRequired: true },
+      { formId: 2, statement: "O educando já estudou em mais de uma escola? Motivo da transferência?", isRequired: true },
+      { formId: 2, statement: "O educando já repetiu de série? Quais? Quantas vezes?", isRequired: true },
+      { formId: 2, statement: "O educando realiza alguma atividade extracurricular? Qual?", isRequired: true },
+      { formId: 2, statement: "O educando possui alguma necessidade especial? Qual?", isRequired: true },
+      { formId: 2, statement: "O educando faz uso de medicação controlada? Qual? Como adquire o medicamento?", isRequired: true },
+      { formId: 2, statement: "Alergias, seletividade alimentar, restrições alimentares e/ou médicas?", isRequired: true },
+    ],
+  });
 }
 
 main()
