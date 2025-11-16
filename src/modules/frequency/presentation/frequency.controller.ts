@@ -27,13 +27,15 @@ import {
   GeneralAttendanceResponseDTO,
 } from "../application/dtos";
 import { CustomParseDatePipe } from "src/common/pipes/CustomParseDatePipe";
+import { StaffAndInterns, StaffOnly } from "src/common/decorators/common.roles.decorator";
 
 @Controller("frequency")
 @ApiTags("frequency-resource")
 @ApiBearerAuth("JWT-auth")
+@StaffOnly()
 export class FrequencyConstroller {
   constructor(private frequencyService: FrequencyService) {}
-
+  @StaffAndInterns()
   @Get("available-classes")
   @ApiOperation({
     summary: "Get available classes for authenticated user",
@@ -104,6 +106,7 @@ export class FrequencyConstroller {
     return await this.frequencyService.getUserClasses(req.user.id);
   }
   @Get("general-attendance")
+  @StaffAndInterns()
   @ApiOperation({
     summary: "Get general attendance list for a specific date",
     description:
@@ -190,6 +193,8 @@ export class FrequencyConstroller {
     await this.frequencyService.updateGeneralAttendance(updateDto);
   }
   @Get("class-attendance")
+  @StaffAndInterns()
+  @HttpCode(201)
   @ApiOperation({
     summary: "Get attendance list for a specific class and date",
     description:
@@ -269,7 +274,6 @@ export class FrequencyConstroller {
     status: 500,
     description: "Failed to create the attendance list",
   })
-  @HttpCode(201)
   async postClassAttendance(
     @Body() body: PostClassAttendanceDTO,
   ): Promise<StudentListByClassAndDateResponseDTO> {

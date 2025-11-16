@@ -24,10 +24,12 @@ import { CreateActivityRequestDto } from "../application/create-activity.request
 import { ActivityMapper } from "../infrastructure/activity.mapper";
 import { ActivityResponseDto } from "../application/activity.response.dto";
 import { UpdateActivityDto } from "../application/update-activity.dto";
+import { StaffAndInterns, StaffOnly } from "src/common/decorators/common.roles.decorator";
 
 @ApiTags("activities")
 @Controller("activities")
 @ApiBearerAuth("JWT-auth")
+@StaffOnly()
 export class ActivityController {
   constructor(private readonly activityService: ActivityService) {}
 
@@ -72,6 +74,7 @@ export class ActivityController {
   }
 
   @Get()
+  @StaffAndInterns()
   @ApiOperation({
     summary: "List activities",
     description: "Retrieves all registered activities",

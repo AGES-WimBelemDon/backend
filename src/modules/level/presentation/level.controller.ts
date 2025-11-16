@@ -3,10 +3,12 @@ import { LevelService } from "../application/level.service";
 import { LevelMapper } from "../infrastructure/level.mapper";
 import { LevelResponseDTO } from "../application/level.response.dto";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { StaffAndInterns } from "src/common/decorators/common.roles.decorator";
 
 @ApiTags("level")
 @Controller("level")
 @ApiBearerAuth("JWT-auth")
+@StaffAndInterns()
 export class LevelController{
     constructor(
         private readonly levelService: LevelService

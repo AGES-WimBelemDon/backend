@@ -21,10 +21,12 @@ import { GenerateUploadUrlRequestDto } from "../application/dto/generate-upload-
 import { GenerateUploadUrlResponseDTO } from "../application/dto/generate-upload-url.response.dto";
 import { ConfirmUploadRequestDto } from "../application/dto/confirm-upload.request.dto";
 import { DocumentResponseDto } from "../application/dto/document.response.dto";
+import { StaffOnly } from "src/common/decorators/common.roles.decorator";
 
 @ApiTags("documents")
 @Controller("documents")
 @ApiBearerAuth("JWT-auth")
+@StaffOnly()
 export class DocumentController {
   constructor(private readonly documentService: DocumentService) {}
 

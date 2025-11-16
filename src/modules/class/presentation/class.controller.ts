@@ -25,10 +25,12 @@ import {
 import { ClassState } from "src/common/enums/domain.enums";
 import { UpdateClassDTO } from "../application/dtos/update-class.request.dto";
 import { DeleteClassResponseDTO } from "../application/dtos/delete-class.response.dto";
+import { StaffAndInterns, StaffOnly } from "src/common/decorators/common.roles.decorator";
 
 @ApiTags("classes")
 @Controller("classes")
 @ApiBearerAuth("JWT-auth")
+@StaffOnly()
 export class ClassController {
   constructor(private readonly classService: ClassService) {}
 
@@ -199,6 +201,7 @@ export class ClassController {
     return await this.classService.createClass(createClassDto);
   }
   @Get()
+  @StaffAndInterns()
   @ApiOperation({
     summary: "Get all classes with optional filters",
     description:
@@ -332,6 +335,7 @@ export class ClassController {
     return await this.classService.findClasses(filterDto);
   }
   @Get("my-classes")
+  @StaffAndInterns()
   @ApiOperation({
     summary: "Get classes assigned to a specific teacher",
     description:

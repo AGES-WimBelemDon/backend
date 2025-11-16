@@ -16,11 +16,14 @@ import {
   StudentStatus,
   UserStatus,
 } from '@prisma/client';
+import { StaffAndInterns } from 'src/common/decorators/common.roles.decorator';
+import { Roles } from 'src/common/decorators/roles.decorator';
 import { MimeTypes } from 'src/common/enums/mime-type.enum';
 
 @Controller('filters')
 @ApiTags('filters')
 @ApiBearerAuth("JWT-auth")
+@StaffAndInterns()
 export class FiltersController {
   @Get('form-types')
   getFormTypes(): FormType[] {
