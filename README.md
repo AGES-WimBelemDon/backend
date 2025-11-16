@@ -285,6 +285,45 @@ As variáveis DEV_ são utilizadas para facilitar o teste em ambiente de desenvo
    - A documentação Swagger estará disponível em `http://localhost:3000/docs`.
 
 ------------------------------------------------------------------------
+
+### Rodando o projeto com seeds
+
+1. Com o Docker Desktop rodando, suba os containers (ou apenas o container do banco, caso prefira):
+
+    ``` bash
+    docker-compose up --build -d
+    ```
+
+2. Realize as migrações do banco de dados:
+
+    ```bash
+    yarn prisma:migrate:deploy
+    ```
+
+3. Em seguida, execute os seeds de desenvolvimento:
+
+    ```bash
+    yarn seed:dev
+    ```
+
+4. Caso queira validar os dados, acesse o Prisma Studio rodando (Opcional):
+
+    ```bash
+    yarn prisma studio
+    ```
+
+5. Inicie a aplicação (caso tenha subido apenas o container do banco):
+
+    ```bash
+    yarn start:dev
+    ```
+
+6. Acesse a aplicação e:
+   - A API estará disponível em `http://localhost:3000/`.
+   - A documentação Swagger estará disponível em `http://localhost:3000/docs`.
+
+------------------------------------------------------------------------
+
 ## Principais comandos no Docker Compose
 
 #### - **`docker-compose up -d --build <nome_do_serviço>`**

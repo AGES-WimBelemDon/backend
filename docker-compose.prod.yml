@@ -9,7 +9,7 @@ services:
     depends_on:
       db-wbd:
         condition: service_healthy
-    command: sh -c "yarn prisma:migrate:prod && node dist/main.js"
+    command: sh -c "yarn prisma:migrate:prod && yarn prisma:seed:prod &&  node dist/main.js"
     networks:
       - app-network
 
