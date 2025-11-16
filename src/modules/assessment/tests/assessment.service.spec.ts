@@ -213,4 +213,44 @@ describe("AssessmentService", () => {
     );
     expect(result).toEqual([existing]);
   });
+
+  it("should update answer keeping existing content when content is undefined", async () => {
+    const existing = makeAnswer({ id: 1, studentId: 7, questionId: 9, content: "Original" });
+    repository.findAnswersByIds.mockResolvedValue([existing]);
+    repository.updateAnswers.mockResolvedValue([existing]);
+
+    await service.bulkUpdateAnswer({
+      updates: [
+        {
+          answerId: 1,
+          content: undefined,
+          submissionDate: new Date("2024-02-02"),
+        },
+      ],
+    });
+
+    expect(repository.updateAnswers).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          content: "Original"
+        })
+      ]),
+    );
+  });
+
+  it("should create answers with undefined submission date", async () => {
+    studentService.findById.mockResolvedValue({} as any);
+    repository.findQuestionsByIds.mockResolvedValue([makeQuestion(1)]);
+    repository.findAnswersByQuestionsIdsAndStudentId.mockResolvedValue([]);
+    const created = [makeAnswer({ id: 10 })];
+    repository.createAnswers.mockResolvedValue(created);
+
+    const result = await service.createAnswers(5, {
+      submissionDate: undefined as any,
+      answers: [{ questionId: 1, content: "A" }],
+    });
+
+    expect(repository.createAnswers).toHaveBeenCalled();
+    expect(result).toEqual(created);
+  });
 });

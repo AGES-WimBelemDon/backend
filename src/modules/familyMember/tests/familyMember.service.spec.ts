@@ -16,7 +16,7 @@ const createDto = {
   phoneNumber: "+555199999999",
   studentIds: [1],
   dateOfBirth: new Date("1990-01-01"),
-  registrationNumber: "12345678901",
+  registrationNumber: "12345678909", // CPF válido
 };
 
 const makeFamilyMember = (
@@ -36,7 +36,7 @@ const makeFamilyMember = (
     socialPrograms: overrides.socialPrograms,
     employmentStatus: overrides.employmentStatus,
     nis: overrides.nis,
-    registrationNumber: overrides.registrationNumber ?? "12345678901",
+    registrationNumber: overrides.registrationNumber ?? "12345678909", // CPF válido
     studentIds: overrides.studentIds ?? [1],
     addressId: overrides.addressId ?? null,
   });
@@ -260,5 +260,64 @@ describe("FamilyMemberService", () => {
     const result = await service.findByStudentId(1);
 
     expect(result).toHaveLength(1);
+  });
+
+  it("should delete family member by id", async () => {
+    repository.findById.mockResolvedValue(makeFamilyMember({ id: 1 }));
+    repository.delete.mockResolvedValue();
+
+    await service.delete(1);
+
+    expect(repository.findById).toHaveBeenCalledWith(1);
+    expect(repository.delete).toHaveBeenCalledWith(1);
+  });
+
+  it("should throw when deleting nonexistent family member", async () => {
+    repository.findById.mockResolvedValue(null);
+
+    await expect(service.delete(99)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+  });
+
+  it("should find family member by id", async () => {
+    const member = makeFamilyMember({ id: 5 });
+    repository.findById.mockResolvedValue(member);
+
+    const result = await service.findById(5);
+
+    expect(result).toBe(member);
+  });
+
+  it("should update family member without changing registration number", async () => {
+    const existing = makeFamilyMember({ id: 1, registrationNumber: "12345678909" });
+    repository.findById.mockResolvedValue(existing);
+    repository.update.mockResolvedValue(existing);
+
+    await service.update(1, { fullName: "Updated Name" } as any);
+
+    expect(repository.update).toHaveBeenCalledWith(existing);
+  });
+
+  it("should update family member without changing email", async () => {
+    const existing = makeFamilyMember({ id: 1, email: "test@example.com" });
+    repository.findById.mockResolvedValue(existing);
+    repository.update.mockResolvedValue(existing);
+
+    await service.update(1, { phoneNumber: "+5551999999999" } as any);
+
+    expect(repository.update).toHaveBeenCalledWith(existing);
+  });
+
+  it("should create family member without email", async () => {
+    repository.findByRegistrationNumber.mockResolvedValue(null);
+    studentService.validateStudentsById.mockResolvedValue();
+    const created = makeFamilyMember({ id: 10 });
+    repository.create.mockResolvedValue(created);
+
+    const result = await service.create(createDto as any);
+
+    expect(repository.create).toHaveBeenCalled();
+    expect(result).toBe(created);
   });
 });

@@ -96,6 +96,11 @@ describe("ClassService", () => {
   });
 
   it("should require dayOfWeek when class is recurrent", async () => {
+    levelService.getById.mockResolvedValue({} as any);
+    classQueries.getManyByTeacherId.mockResolvedValue([
+      new Teacher(1, "Teacher"),
+    ]);
+    
     await expect(
       service.createClass({
         ...baseDto,
@@ -105,6 +110,11 @@ describe("ClassService", () => {
   });
 
   it("should validate start time format", async () => {
+    levelService.getById.mockResolvedValue({} as any);
+    classQueries.getManyByTeacherId.mockResolvedValue([
+      new Teacher(1, "Teacher"),
+    ]);
+    
     await expect(
       service.createClass({
         ...baseDto,
@@ -165,6 +175,181 @@ describe("ClassService", () => {
     await expect(service.deleteClass(1)).rejects.toBeInstanceOf(
       ConflictException,
     );
+  });
+
+  it("should validate end time format", async () => {
+    levelService.getById.mockResolvedValue({} as any);
+    classQueries.getManyByTeacherId.mockResolvedValue([
+      new Teacher(1, "Teacher"),
+    ]);
+
+    await expect(
+      service.createClass({
+        ...baseDto,
+        endTime: "25:00:00",
+      }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it("should reject invalid end time during update", async () => {
+    classRepository.findById.mockResolvedValue(makeClass());
+
+    await expect(
+      service.update(1, { endTime: "30:00:00" } as any),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it("should throw when invalid teacher IDs are provided", async () => {
+    levelService.getById.mockResolvedValue({} as any);
+    classQueries.getManyByTeacherId.mockResolvedValue([
+      new Teacher(1, "Teacher"),
+    ]);
+
+    await expect(
+      service.createClass({
+        ...baseDto,
+        teacherIds: [1, 999],
+      }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it("should create class without teachers when no teacherIds provided", async () => {
+    levelService.getById.mockResolvedValue({} as any);
+    classQueries.getManyByTeacherId.mockResolvedValue([]);
+    const createdClass = makeClass({ teachers: [] });
+    classRepository.create.mockResolvedValue(createdClass);
+
+    const result = await service.createClass({
+      ...baseDto,
+      teacherIds: [],
+    });
+
+    expect(result).toBeDefined();
+  });
+
+  it("should create class without schedules when dayOfWeek is empty and not recurrent", async () => {
+    levelService.getById.mockResolvedValue({} as any);
+    classQueries.getManyByTeacherId.mockResolvedValue([
+      new Teacher(1, "Teacher"),
+    ]);
+    const createdClass = makeClass({ schedules: [] });
+    classRepository.create.mockResolvedValue(createdClass);
+
+    const result = await service.createClass({
+      ...baseDto,
+      isRecurrent: false,
+      dayOfWeek: [],
+    });
+
+    expect(result).toBeDefined();
+  });
+
+  it("should update class with new level", async () => {
+    const existing = makeClass();
+    classRepository.findById.mockResolvedValue(existing);
+    levelService.getById.mockResolvedValue({} as any);
+    classQueries.getManyByTeacherId.mockResolvedValue([]);
+    classRepository.update.mockResolvedValue(existing);
+
+    await service.update(1, { levelId: 2 });
+
+    expect(levelService.getById).toHaveBeenCalledWith(2);
+  });
+
+  it("should require dayOfWeek when updating to recurrent class", async () => {
+    const existing = makeClass();
+    classRepository.findById.mockResolvedValue(existing);
+
+    await expect(
+      service.update(1, { isRecurrent: true, dayOfWeek: [] }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it("should clear schedules when dayOfWeek is set to null", async () => {
+    const existing = makeClass();
+    classRepository.findById.mockResolvedValue(existing);
+    classQueries.getManyByTeacherId.mockResolvedValue([]);
+    classRepository.update.mockResolvedValue(existing);
+
+    await service.update(1, { dayOfWeek: null as any });
+
+    expect(classRepository.update).toHaveBeenCalled();
+  });
+
+  it("should update multiple class properties at once", async () => {
+    const existing = makeClass();
+    classRepository.findById.mockResolvedValue(existing);
+    levelService.getById.mockResolvedValue({} as any);
+    classQueries.getManyByTeacherId.mockResolvedValue([
+      new Teacher(1, "Teacher"),
+    ]);
+    classRepository.update.mockResolvedValue(existing);
+
+    await service.update(1, {
+      name: "Updated Class",
+      activityId: 2,
+      levelId: 3,
+      isRecurrent: false,
+      startDate: new Date("2024-06-01"),
+      endDate: new Date("2024-12-01"),
+      state: ClassState.INATIVA,
+      startTime: "10:00:00",
+      endTime: "11:00:00",
+      teacherIds: [1],
+      dayOfWeek: [DayOfWeek.TERCA],
+    });
+
+    expect(classRepository.update).toHaveBeenCalled();
+  });
+
+  it("should find classes by filters", async () => {
+    const classes = [makeClass()];
+    classRepository.findClasses.mockResolvedValue(classes);
+
+    const result = await service.findClasses({ state: ClassState.ATIVA });
+
+    expect(result).toHaveLength(1);
+    expect(classRepository.findClasses).toHaveBeenCalledWith({
+      state: ClassState.ATIVA,
+    });
+  });
+
+  it("should find user's classes", async () => {
+    const classes = [makeClass()];
+    classRepository.findMyClasses.mockResolvedValue(classes);
+
+    const result = await service.findMyClasses(1, {
+      state: ClassState.ATIVA,
+    });
+
+    expect(result).toHaveLength(1);
+    expect(classRepository.findMyClasses).toHaveBeenCalledWith(1, {
+      state: ClassState.ATIVA,
+    });
+  });
+
+  it("should find class by id", async () => {
+    const classInstance = makeClass();
+    classRepository.findById.mockResolvedValue(classInstance);
+
+    const result = await service.findById(1);
+
+    expect(result).toBe(classInstance);
+  });
+
+  it("should delete class with existing endDate", async () => {
+    const existingEndDate = new Date("2024-12-31");
+    const existing = makeClass({ id: 5, endDate: existingEndDate });
+    classRepository.findById.mockResolvedValue(existing);
+    classRepository.update.mockResolvedValue(existing);
+
+    const result = await service.deleteClass(5);
+
+    expect(enrollmentService.finishEnrollmentsByClassId).toHaveBeenCalledWith(
+      5,
+      existingEndDate,
+    );
+    expect(result.endDate).toBe("2024-12-31");
   });
 });
 

@@ -281,6 +281,64 @@ describe("StudentService", () => {
     );
   });
 
+  it("should delete student by id", async () => {
+    const existing = makeStudent({ id: 1 });
+    repository.findById.mockResolvedValue(existing);
+    repository.delete.mockResolvedValue();
+
+    await service.delete(1);
+
+    expect(repository.findById).toHaveBeenCalledWith(1);
+    expect(repository.delete).toHaveBeenCalledWith(1);
+  });
+
+  it("should find student by id", async () => {
+    const student = makeStudent({ id: 5 });
+    repository.findById.mockResolvedValue(student);
+
+    const result = await service.findById(5);
+
+    expect(result).toBe(student);
+  });
+
+  it("should return null when student not found by id", async () => {
+    repository.findById.mockResolvedValue(null);
+
+    const result = await service.findById(99);
+
+    expect(result).toBeNull();
+  });
+
+  it("should create student without optional fields", async () => {
+    repository.findByRegistrationNumber.mockResolvedValue(null);
+    repository.create.mockResolvedValue(makeStudent({ id: 1 }));
+
+    await service.createStudent(baseDto);
+
+    expect(repository.create).toHaveBeenCalled();
+  });
+
+  it("should update student without changing registration number", async () => {
+    const existing = makeStudent({ id: 1, registrationNumber: "12345678909" });
+    repository.findById.mockResolvedValue(existing);
+    repository.findByRegistrationNumber.mockResolvedValue(existing);
+    repository.update.mockResolvedValue(existing);
+
+    await service.update(1, { fullName: "New Name" } as any);
+
+    expect(repository.update).toHaveBeenCalledWith(existing);
+  });
+
+  it("should find all students without filters", async () => {
+    const students = [makeStudent({ id: 1 }), makeStudent({ id: 2 })];
+    repository.findAll.mockResolvedValue(students);
+
+    const result = await service.findAll({});
+
+    expect(result).toEqual(students);
+    expect(repository.findAll).toHaveBeenCalledWith({});
+  });
+
   function sampleAddressPayload() {
     return {
       street: "Rua X",
