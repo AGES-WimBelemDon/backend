@@ -381,6 +381,42 @@ docker-compose logs -f api-wbd
 ```
 
 
+## Executando os Testes
+
+O projeto possui uma suíte de testes unitários que cobrem os services e regras de negócio.
+
+### Comandos de teste disponíveis:
+
+```bash
+# Executar todos os testes
+npm run test
+
+# Executar testes com relatório de cobertura
+npm run test:cov
+
+# Executar testes em modo watch (re-executa ao salvar)
+npm run test:watch
+
+# Executar testes em modo debug
+npm run test:debug
+```
+
+### Visualizar relatório de cobertura:
+
+Após executar `npm run test:cov`, um relatório HTML será gerado. Para visualizá-lo:
+
+**Windows PowerShell:**
+```bash
+Start-Process "coverage/lcov-report/index.html"
+```
+
+**Linux/Mac:**
+```bash
+open coverage/lcov-report/index.html
+```
+
+------------------------------------------------------------------------
+
 ## Autenticação pelo Firebase
 Quando uma rota ou controller é protegido com a classe FirebaseAuthGuard, como no exemplo abaixo:
 ```ts
