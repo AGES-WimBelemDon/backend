@@ -128,7 +128,10 @@ export class StudentService {
     }
 
     async delete(id: number): Promise<void> {
-        await this.findById(id);
+        const student = await this.findById(id);
+        if(!student){
+             throw new NotFoundException(`Student with ID ${id} not found.`);
+        }
         return this.studentRepository.delete(id);
     }
 

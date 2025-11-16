@@ -3,20 +3,12 @@ import { LevelService } from "../application/level.service";
 import { LevelMapper } from "../infrastructure/level.mapper";
 import { LevelResponseDTO } from "../application/level.response.dto";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Roles } from "src/common/decorators/roles.decorator";
-import { Role } from "@prisma/client";
+import { StaffAndInterns } from "src/common/decorators/common.roles.decorator";
 
 @ApiTags("level")
 @Controller("level")
 @ApiBearerAuth("JWT-auth")
-@Roles(
-  Role.psychology_intern,
-  Role.social_work_intern,
-  Role.admin,
-  Role.manager,
-  Role.psychologist,
-  Role.social_worker,
-  Role.teacher)
+@StaffAndInterns()
 export class LevelController{
     constructor(
         private readonly levelService: LevelService

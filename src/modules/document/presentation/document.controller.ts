@@ -21,13 +21,12 @@ import { GenerateUploadUrlRequestDto } from "../application/dto/generate-upload-
 import { GenerateUploadUrlResponseDTO } from "../application/dto/generate-upload-url.response.dto";
 import { ConfirmUploadRequestDto } from "../application/dto/confirm-upload.request.dto";
 import { DocumentResponseDto } from "../application/dto/document.response.dto";
-import { Roles } from "src/common/decorators/roles.decorator";
-import { Role } from "@prisma/client";
+import { StaffOnly } from "src/common/decorators/common.roles.decorator";
 
 @ApiTags("documents")
 @Controller("documents")
 @ApiBearerAuth("JWT-auth")
-@Roles(Role.admin, Role.manager, Role.psychologist, Role.social_worker, Role.teacher)
+@StaffOnly()
 export class DocumentController {
   constructor(private readonly documentService: DocumentService) {}
 

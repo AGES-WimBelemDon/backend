@@ -30,11 +30,12 @@ import { ListStudentsQueryDto } from "../application/list-students.query.dto";
 import { StudentStatus } from "src/common/enums/domain.enums";
 import { Roles } from "src/common/decorators/roles.decorator";
 import { Role } from "@prisma/client";
+import { StaffAndInterns, StaffOnly } from "src/common/decorators/common.roles.decorator";
 
 @ApiTags("students")
 @Controller("students")
 @ApiBearerAuth("JWT-auth")
-@Roles(Role.admin, Role.manager, Role.psychologist, Role.social_worker, Role.teacher)
+@StaffOnly()
 export class StudentController {
     constructor(private readonly studentService: StudentService) {}
 
@@ -119,7 +120,7 @@ export class StudentController {
     }
 
     @Get()
-    @Roles(Role.psychology_intern, Role.social_work_intern)
+    @StaffAndInterns()
     @ApiOperation({ 
         summary: "List all students",
         description: "Returns a list of students with optional filtering parameters"
@@ -200,7 +201,7 @@ export class StudentController {
     }
 
     @Get(':id')
-    @Roles(Role.psychology_intern, Role.social_work_intern)
+    @StaffAndInterns()
     @ApiOperation({ 
         summary: "Find student by ID",
         description: "Returns the data of a specific student"
@@ -243,7 +244,7 @@ export class StudentController {
     }
 
     @Get('cpf/:registrationNumber')
-    @Roles(Role.psychology_intern, Role.social_work_intern)
+    @StaffAndInterns()
     @ApiOperation({ 
         summary: "Find student by CPF",
         description: "Returns the data of a student by CPF"
@@ -339,7 +340,7 @@ export class StudentController {
     }
 
     @Get(':id/address')
-    @Roles(Role.psychology_intern, Role.social_work_intern)
+    @StaffAndInterns()
     @ApiOperation({ summary: "Search for a student address" })
     @ApiResponse({ status: HttpStatus.OK, description: 'Address retrieved successfully.'})
     @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Address not found!" })

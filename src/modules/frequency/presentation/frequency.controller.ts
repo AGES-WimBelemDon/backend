@@ -27,16 +27,15 @@ import {
   GeneralAttendanceResponseDTO,
 } from "../application/dtos";
 import { CustomParseDatePipe } from "src/common/pipes/CustomParseDatePipe";
-import { Roles } from "src/common/decorators/roles.decorator";
-import { Role } from "@prisma/client";
+import { StaffAndInterns, StaffOnly } from "src/common/decorators/common.roles.decorator";
 
 @Controller("frequency")
 @ApiTags("frequency-resource")
 @ApiBearerAuth("JWT-auth")
-@Roles(Role.admin, Role.manager, Role.psychologist, Role.social_worker, Role.teacher)
+@StaffOnly()
 export class FrequencyConstroller {
   constructor(private frequencyService: FrequencyService) {}
-  @Roles(Role.psychology_intern, Role.social_work_intern)
+  @StaffAndInterns()
   @Get("available-classes")
   @ApiOperation({
     summary: "Get available classes for authenticated user",
@@ -107,7 +106,7 @@ export class FrequencyConstroller {
     return await this.frequencyService.getUserClasses(req.user.id);
   }
   @Get("general-attendance")
-  @Roles(Role.psychology_intern, Role.social_work_intern)
+  @StaffAndInterns()
   @ApiOperation({
     summary: "Get general attendance list for a specific date",
     description:
@@ -194,7 +193,7 @@ export class FrequencyConstroller {
     await this.frequencyService.updateGeneralAttendance(updateDto);
   }
   @Get("class-attendance")
-  @Roles(Role.psychology_intern, Role.social_work_intern)
+  @StaffAndInterns()
   @HttpCode(201)
   @ApiOperation({
     summary: "Get attendance list for a specific class and date",

@@ -8,7 +8,6 @@ import {
   Post,
   Req,
   Request,
-  UseGuards,
   Query,
   HttpCode,
 } from "@nestjs/common";
@@ -26,6 +25,7 @@ import { Role, UserStatus } from "@prisma/client";
 import { AuthErrorCode } from "../domain/exceptions/auth.exception";
 import { Public } from "src/common/decorators/public.decorator";
 import { RequestWithUser } from "src/common/interfaces/request.interface";
+import { StaffOnly } from "src/common/decorators/common.roles.decorator";
 
 @Controller("user")
 @ApiTags("user")
@@ -78,7 +78,7 @@ export class UserController {
   }
 
   @Get()
-  @Roles(Role.teacher, Role.psychologist, Role.social_worker)
+  @StaffOnly()
   @ApiOperation({ summary: "Get all users" })
   @ApiResponse({
     status: 200,

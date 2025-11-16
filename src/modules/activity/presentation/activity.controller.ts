@@ -24,13 +24,12 @@ import { CreateActivityRequestDto } from "../application/create-activity.request
 import { ActivityMapper } from "../infrastructure/activity.mapper";
 import { ActivityResponseDto } from "../application/activity.response.dto";
 import { UpdateActivityDto } from "../application/update-activity.dto";
-import { Roles } from "src/common/decorators/roles.decorator";
-import { Role } from "@prisma/client";
+import { StaffAndInterns, StaffOnly } from "src/common/decorators/common.roles.decorator";
 
 @ApiTags("activities")
 @Controller("activities")
 @ApiBearerAuth("JWT-auth")
-@Roles(Role.admin, Role.manager, Role.psychologist, Role.social_worker, Role.teacher)
+@StaffOnly()
 export class ActivityController {
   constructor(private readonly activityService: ActivityService) {}
 
@@ -75,7 +74,7 @@ export class ActivityController {
   }
 
   @Get()
-  @Roles(Role.psychology_intern, Role.social_work_intern)
+  @StaffAndInterns()
   @ApiOperation({
     summary: "List activities",
     description: "Retrieves all registered activities",

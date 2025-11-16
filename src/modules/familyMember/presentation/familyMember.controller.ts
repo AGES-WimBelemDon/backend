@@ -23,13 +23,12 @@ import { FamilyMemberMapper } from '../infrastructure/familyMember.mapper';
 import { UpdateFamilyMemberDTO } from '../application/updateFamilyMember.dto';
 import { AddressMapper } from 'src/modules/address/infrastructure/address.mapper';
 import { CreateAddressDTO } from 'src/modules/address/application/create-address.dto';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+import { StaffAndInterns, StaffOnly } from 'src/common/decorators/common.roles.decorator';
 
 @ApiTags('family-member')
 @Controller('family-member')
 @ApiBearerAuth("JWT-auth")
-@Roles(Role.admin, Role.manager, Role.psychologist, Role.social_worker, Role.teacher)
+@StaffOnly()
 export class FamilyMemberController {
     constructor(private readonly familyMemberService: FamilyMemberService) { }
 
@@ -67,7 +66,7 @@ export class FamilyMemberController {
     }
 
     @Get('student/:studentId')
-    @Roles(Role.psychology_intern, Role.social_work_intern)
+    @StaffAndInterns()
     @ApiOperation({ summary: 'Search all family members from Student' })
     @ApiParam({ name: 'studentId', description: 'Student ID', type: 'number' })
     @ApiResponse({ status: 200, description: 'Family members retrieved successfully.'})
@@ -77,7 +76,7 @@ export class FamilyMemberController {
     }
 
     @Get(':id')
-    @Roles(Role.psychology_intern, Role.social_work_intern)
+    @StaffAndInterns()
     @ApiOperation({ summary: 'Get Family Member by ID' })
     @ApiParam({ name: 'id', description: 'Family Member ID', type: 'number' })
     @ApiResponse({ status: 200, description: 'Family Member retrieved successfully.'})
@@ -113,7 +112,7 @@ export class FamilyMemberController {
     }
 
     @Get(':id/address')
-    @Roles(Role.psychology_intern, Role.social_work_intern)
+    @StaffAndInterns()
     @ApiOperation({ summary: "Search for a family member address" })
     @ApiResponse({ status: 200, description: 'Address retrieved successfully.'})
     @ApiResponse({ status: 404, description: "Address not found!" })
