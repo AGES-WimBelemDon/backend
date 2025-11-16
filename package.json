@@ -78,16 +78,49 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "src/modules/activity/application/**/*.ts",
+      "src/modules/address/application/**/*.ts",
+      "src/modules/assessment/application/**/*.ts",
+      "src/modules/class/application/**/*.ts",
+      "src/modules/enrollment/application/**/*.ts",
+      "src/modules/familyMember/application/**/*.ts",
+      "src/modules/frequency/application/**/*.ts",
+      "src/modules/student/application/**/*.ts"
     ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "coverageDirectory": "./coverage",
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "main.ts",
+      "app.module.ts",
+      "prisma/",
+      "\\.module\\.ts$",
+      "presentation/",
+      "\\.dto\\.ts$",
+      "\\.interface\\.ts$",
+      "\\.mapper\\.ts$"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
+      }
+    },
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/src/$1"
+    },
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/src/modules/.*/tests/.*\\.spec\\.ts$"
+    ]
   },
   "prisma": {
     "schema": "src/prisma/schema.prisma"
