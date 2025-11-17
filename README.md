@@ -389,21 +389,21 @@ O projeto possui uma suíte de testes unitários que cobrem os services e regras
 
 ```bash
 # Executar todos os testes
-npm run test
+yarn test
 
 # Executar testes com relatório de cobertura
-npm run test:cov
+yarn test:cov
 
 # Executar testes em modo watch (re-executa ao salvar)
-npm run test:watch
+yarn test:watch
 
 # Executar testes em modo debug
-npm run test:debug
+yarn test:debug
 ```
 
 ### Visualizar relatório de cobertura:
 
-Após executar `npm run test:cov`, um relatório HTML será gerado. Para visualizá-lo:
+Após executar `yarn test:cov`, um relatório HTML será gerado. Para visualizá-lo:
 
 **Windows PowerShell:**
 ```bash
@@ -414,6 +414,8 @@ Start-Process "coverage/lcov-report/index.html"
 ```bash
 open coverage/lcov-report/index.html
 ```
+
+> O projeto possui 119 testes unitários com cobertura média de 93.31% (Statements: 93.31%, Branches: 90.17%, Functions: 95.09%, Lines: 93.18%).
 
 ------------------------------------------------------------------------
 
