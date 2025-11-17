@@ -132,29 +132,27 @@ export class PrismaFrequencyQueryService implements IFrequencyQueries {
             COUNT(*) AS present_count
           FROM frequency
           WHERE id_class = ${classId}
-          AND status = 'PRESENTE'
+            AND status = 'PRESENTE'
           GROUP BY id_student
-        ),
-        daily_attendance AS (
-          SELECT
-            id,
-            id_student,
-            status,
-            notes
-          FROM frequency
-          WHERE id_class = ${classId}
-          AND date = ${date}
         )
         SELECT
-          d.id AS "frequencyId",
+          f.id AS "frequencyId",
           s.id AS "studentId",
           s.full_name AS "fullName",
-          COALESCE(a.present_count, 0)/CAST((SELECT count FROM total_classes) AS DECIMAL(4,2)) AS attendance,
-          d.status,
-          d.notes
-        FROM daily_attendance d
-        JOIN student s ON s.id = d.id_student
-        LEFT JOIN student_attendance a ON a.id_student = d.id_student
+          CASE
+            WHEN (SELECT count FROM total_classes) = 0 THEN 0
+            ELSE COALESCE(a.present_count, 0)::numeric / (SELECT count::numeric FROM total_classes)
+          END AS attendance,
+          COALESCE(f.status, 'AUSENTE') AS status,
+          f.notes
+        FROM enrollment e
+        JOIN student s ON s.id = e.id_student
+        LEFT JOIN frequency f
+          ON f.id_student = s.id
+          AND f.id_class = ${classId}
+          AND f.date::date = ${date}::date
+        LEFT JOIN student_attendance a ON a.id_student = s.id
+        WHERE e.id_class = ${classId}
       `;
     return results.map((arg) =>
       FrequencyDTOMapper.toStudentClassAttendanceItemDTO(arg),
