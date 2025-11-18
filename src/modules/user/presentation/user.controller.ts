@@ -126,8 +126,9 @@ export class UserController {
   async editUser(
     @Request() request: RequestWithUser,
     @Param("id", ParseIntPipe) id: number,
+    @Body() user: Partial<RegisterUserDTO>,
   ): Promise<void> {
-    return this.userService.editUser(id, request);
+    return this.userService.editUser(id, user, request);
   }
 
   @Patch("disable/:id")

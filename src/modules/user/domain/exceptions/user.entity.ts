@@ -113,7 +113,9 @@ export class User {
   setClasses(classes: Class[]): void {
     this.classes = classes;
   }
-
+  setName(name: string): void {
+    this.fullName = name;
+  }
   isActive(): boolean {
     return this.status === UserStatus.ATIVO;
   }

@@ -102,10 +102,10 @@ export class PrismaUserRepository implements IUserRepository {
     return UserMapper.toDomain(user);
   }
 
-  async updateUser(user: User): Promise<void> {
+  async updateUser(id: number, user: User): Promise<void> {
     const data = UserMapper.toPersistence(user);
     await this.prisma.user.update({
-      where: { id: user.getId() },
+      where: { id },
       data,
     });
   }

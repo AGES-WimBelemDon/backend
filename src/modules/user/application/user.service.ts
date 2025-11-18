@@ -183,7 +183,7 @@ export class UserService {
     return accessibleRoutes;
   }
 
-  async editUser(id: number, request: RequestWithUser): Promise<void> {
+  async editUser(id: number, user: Partial<RegisterUserDTO>, request: RequestWithUser): Promise<void> {
     const userToEdit = await this.userRepository.findById(id);
     if (!userToEdit) {
       throw new BadRequestException("User not found");
@@ -194,7 +194,15 @@ export class UserService {
       throw new ForbiddenException("Insufficient permissions to edit this user");
     }
 
-    await this.userRepository.updateUser(userToEdit);
+    Object.keys(user).forEach(key => {
+      if(user[key]) {
+        const setterName = `set${key.charAt(0).toUpperCase() + key.slice(1)}`;
+        if (typeof userToEdit[setterName] === 'function') {
+          userToEdit[setterName](user[key]);
+        }
+      }
+    });
+    await this.userRepository.updateUser(id, userToEdit);
   }
 
   async disableUser(id: number, request: RequestWithUser): Promise<void> {
