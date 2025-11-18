@@ -9,7 +9,7 @@ export interface IUserRepository {
   findById(id: number): Promise<User | null>;
   findByUid(uid: string): Promise<User | null>;
   findByEmail(email: string): Promise<User | null>;
-  updateUser(user: User): Promise<void>;
+  updateUser(id: number, user: User): Promise<void>;
   disableUser(id: number): Promise<void>;
   enableUser(id: number): Promise<void>;
 }
