@@ -84,10 +84,39 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "modules/activity/application/**/*.ts",
+      "modules/address/application/**/*.ts",
+      "modules/assessment/application/**/*.ts",
+      "modules/class/application/**/*.ts",
+      "modules/enrollment/application/**/*.ts",
+      "modules/familyMember/application/**/*.ts",
+      "modules/frequency/application/**/*.ts",
+      "modules/student/application/**/*.ts"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "main.ts",
+      "app.module.ts",
+      "prisma/",
+      "\\.module\\.ts$",
+      "presentation/",
+      "\\.dto\\.ts$",
+      "\\.interface\\.ts$",
+      "\\.mapper\\.ts$"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
+      }
+    },
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/$1"
+    }
   },
   "prisma": {
     "schema": "src/prisma/schema.prisma"
